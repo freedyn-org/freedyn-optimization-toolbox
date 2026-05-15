@@ -20,15 +20,15 @@ class fcts_User():
 
 # -----------------------------------------------------------------------------
 
-    def get_LagrangianOCP(self, t):
+    def get_LagrangianOCP(self, z):
         
-        u = self.get_u(t/self.tF)
+        u = self.get_u(self.fd_model.t / self.tF)
 
         return 0.5 * np.dot(u, u)
 
 # -----------------------------------------------------------------------------
 
-    def get_LagrangianOCP_dq(self, z, t):
+    def get_LagrangianOCP_dq(self, z):
         
         # Allocate in __init__ as self.dLdq = np.zeros(self.nDof)
         # If you want to zero all entries, use self.dLdq.fill(0.0)
@@ -39,7 +39,7 @@ class fcts_User():
 
 # -----------------------------------------------------------------------------
 
-    def get_LagrangianOCP_dv(self, z, t):
+    def get_LagrangianOCP_dv(self, z):
         
         # Allocate in __init__ as self.dLdv = np.zeros(self.nDof)
         # If you want to zero all entries, use self.dLdv.fill(0.0)
@@ -50,14 +50,14 @@ class fcts_User():
 
 # -----------------------------------------------------------------------------
 
-    def get_LagrangianOCP_du(self, z, t):
+    def get_LagrangianOCP_du(self, z):
         
         # Allocate in __init__ as self.dLdu = np.zeros(self.nDof)
         # If you want to zero all entries, use self.dLdu.fill(0.0)
         # If you want to access an element, use self.dLdu[i] = ...
         # If dLdu = 0, then only use "return None"
         
-        self.dLdu = self.get_u(t/self.tF).T
+        self.dLdu = self.get_u(self.fd_model.t / self.tF).T
         
         return None
     

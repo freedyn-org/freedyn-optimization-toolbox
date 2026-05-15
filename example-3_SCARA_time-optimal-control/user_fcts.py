@@ -20,7 +20,7 @@ class fcts_User():
     
 # -----------------------------------------------------------------------------
 
-    def get_LagrangianOCP(self, t):
+    def get_LagrangianOCP(self, z):
         
         L = 1
 
@@ -28,7 +28,7 @@ class fcts_User():
 
 # -----------------------------------------------------------------------------
 
-    def get_LagrangianOCP_dq(self, z, t):
+    def get_LagrangianOCP_dq(self, z):
         
         # Allocate in __init__ as self.dLdq = np.zeros(self.nDof)
         # If you want to zero all entries, use self.dLdq.fill(0.0)
@@ -39,7 +39,7 @@ class fcts_User():
 
 # -----------------------------------------------------------------------------
 
-    def get_LagrangianOCP_dv(self, z, t):
+    def get_LagrangianOCP_dv(self, z):
         
         # Allocate in __init__ as self.dLdv = np.zeros(self.nDof)
         # If you want to zero all entries, use self.dLdv.fill(0.0)
@@ -50,7 +50,7 @@ class fcts_User():
 
 # -----------------------------------------------------------------------------
 
-    def get_LagrangianOCP_du(self, z, t):
+    def get_LagrangianOCP_du(self, z):
         
         # Allocate in __init__ as self.dLdu = np.zeros(self.nDof)
         # If you want to zero all entries, use self.dLdu.fill(0.0)

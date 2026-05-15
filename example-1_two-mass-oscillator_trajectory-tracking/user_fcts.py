@@ -20,23 +20,23 @@ class fcts_User():
     
 # -----------------------------------------------------------------------------
 
-    def get_LagrangianOCP(self, t):
+    def get_LagrangianOCP(self, z):
         
-        ybar = self.get_target_path(t)
+        ybar = self.get_target_path(self.fd_model.t)
         delta = self.fd_model.Q[7,0] - self.fd_model.Q[0,0] - ybar
 
         return 0.5 * delta * delta
 
 # -----------------------------------------------------------------------------
 
-    def get_LagrangianOCP_dq(self, z, t):
+    def get_LagrangianOCP_dq(self, z):
         
         # Allocate in __init__ as self.dLdq = np.zeros(self.nDof)
         # If you want to zero all entries, use self.dLdq.fill(0.0)
         # If you want to access an element, use self.dLdq[i] = ...
         # If dLdq = 0, then only use "return None"
         
-        ybar = self.get_target_path(t)
+        ybar = self.get_target_path(self.fd_model.t)
         delta = self.fd_model.Q[7,0] - self.fd_model.Q[0,0] - ybar
            
         self.dLdq[0] = - delta
@@ -46,7 +46,7 @@ class fcts_User():
 
 # -----------------------------------------------------------------------------
 
-    def get_LagrangianOCP_dv(self, z, t):
+    def get_LagrangianOCP_dv(self, z):
         
         # Allocate in __init__ as self.dLdv = np.zeros(self.nDof)
         # If you want to zero all entries, use self.dLdv.fill(0.0)
@@ -57,7 +57,7 @@ class fcts_User():
 
 # -----------------------------------------------------------------------------
 
-    def get_LagrangianOCP_du(self, z, t):
+    def get_LagrangianOCP_du(self, z):
         
         # Allocate in __init__ as self.dLdu = np.zeros(self.nDof)
         # If you want to zero all entries, use self.dLdu.fill(0.0)
