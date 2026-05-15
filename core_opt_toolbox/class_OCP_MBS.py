@@ -62,8 +62,8 @@ class Optimization(Control, FreeDyn, MBS_SysMat, BDF, adjGrads, numDiff, fcts_Us
             
             self.write_ctrl_dataSPL()
             
-            self.fd_model.__del__()
-            self.fd_model = fd.Model(self.fds_path_name, status_output="NO")
+            # self.fd_model.__del__()
+            # self.fd_model = fd.Model(self.fds_path_name, status_output="NO")
             
             self.update_ctrl_gridNodes()
             self.fd_model.reset_for_rerun()
