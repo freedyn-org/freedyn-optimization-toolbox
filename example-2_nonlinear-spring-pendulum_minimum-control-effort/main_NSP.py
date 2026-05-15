@@ -80,36 +80,30 @@ res = sp.optimize.minimize(fun         = optim.objective,                    # c
 
 #
 # -----------------------------------------------------------------------------
-out_dt = 0.01
-optim.change_outputDeltaT_in_fds(out_dt)
 optim.update_vars_if_changed(res.x)
-# -----------------------------------------------------------------------------
 
+dyn_t = np.zeros(optim.dyn_numTimeSteps)
+tau = np.zeros(optim.dyn_numTimeSteps)
 uInit = np.zeros((numControls, optim.dyn_numTimeSteps))
 u = np.zeros((numControls, optim.dyn_numTimeSteps))
-dyn_t = np.zeros(optim.dyn_numTimeSteps)
 dyn_q = np.zeros((optim.nDof, optim.dyn_numTimeSteps))
 dyn_qD = np.zeros((optim.nDof, optim.dyn_numTimeSteps))
 spring_l = np.zeros(optim.dyn_numTimeSteps)
 
 for i in range(optim.dyn_numTimeSteps-1, -1, -1): 
    optim.fd_model.fetch_states_at_index(i)
-   dyn_t[i] = optim.fd_model.get_time_at_index(i) 
+   dyn_t[i] = optim.fd_model.t
+   tau[i] = dyn_t[i]/optim.tF
    
    dyn_q[:,i] = optim.fd_model.Q[:, 0]
    dyn_qD[:,i] = optim.fd_model.Qd[:, 0]
    spring_l[i] = optim.fd_model.get_measure_value("l")
    
-   uInit[:,i] = optim.get_u_for_GridNodes(dyn_t[i]/optim.tF, uDachInit)
-   u[:,i] = optim.get_u_for_GridNodes(dyn_t[i]/optim.tF, optim.uDach)  
-   
-
-tau = dyn_t/optim.tF
+   uInit[:,i] = optim.get_u_for_GridNodes(tau[i], uDachInit)
+   u[:,i] = optim.get_u(tau[i])  
 
 # -----------------------------------------------------------------------------
-
 # plots
-# using the variable axs for multiple Axes
 matplotlib.rcParams.update({'font.size': 15})
 f = plt.figure(figsize=(10,10))
 

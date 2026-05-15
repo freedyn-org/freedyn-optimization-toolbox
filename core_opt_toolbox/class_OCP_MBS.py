@@ -116,8 +116,8 @@ class Optimization(Control, FreeDyn, BDF, adjGrads, numDiff, fcts_User):
         grad_J = self.adjGrad_J_singleBDFstep(z)            
         
         """ Numerischer Gradient - all """
-        # numGrad_J = self.numGrad_J(z)
-        # error =  numGrad_J - grad_J
+        numGrad_J = self.numGrad_J(z)
+        error =  numGrad_J - grad_J
         
         return grad_J
     
