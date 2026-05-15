@@ -12,12 +12,12 @@ class BDF_intOrderTwo:
         self.BDF2_eta2 = 0.0
         
         if self.BDF_modeMAT_sparse:  
-            self.integrate_J_BDF2 = self.integrate_J_BDF2_sparse
-            self.integrate_Phi_BDF2 = self.integrate_Phi_BDF2_sparse
+            self.BDForder2_singleStep_J = self.BDForder2_singleStep_J_sparse
+            self.BDForder2_singleStep_Phi = self.BDForder2_singleStep_Phi_sparse
             
         else:
-            self.integrate_J_BDF2 = self.integrate_J_BDF2_dense
-            self.integrate_Phi_BDF2 = self.integrate_Phi_BDF2_dense
+            self.BDForder2_singleStep_J = self.BDForder2_singleStep_J_dense
+            self.BDForder2_singleStep_Phi = self.BDForder2_singleStep_Phi_dense
             
             
         
@@ -41,7 +41,7 @@ class BDF_intOrderTwo:
     
 # -----------------------------------------------------------------------------
 
-    def integrate_J_BDF2_dense(self, z, time):
+    def BDForder2_singleStep_J_dense(self, z):
         
         idx1 = self.BDF_idx_buff
         idx2 = 1 - idx1
@@ -50,7 +50,7 @@ class BDF_intOrderTwo:
 
 
         self.update_MBS_SysMat()
-        self.update_userFcts_BDF(z, time)
+        self.update_userFcts_BDF(z)
         
         
         # Compute BDF coefficients
@@ -88,7 +88,7 @@ class BDF_intOrderTwo:
     
 # -----------------------------------------------------------------------------  
 
-    def integrate_J_BDF2_sparse(self, z, time):
+    def BDForder2_singleStep_J_sparse(self, z):
         
         idx1 = self.BDF_idx_buff
         idx2 = 1 - idx1
@@ -96,7 +96,7 @@ class BDF_intOrderTwo:
         self.BDF_J_Mp_buff[idx1, :] = self.MBS_M @ self.adjP_J_buff[idx1, :]
         
         self.update_MBS_SysMat()
-        self.update_userFcts_BDF(z, time)
+        self.update_userFcts_BDF(z)
         
         
         # Compute BDF coefficients
@@ -124,7 +124,7 @@ class BDF_intOrderTwo:
     
 # ----------------------------------------------------------------------------- 
 
-    def integrate_Phi_BDF2_dense(self, time):
+    def BDForder2_singleStep_Phi_dense(self):
         
         idx1 = self.BDF_idx_buff
         idx2 = 1 - idx1
@@ -169,7 +169,7 @@ class BDF_intOrderTwo:
 
 # ----------------------------------------------------------------------------- 
 
-    def integrate_Phi_BDF2_sparse(self, time):
+    def BDForder2_singleStep_Phi_sparse(self):
         
         idx1 = self.BDF_idx_buff
         idx2 = 1 - idx1
