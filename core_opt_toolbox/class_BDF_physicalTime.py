@@ -3,7 +3,6 @@ import freedyn as fd
 
 import scipy
 from scipy.sparse.linalg import factorized
-#from pypardiso import spsolve
 from scipy.sparse import bmat
 
 
@@ -11,10 +10,9 @@ from class_BDF_intOrderOne_physicalTime import BDF_intOrderOne
 from class_BDF_intOrderTwo_physicalTime import BDF_intOrderTwo 
 
 from AdjSys_coeffMat_dense import CoeffMat
-from AdjSys_coeffMat_sparse_3x3 import spCoeffMat_3x3
-from AdjSys_coeffMat_sparse_4x4 import spCoeffMat_4x4
+from AdjSys_coeffMat_sparse import spCoeffMat
 
-class BDF(BDF_intOrderOne, BDF_intOrderTwo, CoeffMat, spCoeffMat_3x3, spCoeffMat_4x4):
+class BDF(BDF_intOrderOne, BDF_intOrderTwo, CoeffMat, spCoeffMat):
     
     def __init__(self):
         
@@ -33,32 +31,16 @@ class BDF(BDF_intOrderOne, BDF_intOrderTwo, CoeffMat, spCoeffMat_3x3, spCoeffMat
         self.BDF_BC_dv_tr = np.zeros((self.nDofConstr, self.num_xF))   # (dPhi / dv)^T        
         
             
-        if self.BDF_modeMAT_sparse:
-            
-            #self.spAdjSys = 0 # Eichmeir
-            self.spAdjSys = 1 # Meins
-            
-            if self.spAdjSys == 0:
-                nBDFsys = spCoeffMat_3x3.__init__(self)
-                
-            if self.spAdjSys == 1:    
-                nBDFsys = spCoeffMat_4x4.__init__(self)
-            
-
+        if self.BDF_modeMAT_sparse:   
+            nBDFsys = spCoeffMat.__init__(self)
             self.BDF_BC_eyeMat = scipy.sparse.eye(self.nDof)
             self.compute_consistent_BC_J = self.compute_consistent_BC_J_sparse
             self.compute_consistent_BC_Phi = self.compute_consistent_BC_Phi_sparse
-            
-            
 
         else:
-            
             nBDFsys = CoeffMat.__init__(self)
-            
- 
             self.compute_consistent_BC_J = self.compute_consistent_BC_J_dense
             self.compute_consistent_BC_Phi = self.compute_consistent_BC_Phi_dense
-            
             self.BDF_BC_eyeMat = np.eye(self.nDof)
             self.BDF_BC_zeroMat = np.zeros((self.nConstr, self.nConstr))
 
@@ -184,28 +166,22 @@ class BDF(BDF_intOrderOne, BDF_intOrderTwo, CoeffMat, spCoeffMat_3x3, spCoeffMat
 # -----------------------------------------------------------------------------
 
     def solve_J_AdjSys_dense(self):
-        
         return np.linalg.solve(self.BDF_coeffMat, self.BDF_solVec_J)
     
 # -----------------------------------------------------------------------------
 
     def solve_Phi_AdjSys_dense(self):
-        
         return np.linalg.solve(self.BDF_coeffMat, self.BDF_solVec_Phi)   
 
 # -----------------------------------------------------------------------------
 
     def solve_J_AdjSys_sparse(self):
-        
-        # vec_P_Sig_MU = spsolve(self.BDF_spCoeffMat, self.BDF_solVec_J)
         solve = factorized(self.BDF_spCoeffMat)
         return solve(self.BDF_solVec_J)
     
 # -----------------------------------------------------------------------------
 
     def solve_Phi_AdjSys_sparse(self):
-        
-        # vec_P_Sig_MU = spsolve(self.BDF_spCoeffMat, self.BDF_solVec_Phi)
         solve = factorized(self.BDF_spCoeffMat)
         return solve(self.BDF_solVec_Phi)
 

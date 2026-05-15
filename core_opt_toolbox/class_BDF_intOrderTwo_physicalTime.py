@@ -11,14 +11,9 @@ class BDF_intOrderTwo:
         self.BDF2_eta1 = 0.0
         self.BDF2_eta2 = 0.0
         
-        if self.BDF_modeMAT_sparse:
-            
-            if self.spAdjSys == 0:
-                self.integrate_J_BDF2 = self.integrate_J_BDF2_3x3_sparse
-                self.integrate_Phi_BDF2 = self.integrate_Phi_BDF2_3x3_sparse
-            if self.spAdjSys == 1:    
-                self.integrate_J_BDF2 = self.integrate_J_BDF2_4x4_sparse
-                self.integrate_Phi_BDF2 = self.integrate_Phi_BDF2_4x4_sparse
+        if self.BDF_modeMAT_sparse:  
+            self.integrate_J_BDF2 = self.integrate_J_BDF2_sparse
+            self.integrate_Phi_BDF2 = self.integrate_Phi_BDF2_sparse
             
         else:
             self.integrate_J_BDF2 = self.integrate_J_BDF2_dense
@@ -91,53 +86,9 @@ class BDF_intOrderTwo:
 
         return None
     
-# ----------------------------------------------------------------------------- 
+# -----------------------------------------------------------------------------  
 
-    def integrate_J_BDF2_3x3_sparse(self, z, time):
-        
-        idx1 = self.BDF_idx_buff
-        idx2 = 1 - idx1
-
-        self.BDF_J_Mp_buff[idx1, :] = self.MBS_M @ self.adjP_J_buff[idx1, :]
-        
-        self.update_MBS_SysMat()
-        self.update_userFcts_BDF(z, time)
-        
-        
-        # Compute BDF coefficients
-        self.getEta_BDF2(idx1, idx2)
-        
-        etaTimesW = self.BDF2_eta1 * self.adjW_J_buff[idx1, :] + self.BDF2_eta2 * self.adjW_J_buff[idx2, :]
-        
-        # Bulid the solution vector of the Adjoint Sys
-        self.BDF_solVec_J[:self.nDof] = self.dLdv.T + self.BDF2_eta0_inv*(self.dLdq.T - etaTimesW) - (self.BDF2_eta1 * self.BDF_J_Mp_buff[idx1, :] + self.BDF2_eta2 * self.BDF_J_Mp_buff[idx2, :])
-        self.BDF_solVec_J[self.nDof:self.nDofConstr] = self.MBS_Cq @ (etaTimesW - self.dLdq.T)
-        
-        # get coeff. Matrix of adjoint system
-        self.get_coeffMat_AdjSys_3x3_sparse(self.BDF2_eta0, self.BDF2_eta0_inv)
-        
-        # solve Matrix-Vektor Equation
-        vec_P_Sig_MU = self.solve_J_AdjSys_sparse()
-        
-        # idx shift - use memory of idx = 2 for idx = 0
-        self.BDF_idx_buff = idx2
-        
-        # Compute adj p at time idx = 0
-        self.adjP_J_buff[self.BDF_idx_buff, :] = vec_P_Sig_MU[:self.nDof]
-        
-        # Compute adj w at time idx = 0        
-        self.adjW_J_buff[self.BDF_idx_buff, :] = self.MBS_G_tr.T @ vec_P_Sig_MU[:self.nDof]
-        self.adjW_J_buff[self.BDF_idx_buff, :] += self.MBS_CqvDq.T @ vec_P_Sig_MU[self.nDof:self.nDofConstr] 
-        self.adjW_J_buff[self.BDF_idx_buff, :] += self.MBS_Cq.T @ vec_P_Sig_MU[self.nDofConstr:] 
-        self.adjW_J_buff[self.BDF_idx_buff, :] += self.dLdq.T 
-        self.adjW_J_buff[self.BDF_idx_buff, :] -= etaTimesW
-        self.adjW_J_buff[self.BDF_idx_buff, :] *= self.BDF2_eta0_inv
-
-        return None
-    
-# ----------------------------------------------------------------------------- 
-
-    def integrate_J_BDF2_4x4_sparse(self, z, time):
+    def integrate_J_BDF2_sparse(self, z, time):
         
         idx1 = self.BDF_idx_buff
         idx2 = 1 - idx1
@@ -157,7 +108,7 @@ class BDF_intOrderTwo:
         self.BDF_solVec_J[self.nDof:2*self.nDof] = self.dLdv.T - self.BDF2_eta1 * self.BDF_J_Mp_buff[idx1, :] - self.BDF2_eta2 * self.BDF_J_Mp_buff[idx2, :]
         
         # get coeff. Matrix of adjoint system
-        self.get_coeffMat_AdjSys_4x4_sparse(self.BDF2_eta0)
+        self.get_coeffMat_AdjSys_sparse(self.BDF2_eta0)
         
         # solve Matrix-Vektor Equation
         vec_W_P_Sig_MU = self.solve_J_AdjSys_sparse()
@@ -218,53 +169,7 @@ class BDF_intOrderTwo:
 
 # ----------------------------------------------------------------------------- 
 
-    def integrate_Phi_BDF2_3x3_sparse(self, time):
-        
-        idx1 = self.BDF_idx_buff
-        idx2 = 1 - idx1
-        
-        self.BDF_Phi_Mp_buff[idx1, :, :] = self.MBS_M @ self.adjP_Phi_buff[idx1, :, :]
-        
-        self.update_MBS_SysMat()
-        
-        # Compute BDF coefficients
-        self.getEta_BDF2(idx1, idx2) 
-        
-        etaTimesW = self.BDF2_eta1 * self.adjW_Phi_buff[idx1, :, :] + self.BDF2_eta2 * self.adjW_Phi_buff[idx2, :, :]
-        
-        # Bulid the solution vector of the Adjoint Sys
-        self.BDF_solVec_Phi[:self.nDof,:] = - self.BDF2_eta0_inv * etaTimesW - (self.BDF2_eta1 * self.BDF_Phi_Mp_buff[idx1, :, :] + self.BDF2_eta2 * self.BDF_Phi_Mp_buff[idx2, :, :])
-        self.BDF_solVec_Phi[self.nDof:self.nDofConstr,:] = self.MBS_Cq @ etaTimesW
- 
-        
-        # get coeff. Matrix of adjoint system
-        self.get_coeffMat_AdjSys_3x3_sparse(self.BDF2_eta0, self.BDF2_eta0_inv)
-        
-        # solve Matrix-Vektor Equation
-        vec_P_Sig_MU = self.solve_Phi_AdjSys_sparse()
-        
-        
-        # idx shift - use memory of idx = 2 for idx = 0
-        self.BDF_idx_buff = idx2
-        
-        
-        # Compute adj p at time idx = 0
-        self.adjP_Phi_buff[self.BDF_idx_buff, :, :] = vec_P_Sig_MU[:self.nDof]
-        
-
-        # Compute adj w at time idx = 0
-        self.adjW_Phi_buff[self.BDF_idx_buff, :, :] = self.MBS_G_tr.T @ vec_P_Sig_MU[:self.nDof]
-        self.adjW_Phi_buff[self.BDF_idx_buff, :, :] += self.MBS_CqvDq.T @ vec_P_Sig_MU[self.nDof:self.nDofConstr] 
-        self.adjW_Phi_buff[self.BDF_idx_buff, :, :] += self.MBS_Cq.T @ vec_P_Sig_MU[self.nDofConstr:] 
-        self.adjW_Phi_buff[self.BDF_idx_buff, :, :] -= etaTimesW
-        self.adjW_Phi_buff[self.BDF_idx_buff, :, :] *= self.BDF2_eta0_inv
-
-
-        return None
-
-# ----------------------------------------------------------------------------- 
-
-    def integrate_Phi_BDF2_4x4_sparse(self, time):
+    def integrate_Phi_BDF2_sparse(self, time):
         
         idx1 = self.BDF_idx_buff
         idx2 = 1 - idx1
@@ -282,7 +187,7 @@ class BDF_intOrderTwo:
  
         
         # get coeff. Matrix of adjoint system
-        self.get_coeffMat_AdjSys_4x4_sparse(self.BDF2_eta0)
+        self.get_coeffMat_AdjSys_sparse(self.BDF2_eta0)
         
         # solve Matrix-Vektor Equation
         vec_W_P_Sig_MU = self.solve_Phi_AdjSys_sparse()

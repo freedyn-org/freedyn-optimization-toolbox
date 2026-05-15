@@ -3,19 +3,19 @@ import numpy as np
 import scipy
 from scipy.sparse import bmat
 
-class spCoeffMat_4x4():
+class spCoeffMat():
     
     def __init__(self):
         
         nBDFsys = 2*self.nDof+2*self.nConstr
-        self.init_coeffMat_AdjSys_4x4_sparse('csc')
+        self.init_coeffMat_AdjSys_sparse('csc')
         
         return nBDFsys
         
         
 # -----------------------------------------------------------------------------
 
-    def init_coeffMat_AdjSys_4x4_sparse(self, formatMAT):
+    def init_coeffMat_AdjSys_sparse(self, formatMAT):
 
         self.update_MBS_SysMat() 
         eyeMat_sp = scipy.sparse.eye(self.nDof, format='csr')
@@ -106,7 +106,7 @@ class spCoeffMat_4x4():
         
 # -----------------------------------------------------------------------------
 
-    def get_coeffMat_AdjSys_4x4_sparse(self, eta0):
+    def get_coeffMat_AdjSys_sparse(self, eta0):
         
         # Row 1
         self.BDF_spCoeffMat.data[self.map_A11] = eta0 

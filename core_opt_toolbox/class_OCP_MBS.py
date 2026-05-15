@@ -62,8 +62,8 @@ class Optimization(Control, FreeDyn, MBS_SysMat, BDF, adjGrads, numDiff, fcts_Us
             
             self.write_ctrl_dataSPL()
             
-            # self.fd_model.__del__()
-            # self.fd_model = fd.Model(self.fds_path_name, status_output="NO")
+            self.fd_model.__del__()
+            self.fd_model = fd.Model(self.fds_path_name, status_output="NO")
             
             self.update_ctrl_gridNodes()
             self.fd_model.reset_for_rerun()
@@ -91,14 +91,14 @@ class Optimization(Control, FreeDyn, MBS_SysMat, BDF, adjGrads, numDiff, fcts_Us
         J = 0
         
         self.fd_model.fetch_states_at_index(self.dyn_numTimeSteps-1)
-        tRight = self.fd_model.get_time_at_index(self.dyn_numTimeSteps-1)
+        tRight = self.fd_model.t
         
         integrand_right = self.get_LagrangianOCP(tRight)
         
         for i in range(self.dyn_numTimeSteps-2, -1, -1):
             
             self.fd_model.fetch_states_at_index(i)
-            tLeft = self.fd_model.get_time_at_index(i)
+            tLeft = self.fd_model.t
             
             integrand_left = self.get_LagrangianOCP(tLeft)
 
