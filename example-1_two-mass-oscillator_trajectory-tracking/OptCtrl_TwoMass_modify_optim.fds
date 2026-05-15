@@ -1,0 +1,251 @@
+Header freeDynHeader
+EndHeader
+%
+Body Rigid_EulerParameter_PAI
+	ID = b73e47ac-3e02-4edb-90db-37ed908be191
+	Name = B1
+	InitialVelocityVector = 0.000000,0.000000,0.000000
+	InitialOmegaVector = 0.000000,0.000000,0.000000
+	RegardVelocityInertiaForcesInsideJacobian = no
+	Mass = 1.000000
+	LocationCenterMass = 0.000000,0.000000,0.000000
+	Inertia = 0.001000,0.001000,0.001000
+	OrientationPAI = 1.000000,0.000000,0.000000,0.000000,1.000000,0.000000,0.000000,0.000000,1.000000
+	Geometry = Box 0.020000 0.010000 0.010000
+	Geometry Position = 0.000000,0.000000,0.000000
+	Geometry Orientation = 1.000000,0.000000,0.000000,0.000000,1.000000,0.000000,0.000000,0.000000,1.000000
+	Geometry Color = 29,137,221,255
+	Geometry Transparency = 50
+EndBody
+%
+Body Rigid_EulerParameter_PAI
+	ID = 2b7baee3-1484-4949-babf-2c86c84339f2
+	Name = B2
+	InitialVelocityVector = 3.906222,0.000000,0.000000
+	InitialOmegaVector = 0.000000,0.000000,0.000000
+	RegardVelocityInertiaForcesInsideJacobian = no
+	Mass = 1.000000
+	LocationCenterMass = 0.000000,0.000000,0.000000
+	Inertia = 0.001000,0.001000,0.001000
+	OrientationPAI = 1.000000,0.000000,0.000000,0.000000,1.000000,0.000000,0.000000,0.000000,1.000000
+	Geometry = Box 0.010000 0.020000 0.010000
+	Geometry Position = 0.000000,0.000000,0.000000
+	Geometry Orientation = 1.000000,0.000000,0.000000,0.000000,1.000000,0.000000,0.000000,0.000000,1.000000
+	Geometry Color = 186,214,0,255
+	Geometry Transparency = 50
+EndBody
+%
+Constraint Generic
+	ID = fad5ee64-2968-4907-bfe1-6fb916b8241f
+	Name = Constraint_B1
+	BodyIDs = b73e47ac-3e02-4edb-90db-37ed908be191, 0
+	dxFixed = no
+	dyFixed = yes
+	dzFixed = yes
+	axFixed = yes
+	ayFixed = yes
+	azFixed = yes
+	Location = 0.000000,0.000000,0.000000
+	    ConstraintOrientation = 1.000000,0.000000,0.000000,0.000000,1.000000,0.000000,0.000000,0.000000,1.000000
+EndConstraint
+%
+Constraint Generic
+	ID = d2c2edeb-a6f5-4046-be01-94ca39e01725
+	Name = Constraint_B2
+	BodyIDs = 2b7baee3-1484-4949-babf-2c86c84339f2, 0
+	dxFixed = no
+	dyFixed = yes
+	dzFixed = yes
+	axFixed = yes
+	ayFixed = yes
+	azFixed = yes
+	Location = 0.000000,0.000000,0.000000
+	    ConstraintOrientation = 1.000000,0.000000,0.000000,0.000000,1.000000,0.000000,0.000000,0.000000,1.000000
+EndConstraint
+%
+Force Gravity
+	ID = 1
+	Name = 
+	GravityAccVector = 0.000000,0.000000,-9.810000
+	ActivationTime = 0.000000
+EndForce
+%
+Force GenericForce
+	ID = fc69e13b-d8b7-477b-b0a5-64b7c690ee2a
+	Name = F3
+	BodyIDs = b73e47ac-3e02-4edb-90db-37ed908be191, 2b7baee3-1484-4949-babf-2c86c84339f2
+	PointOfApplication_Body1 = 0.000000,0.000000,0.000000
+	PointOfApplication_Body2 = 0.000000,0.000000,0.000000
+	ForceDirectionType = SpaceFixed
+	ForceDirection = 1.000000,0.000000,0.000000
+	ForceExpression = PARVAL[c3]*(MEAVAL[B2_x]-MEAVAL[B1_x])
+EndForce
+%
+Force GenericForce
+	ID = 4e3f991b-d4ef-4631-89c3-902d60b153b5
+	Name = F1
+	BodyIDs = b73e47ac-3e02-4edb-90db-37ed908be191, 0
+	PointOfApplication_Body1 = 0.000000,0.000000,0.000000
+	PointOfApplication_Body2 = 0.000000,0.000000,0.000000
+	ForceDirectionType = SpaceFixed
+	ForceDirection = -1.000000,0.000000,0.000000
+	ForceExpression = PARVAL[c1]*MEAVAL[B1_x]+PARVAL[d1]*MEAVAL[B1_v]
+EndForce
+%
+Force GenericForce
+	ID = e33a93b8-2fc8-4610-9be7-1a82c881526e
+	Name = F2
+	BodyIDs = 2b7baee3-1484-4949-babf-2c86c84339f2, 0
+	PointOfApplication_Body1 = 0.000000,0.000000,0.000000
+	PointOfApplication_Body2 = 0.000000,0.000000,0.000000
+	ForceDirectionType = SpaceFixed
+	ForceDirection = -1.000000,0.000000,0.000000
+	ForceExpression = PARVAL[c2]*MEAVAL[B2_x]+PARVAL[d2]*MEAVAL[B2_v]
+EndForce
+%
+Force GenericForce
+	ID = fda668a5-debc-4708-82e0-69e70d260283
+	Name = ctrl
+	BodyIDs = 2b7baee3-1484-4949-babf-2c86c84339f2, 0
+	PointOfApplication_Body1 = 0.000000,0.000000,0.000000
+	PointOfApplication_Body2 = 0.000000,0.000000,0.000000
+	ForceDirectionType = SpaceFixed
+	ForceDirection = 1.000000,0.000000,0.000000
+	ForceExpression = PARVAL[fdu]+SPL[SIMTIME[],uDach]
+EndForce
+%
+DataObject Spline_1D
+	ID = 5de64815-ddff-43f4-8312-73b522c381dd
+	Name = uDach
+	InterpolationType = zccspl
+	PathToSplineData = C:\VRoboCoop\GitHub\Philipp\Implementierungen\FreeDyn\TwoMass_Oscillator_Houston\dataSPL.txt
+	NumberOfHeaderLines = 0
+	ColumnXData = 0
+	ColumnYData = 1
+EndDataObject
+%
+DataObject Parameter
+	ID = 513b2ac7-e569-40a7-8067-b3bdcc19ba51
+	Name = c1
+	InitialValue = 2.000000
+EndDataObject
+%
+DataObject Parameter
+	ID = ceb8ef24-a3b9-4cc1-ba59-95c4a9ca103c
+	Name = c2
+	InitialValue = 3.000000
+EndDataObject
+%
+DataObject Parameter
+	ID = 242c8698-51e6-43b6-b976-200a6548f3ba
+	Name = d1
+	InitialValue = 0.100000
+EndDataObject
+%
+DataObject Parameter
+	ID = 741e920f-5321-47f2-8b1f-8855b1c5196a
+	Name = c3
+	InitialValue = 1.000000
+EndDataObject
+%
+DataObject Parameter
+	ID = 963ceae0-ae21-43bf-a422-bdacc8304d0c
+	Name = d2
+	InitialValue = 0.150000
+EndDataObject
+%
+DataObject Parameter
+	ID = e8259991-1ff9-4e06-b684-c700612fbf3b
+	Name = fdu
+	InitialValue = 0.000000
+EndDataObject
+%
+Measure Translational
+	ID = bb5f78db-e397-4021-bcfe-c8e5e80cd02a
+	Name = B1_x
+	BodyIDs = b73e47ac-3e02-4edb-90db-37ed908be191, 0
+	MeasureMode = disp
+	MeasureCoordinate = X
+	MeasureLocation_Body1 = 0.000000,0.000000,0.000000
+	MeasureLocation_Body2 = 0.000000,0.000000,0.000000
+	 UseInitialValueAsOffset = no
+EndMeasure
+%
+Measure Translational
+	ID = c8bcff01-85ed-4dae-af72-fec51ea52d69
+	Name = B2_x
+	BodyIDs = 2b7baee3-1484-4949-babf-2c86c84339f2, 0
+	MeasureMode = disp
+	MeasureCoordinate = X
+	MeasureLocation_Body1 = 0.000000,0.000000,0.000000
+	MeasureLocation_Body2 = 0.000000,0.000000,0.000000
+	 UseInitialValueAsOffset = no
+EndMeasure
+%
+Measure Translational
+	ID = 0ef03ad3-74a6-4b3c-a6fd-de4666e263fa
+	Name = B1_v
+	BodyIDs = b73e47ac-3e02-4edb-90db-37ed908be191, 0
+	MeasureMode = vel
+	MeasureCoordinate = X
+	MeasureLocation_Body1 = 0.000000,0.000000,0.000000
+	MeasureLocation_Body2 = 0.000000,0.000000,0.000000
+	 UseInitialValueAsOffset = no
+EndMeasure
+%
+Measure Translational
+	ID = e3abe3d6-9543-41d8-a0fa-7263c0edd038
+	Name = B2_v
+	BodyIDs = 2b7baee3-1484-4949-babf-2c86c84339f2, 0
+	MeasureMode = vel
+	MeasureCoordinate = X
+	MeasureLocation_Body1 = 0.000000,0.000000,0.000000
+	MeasureLocation_Body2 = 0.000000,0.000000,0.000000
+	 UseInitialValueAsOffset = no
+EndMeasure
+%
+Simulation Dynamic
+	ID = 
+	Name = 
+	SimulationTimeBegin = 0.000000
+	InitialPositionFromFile = 0
+	InitialVelocityFromFile = 0
+	SimulationTimeEnd = 10
+	OutputTimeBegin = 0.000000
+	OutputTimeStepSize = 1.000000e-03
+	isExactOutputTimeEnforced = yes
+	WriteConstraintForceResultFile = no
+	WriteForceResultFile = no
+	WriteVelocityResultFile = no
+	WriteStateResultFile = no
+	WriteAccelerationResultFile = no
+	WriteExtConstraintLagrangeResultFile = no
+	WriteMeasureResultFile = no
+EndSimulation
+%
+Solver HHT
+	ID = 
+	Name = 
+	Alpha = -0.300000
+	MaxNumberOfInnerIterations = 5,5
+	GlobalErrorTolerance = 1.000000e-05
+	SolverMinTimeStep = 1.000000e-10
+	SolverMaxTimeStep = 1.000000e-03
+	ModifyNewmark = no
+	MaxNumOfTimeStepsUsingSameFactorizedJacobian = 0
+	UsePardisoScalingAndMatching = no
+	DebugLevel = 0
+	DebugTimeBegin = 0.000000
+	DebugTimeEnd = 10.000000
+EndSolver
+%
+Globals Settings
+	ID = 
+	Name = 
+	BackgroundColor = 255,255,255,255
+	BoundingMode = 0
+	COGMarkerScale = 0.025000
+	ConstraintIconScale = 0.025000
+	ForceIconScale = 0.025000
+EndGlobals
+%

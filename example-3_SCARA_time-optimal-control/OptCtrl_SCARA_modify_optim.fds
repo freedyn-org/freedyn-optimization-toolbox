@@ -1,0 +1,200 @@
+Header freeDynHeader
+EndHeader
+%
+Body Rigid_EulerParameter_PAI
+	ID = b59765a7-f72f-4d15-80b4-9886968472ab
+	Name = Body_1
+	InitialVelocityVector = 0.000000,0.000000,0.000000
+	InitialOmegaVector = 0.000000,0.000000,0.000000
+	RegardVelocityInertiaForcesInsideJacobian = no
+	Mass = 1.000000
+	LocationCenterMass = 0.353553,-0.353553,0.000000
+	Inertia = 0.000000,0.000000,0.083300
+	OrientationPAI = 0.707107,0.707107,0.000000,-0.707107,0.707107,0.000000,0.000000,-0.000000,1.000000
+	Geometry = Cylinder 0.050000 1.000000
+	Geometry Position = 0.353553,-0.353553,0.000000
+	Geometry Orientation = 0.707107,0.707107,0.000000,-0.707107,0.707107,0.000000,0.000000,-0.000000,1.000000
+	Geometry Color = 200,200,200,200
+	Geometry Transparency = 50
+EndBody
+%
+Body Rigid_EulerParameter_PAI
+	ID = a498396d-e430-410e-bd97-f4a210dd4bc2
+	Name = Body_2
+	InitialVelocityVector = 0.000000,0.000000,0.000000
+	InitialOmegaVector = 0.000000,0.000000,0.000000
+	RegardVelocityInertiaForcesInsideJacobian = no
+	Mass = 0.500000
+	LocationCenterMass = 1.207107,-0.707107,0.000000
+	Inertia = 0.000000,0.000000,0.041700
+	OrientationPAI = 0.000000,1.000000,0.000000,-1.000000,0.000000,0.000000,0.000000,-0.000000,1.000000
+	Geometry = Cylinder 0.030000 1.000000
+	Geometry Position = 1.207107,-0.707107,0.000000
+	Geometry Orientation = 0.000000,1.000000,0.000000,-1.000000,0.000000,0.000000,0.000000,-0.000000,1.000000
+	Geometry Color = 200,200,200,200
+	Geometry Transparency = 50
+EndBody
+%
+Body Rigid_EulerParameter_PAI
+	ID = c77d1e3a-5abf-4d82-814c-0c1cd71e9ba7
+	Name = TCP
+	InitialVelocityVector = 0.000000,0.000000,0.000000
+	InitialOmegaVector = 0.000000,0.000000,0.000000
+	RegardVelocityInertiaForcesInsideJacobian = no
+	Mass = 1.000000
+	LocationCenterMass = 1.707107,-0.707107,0.000000
+	Inertia = 0.000000,0.000000,0.000000
+	OrientationPAI = 1.000000,0.000000,0.000000,0.000000,1.000000,0.000000,0.000000,0.000000,1.000000
+	Geometry = Sphere 0.050000
+	Geometry Position = 1.707107,-0.707107,0.000000
+	Geometry Orientation = 1.000000,0.000000,0.000000,0.000000,1.000000,0.000000,0.000000,0.000000,1.000000
+	Geometry Color = 200,200,200,200
+	Geometry Transparency = 50
+EndBody
+%
+Constraint Generic
+	ID = e2ce918d-2550-4d75-bbdb-5ddefa1c8a57
+	Name = Body_1_2
+	BodyIDs = b59765a7-f72f-4d15-80b4-9886968472ab, a498396d-e430-410e-bd97-f4a210dd4bc2
+	dxFixed = yes
+	dyFixed = yes
+	dzFixed = yes
+	axFixed = yes
+	ayFixed = yes
+	azFixed = no
+	Location = 0.707107,-0.707107,0.000000
+	    ConstraintOrientation = 1.000000,0.000000,0.000000,0.000000,1.000000,0.000000,0.000000,0.000000,1.000000
+EndConstraint
+%
+Constraint Generic
+	ID = d571c167-2e15-46ec-80d3-60a147b57569
+	Name = Body_2_TCP
+	BodyIDs = a498396d-e430-410e-bd97-f4a210dd4bc2, c77d1e3a-5abf-4d82-814c-0c1cd71e9ba7
+	dxFixed = yes
+	dyFixed = yes
+	dzFixed = yes
+	axFixed = yes
+	ayFixed = yes
+	azFixed = yes
+	Location = 1.707107,-0.707107,0.000000
+	    ConstraintOrientation = 1.000000,0.000000,0.000000,0.000000,1.000000,0.000000,0.000000,0.000000,1.000000
+EndConstraint
+%
+Constraint Generic
+	ID = 9aa46c7f-23c2-4314-9222-a40c9188168d
+	Name = Ground_Body_1
+	BodyIDs = b59765a7-f72f-4d15-80b4-9886968472ab, 0
+	dxFixed = yes
+	dyFixed = yes
+	dzFixed = yes
+	axFixed = yes
+	ayFixed = yes
+	azFixed = no
+	Location = 0.000000,0.000000,0.000000
+	    ConstraintOrientation = 1.000000,0.000000,0.000000,0.000000,1.000000,0.000000,0.000000,0.000000,1.000000
+EndConstraint
+%
+Force GenericTorque
+	ID = 2986a41c-38c9-43cb-8672-f33709bcc2c0
+	Name = u1
+	BodyIDs = b59765a7-f72f-4d15-80b4-9886968472ab, 0
+	AxisType = BodyFixed
+	Axis = 0.000000,0.000000,1.000000
+	TorqueExpression = PARVAL[u1par]+SPL[SIMTIME[],u1Dach]
+EndForce
+%
+Force GenericTorque
+	ID = 2f73fca1-d998-4c4b-a88e-c341ae1985de
+	Name = u2_actio
+	BodyIDs = a498396d-e430-410e-bd97-f4a210dd4bc2, 0
+	AxisType = BodyFixed
+	Axis = 0.000000,0.000000,1.000000
+	TorqueExpression = PARVAL[u2par]+SPL[SIMTIME[],u2Dach]
+EndForce
+%
+Force GenericTorque
+	ID = 25dcad13-4381-491b-a51e-df0b0744142c
+	Name = u2_reactio
+	BodyIDs = b59765a7-f72f-4d15-80b4-9886968472ab, 0
+	AxisType = BodyFixed
+	Axis = 0.000000,0.000000,-1.000000
+	TorqueExpression = PARVAL[u2par]+SPL[SIMTIME[],u2Dach]
+EndForce
+%
+DataObject Spline_1D
+	ID = 41282b38-a523-428c-b53b-a498be82e6b1
+	Name = u1Dach
+	InterpolationType = zccspl
+	PathToSplineData = C:\VRoboCoop\GitHub\Philipp\Implementierungen\FreeDyn\SCARA_Two_Axis\Houston\dataSPL.txt
+	NumberOfHeaderLines = 0
+	ColumnXData = 0
+	ColumnYData = 1
+EndDataObject
+%
+DataObject Spline_1D
+	ID = 35b98e2b-3182-4f56-b5af-a4f4d10b24f1
+	Name = u2Dach
+	InterpolationType = zccspl
+	PathToSplineData = C:\VRoboCoop\GitHub\Philipp\Implementierungen\FreeDyn\SCARA_Two_Axis\Houston\dataSPL.txt
+	NumberOfHeaderLines = 0
+	ColumnXData = 0
+	ColumnYData = 2
+EndDataObject
+%
+DataObject Parameter
+	ID = c02fb8b3-d09a-480a-a594-e7401cef2f7f
+	Name = u1par
+	InitialValue = 0.000000
+EndDataObject
+%
+DataObject Parameter
+	ID = 85e9a530-0985-4ff3-8384-3fa068735293
+	Name = u2par
+	InitialValue = 0.000000
+EndDataObject
+%
+Simulation Dynamic
+	ID = 
+	Name = 
+	SimulationTimeBegin = 0.000000
+	InitialPositionFromFile = 0
+	InitialVelocityFromFile = 0
+	SimulationTimeEnd = 3.635974591660735
+	OutputTimeBegin = 0.000000
+	OutputTimeStepSize = 0.01
+	isExactOutputTimeEnforced = yes
+	WriteConstraintForceResultFile = no
+	WriteForceResultFile = no
+	WriteVelocityResultFile = no
+	WriteStateResultFile = no
+	WriteAccelerationResultFile = no
+	WriteExtConstraintLagrangeResultFile = no
+	WriteMeasureResultFile = no
+EndSimulation
+%
+Solver HHT
+	ID = 
+	Name = 
+	Alpha = -0.300000
+	MaxNumberOfInnerIterations = 5,5
+	GlobalErrorTolerance = 1.000000e-05
+	SolverMinTimeStep = 1.000000e-10
+	SolverMaxTimeStep = 1.000000e-03
+	ModifyNewmark = no
+	MaxNumOfTimeStepsUsingSameFactorizedJacobian = 0
+	UsePardisoScalingAndMatching = no
+	DebugLevel = 0
+	DebugTimeBegin = 0.000000
+	DebugTimeEnd = 3.000000
+EndSolver
+%
+Globals Settings
+	ID = 
+	Name = 
+	BackgroundColor = 255,255,255,255
+	BoundingMode = 0
+	COGMarkerScale = 0.500000
+	ConstraintIconScale = 0.500000
+	ForceIconScale = 0.500000
+EndGlobals
+%
