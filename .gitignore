@@ -136,3 +136,6 @@ install/
 *.fds.err
 *.fds.log
 results/
+
+# Archiv
+Archiv/
