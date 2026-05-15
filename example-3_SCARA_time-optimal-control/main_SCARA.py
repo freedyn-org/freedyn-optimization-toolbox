@@ -4,8 +4,6 @@ import numpy as np
 import scipy as sp
 import matplotlib
 import matplotlib.pyplot as plt
-import time
-from pyinstrument import Profiler
 
 
 """ Define paths  """
@@ -86,10 +84,6 @@ options = {'disp': True, 'iprint': 2, 'ftol': optFtol, 'eps':optEps, 'maxiter': 
     
 constraints = {'type':'eq', 'fun':optim.ceq_tF, 'jac':optim.get_grad_Phi}
 
-
-profiler = Profiler()
-profiler.start()
-countStart = time.perf_counter()
 res = sp.optimize.minimize(fun         = optim.objective,                    # cost function
                            x0          = z0,                                 # initial values
                            method      = 'SLSQP',                            # optimization method
@@ -98,12 +92,6 @@ res = sp.optimize.minimize(fun         = optim.objective,                    # c
                            constraints = constraints,                        # non-linear constraints
                            options     = options                             # optimization options
                            )
-countEnd = time.perf_counter()
-profiler.stop()
-timeComp = countEnd - countStart
-print(f"Zeitdauer Optimierung: {timeComp} s")
-
-profiler.open_in_browser("speedscope")  # Öffnet direkt in speedscope.app
     
 # -----------------------------------------------------------------------------
 # Reduce output Step for plotting

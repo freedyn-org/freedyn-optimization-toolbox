@@ -212,7 +212,7 @@ Simulation Dynamic
 	InitialVelocityFromFile = 0
 	SimulationTimeEnd = 10
 	OutputTimeBegin = 0.000000
-	OutputTimeStepSize = 1.000000e-03
+	OutputTimeStepSize = 0.01
 	isExactOutputTimeEnforced = yes
 	WriteConstraintForceResultFile = no
 	WriteForceResultFile = no
