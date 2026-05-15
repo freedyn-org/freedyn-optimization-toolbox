@@ -1,17 +1,15 @@
 import freedyn as fd
-        
+import numpy as np
+from ctypes import c_int
 
 class MBS_SysMat:
     
-    def __init__(self):
+    def __init__(self,
+                 nameParFdu):
         
-        # Derivative of sum of external forces w.r.t. parameter given as string
-        self.buffer_MBS_fDu = fd.ForceParameterDerivativeMatrixBuffer(self.nameParFdu, 
-                                                                      False)
-        self.fDu = self.buffer_MBS_fDu.data
+        self.create_identy_matMBS()
+        self.create_ID_MBS()
         
-        # self.slot_MBS_states = fd.MBS_States_slots(self.nDof, self.nConstr)    
-
         """ Decision on dense or sparse dense_matrices """
         if self.nDofConstr < (10 * 7 + 1):
             self.BDF_modeMAT_sparse = False
@@ -22,6 +20,12 @@ class MBS_SysMat:
             
         self.init_MBS_SysMat_slots(self.BDF_modeMAT_sparse)    
         self.create_views_MBS_SysMat_slots()
+        
+        
+        """ Derivative of sum of external forces w.r.t. parameter given as string """
+        self.nameParFdu = nameParFdu
+        self.buffer_MBS_fDu = fd.ForceParameterDerivativeMatrixBuffer(nameParFdu, False)
+        self.fDu = self.buffer_MBS_fDu.data
         
                 
         print('class MBS_sysdense_mat initialized')
@@ -95,4 +99,62 @@ class MBS_SysMat:
         
         return None
 
+# -----------------------------------------------------------------------------
+
+    def create_identy_matMBS(self):
+        
+        self.MBS_singleMat_row = np.array([0], dtype=c_int)
+        self.MBS_singleMat_col = np.array([0], dtype=c_int)
+        self.MBS_singleMat_scale = np.array([1.0])
+        
+        self.identy_MBS_MASS = np.array([101], dtype=c_int)     # "MASS"
+        self.identy_MBS_CQ = np.array([301], dtype=c_int)          # "CQ"
+        self.identy_MBS_CQDT = np.array([302], dtype=c_int)        # "CQDT"
+        self.identy_MBS_DQEXTDQD = np.array([109], dtype=c_int)    # "DQEXTDQD"
+        
+        # G^T = "DQEXTDQ" - "DCQTLEDQ" - "DCQTLIDQ" - "DMQDDDQ"
+        self.MBS_G_tr_row = np.array([0, 0, 0, 0], dtype=c_int)
+        self.MBS_G_tr_col = np.array([0, 0, 0, 0], dtype=c_int)
+        self.MBS_G_tr_scale = np.array([1.0, -1.0, -1.0, -1.0])
+        self.identy_MBS_G_tr = np.array([108, 110, 105, 102], dtype=c_int)
+
+        return None
+
+
+# -----------------------------------------------------------------------------
+        
+    def create_ID_MBS(self):
+
+        # Mass matrix M
+        self.ID_M = fd.analysis.create_matrix(self.identy_MBS_MASS, 
+                                              self.MBS_singleMat_row, 
+                                              self.MBS_singleMat_col, 
+                                              self.MBS_singleMat_scale) 
+        
+        # Constraint Jacobian Cq
+        self.ID_Cq = fd.analysis.create_matrix(self.identy_MBS_CQ, 
+                                               self.MBS_singleMat_row, 
+                                               self.MBS_singleMat_col, 
+                                               self.MBS_singleMat_scale)
+        
+        # MBS_CQDT
+        self.ID_CqvDq = fd.analysis.create_matrix(self.identy_MBS_CQDT, 
+                                                  self.MBS_singleMat_row, 
+                                                  self.MBS_singleMat_col, 
+                                                  self.MBS_singleMat_scale)
+        
+        # fv
+        self.ID_fv = fd.analysis.create_matrix(self.identy_MBS_DQEXTDQD, 
+                                               self.MBS_singleMat_row, 
+                                               self.MBS_singleMat_col, 
+                                               self.MBS_singleMat_scale)     
+        
+        # mat G^T = fq - CqTxlaDq_e - CqTxlaDq_i - MxqddDq
+        self.ID_G = fd.analysis.create_matrix(self.identy_MBS_G_tr, 
+                                              self.MBS_G_tr_row, 
+                                              self.MBS_G_tr_col, 
+                                              self.MBS_G_tr_scale)
+        
+        return None
+    
 # -----------------------------------------------------------------------------

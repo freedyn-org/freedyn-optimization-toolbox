@@ -10,29 +10,16 @@ class Control:
         self.numNodes = numberGridNodes
         self.tDach     = np.linspace(0, 1, numberGridNodes)
         
-        self.init_ctrl_for_new_optIT()
-        
         self.inv_A_Dot_K = self.spline_time_invariant()
         
         print('class Control initialized')
-        
-# -----------------------------------------------------------------------------
-    def init_ctrl_for_new_optIT(self):
-        
-        self.ctrl_intSPL_pos = self.numNodes - 2
-
-        return None
 
 # -----------------------------------------------------------------------------
     def find_SPL_by_t(self, t):
         
-        # idx = np.searchsorted(self.tDach, t)
-        # self.ctrl_intSPL_pos = min(max(0, idx - 1), self.numNodes-2)
+        idx = np.searchsorted(self.tDach, t)
+        self.ctrl_intSPL_pos = min(max(0, idx - 1), self.numNodes-2)
 
-        
-        while t < self.tDach[self.ctrl_intSPL_pos]:
-            self.ctrl_intSPL_pos -= 1
-            
         return None
 
 # -----------------------------------------------------------------------------

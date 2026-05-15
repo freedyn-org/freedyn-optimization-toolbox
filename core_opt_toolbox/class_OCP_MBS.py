@@ -1,15 +1,16 @@
 import numpy as np
-
+import freedyn as fd
 
 from class_Control import Control
 from class_FreeDyn import FreeDyn
+from class_Manager_MBS_SysMat_Deriv import MBS_SysMat 
 from class_BDF_physicalTime import BDF
 from class_adjGrad_wrt_uDach_MBS import adjGrads
 from class_numDiff_MBS import numDiff
 from user_fcts import fcts_User
 
 
-class Optimization(Control, FreeDyn, BDF, adjGrads, numDiff, fcts_User):
+class Optimization(Control, FreeDyn, MBS_SysMat, BDF, adjGrads, numDiff, fcts_User):
     
     def __init__(self,
                       numOptVar, numControls, numGridNodes,
@@ -22,15 +23,16 @@ class Optimization(Control, FreeDyn, BDF, adjGrads, numDiff, fcts_User):
         self.numOptVar = numOptVar
         self.tF = tF
         self.uDach = None
+        self.nameCtrlSpline = nameCtrlSpline
         
         
         self.xF = xF
         self.num_xF = len(xF)
-        
-        
+
         
         Control.__init__(self, numControls, numGridNodes)
-        FreeDyn.__init__(self, path_fds, name_fds, nameCtrlSpline, nameParFdu, pathFDdll)
+        FreeDyn.__init__(self, path_fds, name_fds, pathFDdll)
+        MBS_SysMat.__init__(self, nameParFdu)
         BDF.__init__(self)
         numDiff.__init__(self)
         adjGrads.__init__(self)
@@ -50,21 +52,27 @@ class Optimization(Control, FreeDyn, BDF, adjGrads, numDiff, fcts_User):
 
         mat_uDach_new = z.reshape((self.numNodes, self.numCtrls),order='F')              
 
-
         # compare of change
         u_changed = not np.array_equal(self.uDach, mat_uDach_new)
 
         # Only assign if changed
+        # reuse or compute solution
         if u_changed:
             self.uDach = mat_uDach_new.copy()
-            self.write_ctrl_dataSPL()
-            self.dyn_numTimeSteps = 0
             
-        # reuse or compute solution
-        if self.dyn_numTimeSteps == 0:
+            self.write_ctrl_dataSPL()
+            
+            self.fd_model.__del__()
+            self.fd_model = fd.Model(self.fds_path_name, status_output="NO")
+            
+            self.update_ctrl_gridNodes()
+            self.fd_model.reset_for_rerun()
+            
+            self.create_ID_MBS()
+            self.update_MBS_SysMat_idx()
+            
+            # Simulate the model 
             self.exec_FreeDyn()  
-        
-        self.init_ctrl_for_new_optIT()
         
         return None
 
@@ -140,8 +148,8 @@ class Optimization(Control, FreeDyn, BDF, adjGrads, numDiff, fcts_User):
         grad_Phi = self.adjGrad_Phi_singleBDFstep(z)
         
         """ Numerischer Gradient - all """
-        # numGrad_Phi = self.numGrad_Phi(z)
-        # error = numGrad_Phi - grad_Phi
+        numGrad_Phi = self.numGrad_Phi(z)
+        error = numGrad_Phi - grad_Phi
 
         return grad_Phi
     
