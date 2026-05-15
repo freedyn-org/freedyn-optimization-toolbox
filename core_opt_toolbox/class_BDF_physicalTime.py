@@ -70,13 +70,11 @@ class BDF(BDF_intOrderOne, BDF_intOrderTwo, CoeffMat, spCoeffMat):
 # -----------------------------------------------------------------------------
     
     def compute_consistent_BC_J_dense(self):
-
         return None 
 
 # -----------------------------------------------------------------------------
     
     def compute_consistent_BC_J_sparse(self):
-
         return None
 
 # -----------------------------------------------------------------------------
@@ -156,10 +154,10 @@ class BDF(BDF_intOrderOne, BDF_intOrderTwo, CoeffMat, spCoeffMat):
 
 # -----------------------------------------------------------------------------
 
-    def update_userFcts_BDF(self, z, time):
+    def update_userFcts_BDF(self, z):
         
-        self.get_LagrangianOCP_dq(z,time)
-        self.get_LagrangianOCP_dv(z,time)
+        self.get_LagrangianOCP_dq(z)
+        self.get_LagrangianOCP_dv(z)
         
         return None
 
@@ -185,85 +183,4 @@ class BDF(BDF_intOrderOne, BDF_intOrderTwo, CoeffMat, spCoeffMat):
         solve = factorized(self.BDF_spCoeffMat)
         return solve(self.BDF_solVec_Phi)
 
-# -----------------------------------------------------------------------------
-    
-    def apply_BDF_J(self, points, finalTime, z):
-                
-        p = np.empty((self.nDof, points))
-        
-        self.get_consistent_BC_J() 
-        p[:,-1] = self.adjP_J_buff[self.BDF_idx_buff, :]
-
-        """ BDF order 1 """
-        tLeft = self.fdApi2.getStatesAtTimeIndex(points-2, self.FDstates) #attention call fdApi2! not available in fdApi
-        self.fdApi.updateSystem(tLeft, self.FDstates)
-        self.BDF_diff_tau[self.BDF_idx_buff] = finalTime - tLeft
-        self.integrate_J_BDF1(z, tLeft)
-        p[:,points-2] = self.adjP_J_buff[self.BDF_idx_buff, :]
-        
-        
-        """ BDF order 2 """
-        for n in range(points-3, -1, -1):
-            tRight = tLeft
-            tLeft = self.fdApi2.getStatesAtTimeIndex(n, self.FDstates) #attention call fdApi2! not available in fdApi
-            self.fdApi.updateSystem(tLeft, self.FDstates)    
-            self.BDF_diff_tau[self.BDF_idx_buff] = tRight - tLeft                 
-            self.integrate_J_BDF2(z, tLeft)
-            p[:,n] = self.adjP_J_buff[self.BDF_idx_buff, :]
-
-        return p
-
-# -----------------------------------------------------------------------------
-    
-    def apply_BDF_Phi(self, repeats, points, finalTime):
-        
-        p = np.empty((self.nDof,repeats,points))
-        
-        self.get_consistent_BC_Phi() 
-        p[:,:,-1] = self.adjP_Phi_buff[self.BDF_idx_buff, :, :]  
-         
-               
-        """ BDF order 1 """
-        tLeft = self.fdApi2.getStatesAtTimeIndex(points-2, self.FDstates) #attention call fdApi2! not available in fdApi
-        self.fdApi.updateSystem(tLeft, self.FDstates)
-        self.BDF_diff_tau[self.BDF_idx_buff] = finalTime - tLeft
-        self.integrate_Phi_BDF1(tLeft)
-        p[:,:,points-2] = self.adjP_Phi_buff[self.BDF_idx_buff, :, :]  
-        
-            
-        """ BDF order 2 """
-        for n in range(points-3, -1, -1):
-            tRight = tLeft
-            tLeft = self.fdApi2.getStatesAtTimeIndex(n, self.FDstates) #attention call fdApi2! not available in fdApi
-            self.fdApi.updateSystem(tLeft, self.FDstates)
-            self.BDF_diff_tau[self.BDF_idx_buff] = tRight - tLeft
-            self.integrate_Phi_BDF2(tLeft)
-            p[:,:,n] = self.adjP_Phi_buff[self.BDF_idx_buff, :, :]  
-
-        return p
-
-# -----------------------------------------------------------------------------
-
-    def singleStep_BDForder_one_J(self, z, time):
-
-        return self.integrate_J_BDF1(z, time)   
-
-# -----------------------------------------------------------------------------
-
-    def singleStep_BDForder_two_J(self, z, time):
-
-        return self.integrate_J_BDF2(z, time)
-
-# -----------------------------------------------------------------------------
-    
-    def singleStep_BDForder_one_Phi(self, time):
-
-        return self.integrate_Phi_BDF1(time)
-    
-# -----------------------------------------------------------------------------
-    
-    def singleStep_BDForder_two_Phi(self, time):
-
-        return self.integrate_Phi_BDF2(time)
-    
 # -----------------------------------------------------------------------------
