@@ -8,25 +8,21 @@ import time
 from pyinstrument import Profiler
 
 
-""" Define full path to FreeDyn dll """
+""" Define paths  """
+# Path to FreeDyn dll
 pathFDdll = 'C:\\VRoboCoop\\Programme\\FreeDyn\\Release_1.0.5\\FreeDyn-win-x64_MD\\freedyn.dll'
 
-
-""" Define full path to FreeDyn API """
-# original:    
-# pathFDApi = 'C:\\VRoboCoop\\Programme\\FreeDyn\\freedyn-1.0.1\\bindings\\python'
-# pathFDApi = 'C:\\VRoboCoop\\Programme\\FreeDyn\\FreeDyn-1.0.1-win-x64_MD'
-
-# test for opt API
-pathFDApi = 'C:\\VRoboCoop\\GitHub\\Philipp\\Implementierungen\\Python\\bindings\\python'
-
+# Path to FreeDyn API """
+pathFDApi = '..\\..\\freedyn\\bindings\\python'
 sys.path.insert(0, pathFDApi)
 
+# Path to core_opt_toolbox
+bib_path = '..\\core_opt_toolbox'
+sys.path.insert(0, bib_path)
 
-""" Define relative path to global Bib """
-bib_path = str(Path(__file__).resolve().parent.parent / "Global_Bib")
-if bib_path not in sys.path:
-    sys.path.insert(0, bib_path)
+# Define path and name of *.fds - without file typ!
+path_fds = Path(__file__).resolve().parent
+name_fds = 'OptCtrl_SCARA'
 
 
 """  Choose OCP Problem """
@@ -35,12 +31,6 @@ if bib_path not in sys.path:
 
 # Final time tF is free: Time-optimal control problem with/without final constraints Phi
 from class_TOCP_MBS import Optimization     
-
-
-""" Define full path to FDS file """
-# Define path and name of *.fds - without file typ!
-path_fds = 'C:\\VRoboCoop\\GitHub\\Philipp\\Implementierungen\\FreeDyn\\SCARA_Two_Axis\\Houston'
-name_fds = 'OptCtrl_SCARA'
 
 
 """ Define the names of ctrl splines """
@@ -149,19 +139,7 @@ tau = dyn_t/optim.tF
 
 
 # -----------------------------------------------------------------------------
-write_data_Tiks = 0
 
-if write_data_Tiks:
-    from write_data_TikzFig import write_data_TikzFig
-    
-    write_data_TikzFig(name_fds,
-                       numControls, numGridNodes, uLimit, optim.uDach, uInit, u,
-                       xF, tF_init, optim.tF,
-                       x_TCP, y_TCP,
-                       dyn_t, tau,
-                       res.fun, optFtol, optEps, res.nit, timeComp)
-
-# -----------------------------------------------------------------------------
 # plots
 # using the variable axs for multiple Axes
 matplotlib.rcParams.update({'font.size': 15})

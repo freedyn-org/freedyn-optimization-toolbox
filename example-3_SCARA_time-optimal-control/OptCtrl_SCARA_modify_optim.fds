@@ -2,7 +2,7 @@ Header freeDynHeader
 EndHeader
 %
 Body Rigid_EulerParameter_PAI
-	ID = b59765a7-f72f-4d15-80b4-9886968472ab
+	ID = b821fa10-af58-461d-a99a-0020467bfb18
 	Name = Body_1
 	InitialVelocityVector = 0.000000,0.000000,0.000000
 	InitialOmegaVector = 0.000000,0.000000,0.000000
@@ -19,7 +19,7 @@ Body Rigid_EulerParameter_PAI
 EndBody
 %
 Body Rigid_EulerParameter_PAI
-	ID = a498396d-e430-410e-bd97-f4a210dd4bc2
+	ID = e21d9ef8-1ac9-4c78-82ee-6a0c2873fc3a
 	Name = Body_2
 	InitialVelocityVector = 0.000000,0.000000,0.000000
 	InitialOmegaVector = 0.000000,0.000000,0.000000
@@ -36,7 +36,7 @@ Body Rigid_EulerParameter_PAI
 EndBody
 %
 Body Rigid_EulerParameter_PAI
-	ID = c77d1e3a-5abf-4d82-814c-0c1cd71e9ba7
+	ID = 98daad77-3580-433d-a6af-844d663eec9f
 	Name = TCP
 	InitialVelocityVector = 0.000000,0.000000,0.000000
 	InitialOmegaVector = 0.000000,0.000000,0.000000
@@ -45,7 +45,7 @@ Body Rigid_EulerParameter_PAI
 	LocationCenterMass = 1.707107,-0.707107,0.000000
 	Inertia = 0.000000,0.000000,0.000000
 	OrientationPAI = 1.000000,0.000000,0.000000,0.000000,1.000000,0.000000,0.000000,0.000000,1.000000
-	Geometry = Sphere 0.050000
+	Geometry = Sphere 0.100000
 	Geometry Position = 1.707107,-0.707107,0.000000
 	Geometry Orientation = 1.000000,0.000000,0.000000,0.000000,1.000000,0.000000,0.000000,0.000000,1.000000
 	Geometry Color = 200,200,200,200
@@ -53,9 +53,23 @@ Body Rigid_EulerParameter_PAI
 EndBody
 %
 Constraint Generic
-	ID = e2ce918d-2550-4d75-bbdb-5ddefa1c8a57
-	Name = Body_1_2
-	BodyIDs = b59765a7-f72f-4d15-80b4-9886968472ab, a498396d-e430-410e-bd97-f4a210dd4bc2
+	ID = 9e4f199b-5b99-46d0-a3be-df6f38172367
+	Name = Ground__Body_1
+	BodyIDs = b821fa10-af58-461d-a99a-0020467bfb18, 0
+	dxFixed = yes
+	dyFixed = yes
+	dzFixed = yes
+	axFixed = yes
+	ayFixed = yes
+	azFixed = no
+	Location = 0.000000,0.000000,0.000000
+	    ConstraintOrientation = 1.000000,0.000000,0.000000,0.000000,1.000000,0.000000,0.000000,0.000000,1.000000
+EndConstraint
+%
+Constraint Generic
+	ID = a6c1d8dc-cc76-41d2-9063-620ce78e1018
+	Name = Body_1__Body_2
+	BodyIDs = e21d9ef8-1ac9-4c78-82ee-6a0c2873fc3a, b821fa10-af58-461d-a99a-0020467bfb18
 	dxFixed = yes
 	dyFixed = yes
 	dzFixed = yes
@@ -67,9 +81,9 @@ Constraint Generic
 EndConstraint
 %
 Constraint Generic
-	ID = d571c167-2e15-46ec-80d3-60a147b57569
-	Name = Body_2_TCP
-	BodyIDs = a498396d-e430-410e-bd97-f4a210dd4bc2, c77d1e3a-5abf-4d82-814c-0c1cd71e9ba7
+	ID = e7596a73-62a3-4e34-8562-6a9c4c342ee4
+	Name = Body_2__TCP
+	BodyIDs = 98daad77-3580-433d-a6af-844d663eec9f, e21d9ef8-1ac9-4c78-82ee-6a0c2873fc3a
 	dxFixed = yes
 	dyFixed = yes
 	dzFixed = yes
@@ -80,75 +94,61 @@ Constraint Generic
 	    ConstraintOrientation = 1.000000,0.000000,0.000000,0.000000,1.000000,0.000000,0.000000,0.000000,1.000000
 EndConstraint
 %
-Constraint Generic
-	ID = 9aa46c7f-23c2-4314-9222-a40c9188168d
-	Name = Ground_Body_1
-	BodyIDs = b59765a7-f72f-4d15-80b4-9886968472ab, 0
-	dxFixed = yes
-	dyFixed = yes
-	dzFixed = yes
-	axFixed = yes
-	ayFixed = yes
-	azFixed = no
-	Location = 0.000000,0.000000,0.000000
-	    ConstraintOrientation = 1.000000,0.000000,0.000000,0.000000,1.000000,0.000000,0.000000,0.000000,1.000000
-EndConstraint
-%
 Force GenericTorque
-	ID = 2986a41c-38c9-43cb-8672-f33709bcc2c0
+	ID = 5f52f15e-490f-4f12-b055-c5fdc4a23ad6
 	Name = u1
-	BodyIDs = b59765a7-f72f-4d15-80b4-9886968472ab, 0
+	BodyIDs = b821fa10-af58-461d-a99a-0020467bfb18, 0
 	AxisType = BodyFixed
 	Axis = 0.000000,0.000000,1.000000
 	TorqueExpression = PARVAL[u1par]+SPL[SIMTIME[],u1Dach]
 EndForce
 %
 Force GenericTorque
-	ID = 2f73fca1-d998-4c4b-a88e-c341ae1985de
+	ID = e276e515-e5b0-4f14-b147-ae63381b0de8
 	Name = u2_actio
-	BodyIDs = a498396d-e430-410e-bd97-f4a210dd4bc2, 0
+	BodyIDs = e21d9ef8-1ac9-4c78-82ee-6a0c2873fc3a, 0
 	AxisType = BodyFixed
 	Axis = 0.000000,0.000000,1.000000
 	TorqueExpression = PARVAL[u2par]+SPL[SIMTIME[],u2Dach]
 EndForce
 %
 Force GenericTorque
-	ID = 25dcad13-4381-491b-a51e-df0b0744142c
+	ID = e35c8165-829f-402d-85f1-21f721ae4ed5
 	Name = u2_reactio
-	BodyIDs = b59765a7-f72f-4d15-80b4-9886968472ab, 0
+	BodyIDs = b821fa10-af58-461d-a99a-0020467bfb18, 0
 	AxisType = BodyFixed
 	Axis = 0.000000,0.000000,-1.000000
 	TorqueExpression = PARVAL[u2par]+SPL[SIMTIME[],u2Dach]
 EndForce
 %
 DataObject Spline_1D
-	ID = 41282b38-a523-428c-b53b-a498be82e6b1
+	ID = d97205cc-d83e-4b41-940b-182092c79a76
 	Name = u1Dach
 	InterpolationType = zccspl
-	PathToSplineData = C:\VRoboCoop\GitHub\Philipp\Implementierungen\FreeDyn\SCARA_Two_Axis\Houston\dataSPL.txt
+	PathToSplineData = C:\VRoboCoop\GitHub\freedyn_org\freedyn-optimization-toolbox\example-3_SCARA_time-optimal-control\dataSPL.txt
 	NumberOfHeaderLines = 0
 	ColumnXData = 0
 	ColumnYData = 1
 EndDataObject
 %
 DataObject Spline_1D
-	ID = 35b98e2b-3182-4f56-b5af-a4f4d10b24f1
+	ID = 84978d78-ea53-48d3-bb23-3cf569399dac
 	Name = u2Dach
 	InterpolationType = zccspl
-	PathToSplineData = C:\VRoboCoop\GitHub\Philipp\Implementierungen\FreeDyn\SCARA_Two_Axis\Houston\dataSPL.txt
+	PathToSplineData = C:\VRoboCoop\GitHub\freedyn_org\freedyn-optimization-toolbox\example-3_SCARA_time-optimal-control\dataSPL.txt
 	NumberOfHeaderLines = 0
 	ColumnXData = 0
 	ColumnYData = 2
 EndDataObject
 %
 DataObject Parameter
-	ID = c02fb8b3-d09a-480a-a594-e7401cef2f7f
+	ID = unassigned
 	Name = u1par
 	InitialValue = 0.000000
 EndDataObject
 %
 DataObject Parameter
-	ID = 85e9a530-0985-4ff3-8384-3fa068735293
+	ID = unassigned
 	Name = u2par
 	InitialValue = 0.000000
 EndDataObject
@@ -159,9 +159,9 @@ Simulation Dynamic
 	SimulationTimeBegin = 0.000000
 	InitialPositionFromFile = 0
 	InitialVelocityFromFile = 0
-	SimulationTimeEnd = 3.635974591660735
+	SimulationTimeEnd = 2.0
 	OutputTimeBegin = 0.000000
-	OutputTimeStepSize = 0.01
+	OutputTimeStepSize = 1.000000e-03
 	isExactOutputTimeEnforced = yes
 	WriteConstraintForceResultFile = no
 	WriteForceResultFile = no

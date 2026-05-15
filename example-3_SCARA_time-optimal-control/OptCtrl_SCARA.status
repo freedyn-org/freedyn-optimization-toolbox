@@ -1,0 +1,55 @@
+*************************************
+FREEDYN General data 
+*************************************
+FREEDYN Version 1.0.3 
+Build date 2026-05-06 (303aa53) 
+Fri May 15 10:48:45 2026
+
+Homepage: www.freedyn.at
+Suggestions, bug reports: bugs@freedyn.at 
+
+Copyright (C) 2022  Development team of FreeDyn 
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+Reading initial conditions from input file ...
+Initial conditions have been read successfully from input file!
+
+*************************************
+Simulation monitoring ...
+*************************************
+
+
+*************************************
+
+Checking if the system is overconstrained ...
+Correct: The system is not overconstrained!
+*************************************
+Checking the constraint equation C(q)=0 ...
+Constraint equation is fulfilled!
+*************************************
+Checking the first time derivative of the constraint (Cq*qd = 0) ...
+First time derivative of constraint equations is fulfilled!
+*************************************
+Computing the acceleration and the Lagrange multipliers for the given initial conditions ...
+The acceleration and the Lagrange multipliers have been successfully computed for the given initial conditions!
+Finished computation of initial state.
+Computation has been successfully finished :-) 
+
+
+*************************************
+Summary of computation 
+*************************************
+Total number of corrector updates   = 6002
+
+Needed CPU time = 1.394000
+*************************************
+

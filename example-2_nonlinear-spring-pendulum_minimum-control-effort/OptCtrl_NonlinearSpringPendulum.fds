@@ -109,7 +109,7 @@ DataObject Spline_1D
 	ID = d09e6cb1-d40a-4c2f-9c18-76b234b8cea7
 	Name = uDach_x
 	InterpolationType = zccspl
-	PathToSplineData = C:\VRoboCoop\GitHub\Philipp\Implementierungen\FreeDyn\Nonlinear_Spring_Pendulum_Houston\dataSPL.txt
+	PathToSplineData = C:\VRoboCoop\GitHub\freedyn_org\freedyn-optimization-toolbox\example-2_nonlinear-spring-pendulum_minimum-control-effort\dataSPL.txt
 	NumberOfHeaderLines = 0
 	ColumnXData = 0
 	ColumnYData = 1
@@ -119,7 +119,7 @@ DataObject Spline_1D
 	ID = 6773ec7c-e261-4993-a0f8-9513b0ac55b4
 	Name = uDach_y
 	InterpolationType = zccspl
-	PathToSplineData = C:\VRoboCoop\GitHub\Philipp\Implementierungen\FreeDyn\Nonlinear_Spring_Pendulum_Houston\dataSPL.txt
+	PathToSplineData = C:\VRoboCoop\GitHub\freedyn_org\freedyn-optimization-toolbox\example-2_nonlinear-spring-pendulum_minimum-control-effort\dataSPL.txt
 	NumberOfHeaderLines = 0
 	ColumnXData = 0
 	ColumnYData = 2
@@ -129,7 +129,7 @@ DataObject Spline_1D
 	ID = 5a101fb6-bc65-4bbb-83c2-4c54b6a12960
 	Name = uDach_z
 	InterpolationType = zccspl
-	PathToSplineData = C:\VRoboCoop\GitHub\Philipp\Implementierungen\FreeDyn\Nonlinear_Spring_Pendulum_Houston\dataSPL.txt
+	PathToSplineData = C:\VRoboCoop\GitHub\freedyn_org\freedyn-optimization-toolbox\example-2_nonlinear-spring-pendulum_minimum-control-effort\dataSPL.txt
 	NumberOfHeaderLines = 0
 	ColumnXData = 0
 	ColumnYData = 3
