@@ -63,13 +63,6 @@ Constraint Generic
 	    ConstraintOrientation = 1.000000,0.000000,0.000000,0.000000,1.000000,0.000000,0.000000,0.000000,1.000000
 EndConstraint
 %
-Force Gravity
-	ID = 1
-	Name = 
-	GravityAccVector = 0.000000,0.000000,-9.810000
-	ActivationTime = 0.000000
-EndForce
-%
 Force GenericForce
 	ID = fc69e13b-d8b7-477b-b0a5-64b7c690ee2a
 	Name = F3

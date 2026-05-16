@@ -81,22 +81,23 @@ res = sp.optimize.minimize(fun         = optim.objective,                    # c
 #
 # -----------------------------------------------------------------------------
 optim.update_vars_if_changed(res.x)
+optim.write_ctrl_dataSPL()
 
-dyn_t = np.zeros(optim.dyn_numTimeSteps)
-tau = np.zeros(optim.dyn_numTimeSteps)
-uInit = np.zeros((numControls, optim.dyn_numTimeSteps))
-u = np.zeros((numControls, optim.dyn_numTimeSteps))
-dyn_q = np.zeros((optim.nDof, optim.dyn_numTimeSteps))
-dyn_qD = np.zeros((optim.nDof, optim.dyn_numTimeSteps))
-spring_l = np.zeros(optim.dyn_numTimeSteps)
+t = np.zeros(optim.numTimeSteps)
+tau = np.zeros(optim.numTimeSteps)
+uInit = np.zeros((numControls, optim.numTimeSteps))
+u = np.zeros((numControls, optim.numTimeSteps))
+q = np.zeros((optim.nDof, optim.numTimeSteps))
+qD = np.zeros((optim.nDof, optim.numTimeSteps))
+spring_l = np.zeros(optim.numTimeSteps)
 
-for i in range(optim.dyn_numTimeSteps-1, -1, -1): 
+for i in range(optim.numTimeSteps-1, -1, -1): 
    optim.fd_model.fetch_states_at_index(i)
-   dyn_t[i] = optim.fd_model.t
-   tau[i] = dyn_t[i]/optim.tF
+   t[i] = optim.fd_model.t
+   tau[i] = t[i]/optim.tF
    
-   dyn_q[:,i] = optim.fd_model.Q[:, 0]
-   dyn_qD[:,i] = optim.fd_model.Qd[:, 0]
+   q[:,i] = optim.fd_model.Q[:, 0]
+   qD[:,i] = optim.fd_model.Qd[:, 0]
    spring_l[i] = optim.fd_model.get_measure_value("l")
    
    uInit[:,i] = optim.get_u_for_GridNodes(tau[i], uDachInit)
@@ -109,9 +110,9 @@ f = plt.figure(figsize=(10,10))
 
 # plot relative motion
 ax1 = f.add_subplot(2,2, 1)
-ax1.plot(dyn_t, dyn_q[0,:], c = 'blue', linewidth = 2)
-ax1.plot(dyn_t, dyn_q[1,:], c = 'green', linewidth = 2)
-ax1.plot(dyn_t, dyn_q[2,:], c = 'darkorange', linewidth = 2)
+ax1.plot(t, q[0,:], c = 'blue', linewidth = 2)
+ax1.plot(t, q[1,:], c = 'green', linewidth = 2)
+ax1.plot(t, q[2,:], c = 'darkorange', linewidth = 2)
 ax1.scatter(np.array([tF,tF,tF]), xF[0:3], c = 'r', marker = 'x')
 ax1.set_xlabel('Time in s')
 ax1.set_ylabel('Position in m')
@@ -119,9 +120,9 @@ ax1.grid()
 
 # plot relative veloctiy
 ax2 = f.add_subplot(2,2, 2)
-ax2.plot(dyn_t, dyn_qD[0,:], c = 'blue', linewidth = 2)
-ax2.plot(dyn_t, dyn_qD[1,:], c = 'green', linewidth = 2)
-ax2.plot(dyn_t, dyn_qD[2,:], c = 'darkorange', linewidth = 2)
+ax2.plot(t, qD[0,:], c = 'blue', linewidth = 2)
+ax2.plot(t, qD[1,:], c = 'green', linewidth = 2)
+ax2.plot(t, qD[2,:], c = 'darkorange', linewidth = 2)
 ax2.scatter(np.array([tF,tF,tF]), xF[3:6], c = 'r', marker = 'x')
 ax2.set_xlabel('Time in s')
 ax2.set_ylabel('Velocity in m/s')
@@ -139,7 +140,7 @@ ax3.set_xlim([0, 1])
 
 # Plot Spring length
 ax4 = f.add_subplot(2,2, 4)
-ax4.plot(dyn_t, spring_l, c = 'blue', linewidth = 2)
+ax4.plot(t, spring_l, c = 'blue', linewidth = 2)
 ax4.set_ylabel('Spring length in m')
 ax4.set_xlabel('Time in s')
 ax4.grid()

@@ -76,21 +76,21 @@ res = sp.optimize.minimize(fun         = optim.objective,                    # c
 optim.update_vars_if_changed(res.x)
 optim.write_ctrl_dataSPL()
 
-dyn_t = np.zeros(optim.dyn_numTimeSteps)
-tau = np.zeros(optim.dyn_numTimeSteps)
-uInit = np.zeros((numControls, optim.dyn_numTimeSteps))
-u = np.zeros((numControls, optim.dyn_numTimeSteps))
-y = np.zeros(optim.dyn_numTimeSteps)
-ybar = np.zeros(optim.dyn_numTimeSteps)
+t = np.zeros(optim.numTimeSteps)
+tau = np.zeros(optim.numTimeSteps)
+uInit = np.zeros((numControls, optim.numTimeSteps))
+u = np.zeros((numControls, optim.numTimeSteps))
+y = np.zeros(optim.numTimeSteps)
+ybar = np.zeros(optim.numTimeSteps)
 
-for i in range(optim.dyn_numTimeSteps-1, -1, -1): 
+for i in range(optim.numTimeSteps-1, -1, -1): 
    optim.fd_model.fetch_states_at_index(i)
-   dyn_t[i] = optim.fd_model.t
-   tau[i] = dyn_t[i]/optim.tF
+   t[i] = optim.fd_model.t
+   tau[i] = t[i]/optim.tF
    
-   dyn_q = optim.fd_model.Q[:, 0]
-   y[i] = dyn_q[7] - dyn_q[0]
-   ybar[i] = optim.get_target_path(dyn_t[i])
+   q = optim.fd_model.Q[:, 0]
+   y[i] = q[7] - q[0]
+   ybar[i] = optim.get_target_path(t[i])
    
    uInit[:,i] = optim.get_u_for_GridNodes(tau[i], uDachInit)
    u[:,i] = optim.get_u(tau[i])
@@ -103,8 +103,8 @@ f = plt.figure(figsize=(10,5))
 
 # plot relative motion
 ax2 = f.add_subplot(1, 2, 1)
-ax2.plot(dyn_t, y, linewidth = 1)
-ax2.plot(dyn_t, ybar, linewidth = 1)
+ax2.plot(t, y, linewidth = 1)
+ax2.plot(t, ybar, linewidth = 1)
 ax2.set_xlabel('normalized time')
 ax2.set_ylabel('y in m')
 ax2.grid()
