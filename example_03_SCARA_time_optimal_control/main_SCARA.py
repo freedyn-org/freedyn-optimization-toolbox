@@ -45,7 +45,7 @@ nameParFdu = ["u1par","u2par"]
 
 """ Define controls """
 numControls = 2           # number of controls
-numGridNodes = 10        # number of grid nodes per control
+numGridNodes = 50        # number of grid nodes per control
 uDachInit = np.zeros(numGridNodes*numControls)
 
 
@@ -80,7 +80,7 @@ optim = Optimization(numOptVar, numControls, numGridNodes,
                      pathFDdll)
 
 
-options = {'disp': True, 'iprint': 2, 'ftol': 1e-8, 'eps':1e-8, 'maxiter': 5}
+options = {'disp': True, 'iprint': 2, 'ftol': 1e-8, 'eps':1e-8, 'maxiter': 500}
 constraints = {'type':'eq', 'fun':optim.ceq_tF, 'jac':optim.get_grad_Phi}
 
 profiler = Profiler()
@@ -105,30 +105,30 @@ profiler.open_in_browser("speedscope")  # Öffnet direkt in speedscope.app
 optim.update_vars_if_changed(res.x)
 optim.write_ctrl_dataSPL()
 
-dyn_t = np.zeros(optim.dyn_numTimeSteps)
-tau = np.zeros(optim.dyn_numTimeSteps)
-uInit = np.zeros((numControls, optim.dyn_numTimeSteps))
-u = np.zeros((numControls, optim.dyn_numTimeSteps))
-dyn_q = np.zeros((optim.nDof, optim.dyn_numTimeSteps))
-dyn_qD = np.zeros((optim.nDof, optim.dyn_numTimeSteps))
+t = np.zeros(optim.numTimeSteps)
+tau = np.zeros(optim.numTimeSteps)
+uInit = np.zeros((numControls, optim.numTimeSteps))
+u = np.zeros((numControls, optim.numTimeSteps))
+q = np.zeros((optim.nDof, optim.numTimeSteps))
+qD = np.zeros((optim.nDof, optim.numTimeSteps))
     
-for i in range(optim.dyn_numTimeSteps-1, -1, -1): 
+for i in range(optim.numTimeSteps-1, -1, -1): 
    optim.fd_model.fetch_states_at_index(i)
-   dyn_t[i] = optim.fd_model.t
-   tau[i] = dyn_t[i]/optim.tF
+   t[i] = optim.fd_model.t
+   tau[i] = t[i]/optim.tF
    
    uInit[:,i] = optim.get_u_for_GridNodes(tau[i], uDachInit)
    u[:,i] = optim.get_u(tau[i])
-   dyn_q[:,i] = optim.fd_model.Q[:, 0]
-   dyn_qD[:,i] = optim.fd_model.Qd[:, 0]
+   q[:,i] = optim.fd_model.Q[:, 0]
+   qD[:,i] = optim.fd_model.Qd[:, 0]
 
 
-x_TCP = dyn_q[14,:]
-y_TCP = dyn_q[15,:]
-x_COG2 = dyn_q[7,:]
-y_COG2 = dyn_q[8,:]
-x_COG1 = dyn_q[0,:]
-y_COG1 = dyn_q[1,:]
+x_TCP = q[14,:]
+y_TCP = q[15,:]
+x_COG2 = q[7,:]
+y_COG2 = q[8,:]
+x_COG1 = q[0,:]
+y_COG1 = q[1,:]
 
 # -----------------------------------------------------------------------------
 # plots
