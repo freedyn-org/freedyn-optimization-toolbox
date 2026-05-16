@@ -10,7 +10,7 @@ from pyinstrument import Profiler
 
 """ Define paths  """
 # Path to FreeDyn dll
-pathFDdll = 'C:\\VRoboCoop\\Programme\\FreeDyn\\Release_1.0.5\\FreeDyn-win-x64_MD\\freedyn.dll'
+pathFDdll = 'C:\\VRoboCoop\\Programme\\FreeDyn\\freedyn_v1.0.6_preview\\freedyn.dll'
 
 # Path to FreeDyn API """
 pathFDApi = '..\\..\\freedyn\\bindings\\python'

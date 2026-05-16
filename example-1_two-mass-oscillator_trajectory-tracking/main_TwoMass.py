@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 
 """ Define paths  """
 # Path to FreeDyn dll
-pathFDdll = 'C:\\VRoboCoop\\Programme\\FreeDyn\\Release_1.0.5\\FreeDyn-win-x64_MD\\freedyn.dll'
+pathFDdll = 'C:\\VRoboCoop\\Programme\\FreeDyn\\freedyn_v1.0.6_preview\\freedyn.dll'
 
 # Path to FreeDyn API """
 pathFDApi = '..\\..\\freedyn\\bindings\\python'
@@ -43,7 +43,7 @@ nameParFdu = ["fdu"]
 
 """ Define controls """
 numControls = 1          # number of controls
-numGridNodes = 12        # number of grid nodes per control
+numGridNodes = 22        # number of grid nodes per control
 uDachInit = np.zeros(numGridNodes*numControls)
 
 
@@ -62,9 +62,8 @@ optim = Optimization(numOptVar, numControls, numGridNodes,
                      nameCtrlSpline, nameParFdu,
                      pathFDdll)
 
-optFtol = 1e-8
-optEps = 1e-8
-options = {'disp': True, 'iprint': 2, 'ftol': optFtol, 'eps':optEps, 'maxiter': 2}
+
+options = {'disp': True, 'iprint': 2, 'ftol': 1e-8, 'eps':1e-8, 'maxiter': 150}
 
 res = sp.optimize.minimize(fun         = optim.objective,                    # cost function
                            x0          = z0,                                 # initial values
@@ -75,6 +74,7 @@ res = sp.optimize.minimize(fun         = optim.objective,                    # c
 
 # -----------------------------------------------------------------------------
 optim.update_vars_if_changed(res.x)
+optim.write_ctrl_dataSPL()
 
 dyn_t = np.zeros(optim.dyn_numTimeSteps)
 tau = np.zeros(optim.dyn_numTimeSteps)
@@ -112,7 +112,7 @@ ax2.grid()
 # plot control
 ax1 = f.add_subplot(1, 2, 2)
 ax1.plot(tau, u.T, linewidth = 2)
-ax1.set_ylabel('control in Nm')
+ax1.set_ylabel('control in N')
 ax1.set_xlabel('normalized time')
 ax1.grid()
 ax1.set_xlim([0, 1])

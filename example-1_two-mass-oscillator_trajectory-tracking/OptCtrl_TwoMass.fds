@@ -118,7 +118,7 @@ DataObject Spline_1D
 	ID = 5de64815-ddff-43f4-8312-73b522c381dd
 	Name = uDach
 	InterpolationType = zccspl
-	PathToSplineData = C:\VRoboCoop\GitHub\freedyn_org\freedyn-optimization-toolbox\example-1_two-mass-oscillator_trajectory-tracking\dataSPL.txt
+	PathToSplineData = dataSPL.txt
 	NumberOfHeaderLines = 0
 	ColumnXData = 0
 	ColumnYData = 1

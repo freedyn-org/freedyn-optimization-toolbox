@@ -55,23 +55,11 @@ class Optimization(Control, FreeDyn, MBS_SysMat, BDF, adjGrads, numDiff, fcts_Us
         # compare of change
         u_changed = not np.array_equal(self.uDach, mat_uDach_new)
 
-        # Only assign if changed
-        # reuse or compute solution
+        # reuse or compute solution, only assign and compute if changed
         if u_changed:
             self.uDach = mat_uDach_new.copy()
-            
-            self.write_ctrl_dataSPL()
-            
-            self.fd_model.__del__()
-            self.fd_model = fd.Model(self.fds_path_name, status_output="NO")
-            
             self.update_ctrl_gridNodes()
             self.fd_model.reset_for_rerun()
-            
-            self.create_ID_MBS()
-            self.update_MBS_SysMat_idx()
-            
-            # Simulate the model 
             self.exec_FreeDyn()  
         
         return None
@@ -116,8 +104,8 @@ class Optimization(Control, FreeDyn, MBS_SysMat, BDF, adjGrads, numDiff, fcts_Us
         grad_J = self.adjGrad_J(z)            
         
         """ Numerischer Gradient - all """
-        numGrad_J = self.numGrad_J(z)
-        error =  numGrad_J - grad_J
+        # numGrad_J = self.numGrad_J(z)
+        # error =  numGrad_J - grad_J
         
         return grad_J
     
