@@ -21,7 +21,7 @@ class FreeDyn():
         self.nDof = info.num_generalized_coordinates
         self.nConstr = info.num_lagrange_multipliers
         self.nDofConstr = self.nDof + self.nConstr 
-        self.dyn_numTimeSteps = 0
+        self.numTimeSteps = 0
         
         print('class FreeDyn initialized')
         
@@ -36,7 +36,7 @@ class FreeDyn():
     def exec_FreeDyn(self):
         self.fd_model.compute_initial_conditions()
         self.fd_model.solve_until(self.tF) 
-        self.dyn_numTimeSteps = self.fd_model.get_num_time_steps() 
+        self.numTimeSteps = self.fd_model.get_num_time_steps() 
 
         return None        
 
