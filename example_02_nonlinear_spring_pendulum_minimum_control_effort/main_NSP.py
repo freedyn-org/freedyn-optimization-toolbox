@@ -92,6 +92,7 @@ spring_l = np.zeros(optim.numTimeSteps)
 
 for i in range(optim.numTimeSteps-1, -1, -1): 
    optim.fd_model.fetch_states_at_index(i)
+   optim.fd_model.update_state_at_index(i)
    t[i] = optim.fd_model.t
    tau[i] = t[i]/optim.tF
    
