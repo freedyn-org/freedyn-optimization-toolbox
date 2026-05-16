@@ -79,11 +79,8 @@ optim = Optimization(numOptVar, numControls, numGridNodes,
                      nameCtrlSpline, nameParFdu,
                      pathFDdll)
 
-optFtol = 1e-8
-optEps = 1e-8
-options = {'disp': True, 'iprint': 2, 'ftol': optFtol, 'eps':optEps, 'maxiter': 5}
 
-    
+options = {'disp': True, 'iprint': 2, 'ftol': 1e-8, 'eps':1e-8, 'maxiter': 5}
 constraints = {'type':'eq', 'fun':optim.ceq_tF, 'jac':optim.get_grad_Phi}
 
 profiler = Profiler()
@@ -106,6 +103,7 @@ profiler.open_in_browser("speedscope")  # Öffnet direkt in speedscope.app
     
 # -----------------------------------------------------------------------------
 optim.update_vars_if_changed(res.x)
+optim.write_ctrl_dataSPL()
 
 dyn_t = np.zeros(optim.dyn_numTimeSteps)
 tau = np.zeros(optim.dyn_numTimeSteps)

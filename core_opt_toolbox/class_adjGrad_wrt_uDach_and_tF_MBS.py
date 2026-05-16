@@ -33,7 +33,7 @@ class adjGrads:
         
         idx_buff = 0
         
-        tRight = self.adjGrad_updates(self.dyn_numTimeSteps-1)
+        tRight = self.adjGrad_updates(self.numTimeSteps-1)
         self.get_consistent_BC_J() 
         self.get_LagrangianOCP_du(z)
         
@@ -48,7 +48,7 @@ class adjGrads:
         """ BDF order 1 """
         idx_buff = 1 - idx_buff
         
-        tLeft = self.adjGrad_updates(self.dyn_numTimeSteps-2)
+        tLeft = self.adjGrad_updates(self.numTimeSteps-2)
         
         deltaT = tRight - tLeft
         self.BDF_diff_tau[self.BDF_idx_buff] = deltaT
@@ -67,7 +67,7 @@ class adjGrads:
                 
         """ BDF order 2 """        
         
-        for i in range(self.dyn_numTimeSteps-3, -1, -1):
+        for i in range(self.numTimeSteps-3, -1, -1):
             idx_buff = 1 - idx_buff
             integrand_tF_Right = integrand_tF_Left
             tRight = tLeft
@@ -107,7 +107,7 @@ class adjGrads:
         
         idx_buff = 0
 
-        tRight = self.adjGrad_updates(self.dyn_numTimeSteps-1)
+        tRight = self.adjGrad_updates(self.numTimeSteps-1)
         
         self.get_consistent_BC_Phi() # this updates self.dPhidq and self.dPhidv
         
@@ -123,7 +123,7 @@ class adjGrads:
         """ BDF order 1 """ 
         idx_buff = 1 - idx_buff
         
-        tLeft = self.adjGrad_updates(self.dyn_numTimeSteps-2)
+        tLeft = self.adjGrad_updates(self.numTimeSteps-2)
         
         deltaT = tRight - tLeft
         self.BDF_diff_tau[self.BDF_idx_buff] = deltaT
@@ -141,7 +141,7 @@ class adjGrads:
         
         """ BDF order 2 """      
         
-        for i in range(self.dyn_numTimeSteps-3, -1, -1):
+        for i in range(self.numTimeSteps-3, -1, -1):
             idx_buff = 1 - idx_buff
             integrand_tF_Right = integrand_tF_Left
             tRight = tLeft

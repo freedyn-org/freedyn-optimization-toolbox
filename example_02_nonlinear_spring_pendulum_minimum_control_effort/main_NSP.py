@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 
 """ Define paths  """
 # Path to FreeDyn dll
-pathFDdll = 'C:\\VRoboCoop\\Programme\\FreeDyn\\Release_1.0.5\\FreeDyn-win-x64_MD\\freedyn.dll'
+pathFDdll = 'C:\\VRoboCoop\\Programme\\FreeDyn\\freedyn_v1.0.6_preview\\freedyn.dll'
 
 # Path to FreeDyn API """
 pathFDApi = '..\\..\\freedyn\\bindings\\python'
@@ -63,9 +63,8 @@ optim = Optimization(numOptVar, numControls, numGridNodes,
                      nameCtrlSpline, nameParFdu,
                      pathFDdll)
 
-optFtol = 1e-8
-optEps = 1e-8
-options = {'disp': True, 'iprint': 2, 'ftol': optFtol, 'eps':optEps, 'maxiter': 5}
+
+options = {'disp': True, 'iprint': 2, 'ftol': 1e-8, 'eps':1e-8, 'maxiter': 50}
 constraints = {'type':'eq', 'fun':optim.ceq_tF, 'jac':optim.get_grad_Phi}
 
 

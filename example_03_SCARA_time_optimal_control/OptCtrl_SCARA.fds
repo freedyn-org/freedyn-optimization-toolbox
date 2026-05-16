@@ -125,7 +125,7 @@ DataObject Spline_1D
 	ID = d97205cc-d83e-4b41-940b-182092c79a76
 	Name = u1Dach
 	InterpolationType = zccspl
-	PathToSplineData = C:\VRoboCoop\GitHub\freedyn_org\freedyn-optimization-toolbox\example-3_SCARA_time-optimal-control\dataSPL.txt
+	PathToSplineData = dataSPL.txt
 	NumberOfHeaderLines = 0
 	ColumnXData = 0
 	ColumnYData = 1
@@ -135,7 +135,7 @@ DataObject Spline_1D
 	ID = 84978d78-ea53-48d3-bb23-3cf569399dac
 	Name = u2Dach
 	InterpolationType = zccspl
-	PathToSplineData = C:\VRoboCoop\GitHub\freedyn_org\freedyn-optimization-toolbox\example-3_SCARA_time-optimal-control\dataSPL.txt
+	PathToSplineData = dataSPL.txt
 	NumberOfHeaderLines = 0
 	ColumnXData = 0
 	ColumnYData = 2

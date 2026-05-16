@@ -62,18 +62,8 @@ class Optimization(Control, FreeDyn, MBS_SysMat, BDF, adjGrads, numDiff, fcts_Us
         if tf_changed or u_changed:
             self.tF = new_tf
             self.uDach = mat_uDach_new.copy()
-            self.write_ctrl_dataSPL()
-            
-            self.fd_model.__del__()
-            self.fd_model = fd.Model(self.fds_path_name, status_output="NO")
-            
             self.update_ctrl_gridNodes()
-            #self.fd_model.reset_for_rerun()
-            
-            self.create_ID_MBS()
-            self.update_MBS_SysMat_idx()
-            
-            # Simulate the model 
+            self.fd_model.reset_for_rerun()
             self.exec_FreeDyn()  
         
         return None      
@@ -92,11 +82,11 @@ class Optimization(Control, FreeDyn, MBS_SysMat, BDF, adjGrads, numDiff, fcts_Us
        
         J = 0
         
-        self.fd_model.fetch_states_at_index(self.dyn_numTimeSteps-1)
+        self.fd_model.fetch_states_at_index(self.numTimeSteps-1)
         tRight = self.fd_model.t
         integrand_right = self.get_LagrangianOCP(z)
         
-        for i in range(self.dyn_numTimeSteps-2, -1, -1):
+        for i in range(self.numTimeSteps-2, -1, -1):
             self.fd_model.fetch_states_at_index(i)
             tLeft = self.fd_model.t
             integrand_left = self.get_LagrangianOCP(z)
@@ -128,7 +118,7 @@ class Optimization(Control, FreeDyn, MBS_SysMat, BDF, adjGrads, numDiff, fcts_Us
     def ceq_tF(self, z):
 
         self.update_vars_if_changed(z)
-        self.fd_model.fetch_states_at_index(self.dyn_numTimeSteps-1)
+        self.fd_model.fetch_states_at_index(self.numTimeSteps-1)
 
         return self.eval_Phi()
 
