@@ -55,6 +55,12 @@ J = \int_{t_0}^{t_\mathrm{f}} 1 \mathrm{d}t \quad \left. \begin{pmatrix}
     \end{pmatrix} \right|_{t_\mathrm{f}} = \mathbf{0}
 \end{aligned}
 $$
+
+## Requirements
+- Python 3.8+
+- numpy, scipy
+- freedyn.dll - Core MBS solver (C-interface Dynamic Link Library)
+- FreeDyn API - Python Bindings
  
 ## Citation
 If you use the FreeDyn Optimization Toolbox in your research, please cite:
