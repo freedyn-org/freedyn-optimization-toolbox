@@ -38,7 +38,7 @@ $$
 
 $$
 \begin{aligned}
-J = \int_{t_0}^{t_\mathrm{f}} \frac{1}{2} \mathbf{u}^\top \mathbf{u} \mathrm{d}t \quad \left. \begin{pmatrix}
+J = \int_{t_0}^{t_\mathrm{f}} \frac{1}{2} \mathbf{u}^\top \mathbf{u} \mathrm{d}t \quad \boldsymbol{\phi} = \left. \begin{pmatrix}
         \mathbf{x} - \mathbf{x}_\mathrm{f} \\ 
         \dot{\mathbf{x}}  - \dot{\mathbf{x}}_\mathrm{f}
     \end{pmatrix} \right|_{t_\mathrm{f}} = \mathbf{0}
@@ -49,7 +49,7 @@ $$
 
 $$
 \begin{aligned}
-J = \int_{t_0}^{t_\mathrm{f}} 1 \mathrm{d}t \quad \left. \begin{pmatrix}
+J = \int_{t_0}^{t_\mathrm{f}} 1 \mathrm{d}t \quad \boldsymbol{\phi} = \left. \begin{pmatrix}
         \mathbf{x} - \mathbf{x}_\mathrm{f} \\ 
         \dot{\mathbf{x}}
     \end{pmatrix} \right|_{t_\mathrm{f}} = \mathbf{0}
