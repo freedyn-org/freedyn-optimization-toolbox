@@ -4,6 +4,8 @@ import numpy as np
 import scipy as sp
 import matplotlib
 import matplotlib.pyplot as plt
+import time
+from pyinstrument import Profiler
 
 
 """ Define paths  """
@@ -64,13 +66,19 @@ optim = Optimization(numOptVar, numControls, numGridNodes,
 
 
 options = {'disp': True, 'iprint': 2, 'ftol': 1e-8, 'eps':1e-8, 'maxiter': 150}
-
+profiler = Profiler()
+profiler.start()
+countStart = time.perf_counter()
 res = sp.optimize.minimize(fun         = optim.objective,                    # cost function
                            x0          = z0,                                 # initial values
                            method      = 'SLSQP',                            # optimization method
                            jac         = optim.get_grad_J,                   # gradient of cost function
                            options     = options                             # optimization options
                            )
+countEnd = time.perf_counter()
+profiler.stop()
+timeComp = countEnd - countStart
+print(f"Zeitdauer Optimierung: {timeComp} s")
 
 # -----------------------------------------------------------------------------
 optim.update_vars_if_changed(res.x)
