@@ -56,6 +56,18 @@ J = \int_{t_0}^{t_\mathrm{f}} 1 \mathrm{d}t \quad \boldsymbol{\phi} = \left. \be
 \end{aligned}
 $$
 
+## Quick Start
+1. Download and extract FreeDyn release ZIP
+2. Define paths
+```bash
+# Path to freeDyn.dll
+pathFDdll = '..\\..\\Releases\\freedyn-1.0.6\\bin\\FreeDyn-win-x64_MD\\freedyn.dll'
+
+# Path to FreeDyn API
+pathFDApi = '..\\..\\Releases\\freedyn-1.0.6\\bindings\\python'
+ ```
+4. Run `main.py`
+
 ## Requirements
 - Python 3.8+
 - numpy, scipy
