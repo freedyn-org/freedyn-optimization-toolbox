@@ -26,9 +26,9 @@ have to be satisfied.
 - **Optimal Control Problems with free final time** `class_TOCP_MBS.py`
 
 ## Examples
-- See [examples/](example_01_two_mass_oscillator_trajectory_tracking/) folder
-- See [examples/](example_01_two_mass_oscillator_trajectory_tracking/) folder
-- See [examples/](example_01_two_mass_oscillator_trajectory_tracking/) folder
+- [Trajectory Tracking/](example_01_two_mass_oscillator_trajectory_tracking/)
+- [Minimum Control Effort/](example_02_nonlinear_spring_pendulum_minimum_control_effort/) 
+- [Time Optimal Control/](example_03_SCARA_time_optimal_control/) 
 
 ## Citation
 If you use the FreeDyn Optimization Toolbox in your research, please cite:
