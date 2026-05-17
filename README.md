@@ -38,7 +38,7 @@ $$
 
 $$
 \begin{aligned}
-J = \int_{t_0}^{t_\mathrm{f}} \frac{1}{2} \mathbf{u}^\top \mathbf{u} \mathrm{d}t \quad \left. \begin{pmatrix}
+J = \int_{t_0}^{t_\mathrm{f}} \frac{1}{2} \mathbf{u}^\top \mathbf{u} \mathrm{d}t \quad \boldsymbol{\phi} = \left. \begin{pmatrix}
         \mathbf{x} - \mathbf{x}_\mathrm{f} \\ 
         \dot{\mathbf{x}}  - \dot{\mathbf{x}}_\mathrm{f}
     \end{pmatrix} \right|_{t_\mathrm{f}} = \mathbf{0}
@@ -49,12 +49,24 @@ $$
 
 $$
 \begin{aligned}
-J = \int_{t_0}^{t_\mathrm{f}} 1 \mathrm{d}t \quad \left. \begin{pmatrix}
+J = \int_{t_0}^{t_\mathrm{f}} 1 \mathrm{d}t \quad \boldsymbol{\phi} = \left. \begin{pmatrix}
         \mathbf{x} - \mathbf{x}_\mathrm{f} \\ 
         \dot{\mathbf{x}}
     \end{pmatrix} \right|_{t_\mathrm{f}} = \mathbf{0}
 \end{aligned}
 $$
+
+## Quick Start
+1. Download and extract FreeDyn release ZIP
+2. Define paths
+```bash
+# Path to freeDyn.dll
+pathFDdll = '..\\..\\Releases\\freedyn-1.0.6\\bin\\FreeDyn-win-x64_MD\\freedyn.dll'
+
+# Path to FreeDyn API
+pathFDApi = '..\\..\\Releases\\freedyn-1.0.6\\bindings\\python'
+ ```
+3. Run `main.py`
 
 ## Requirements
 - Python 3.8+
@@ -78,4 +90,4 @@ If you use the FreeDyn Optimization Toolbox in your research, please cite:
 Papers demonstrating the toolbox:
 
 P. Zallinger, L. Buchner, W. Steiner, K. Nachbagauer. A Low-Effort Approach to Adjoint Gradient Computation for Optimal Control Problems Using a Multibody Dynamics Simulation Interface. 
-ASME International Conference on Multibody Systems, Nonlinear Dynamics, and Control, Houston, Texas, USA, 2026.
+Proceedings of the ASME 2026 International Design Engineering Technical Conferences and Computers and Information in Engineering Conference. 22nd International Conference on Multibody Systems, Nonlinear Dynamics, and Control (MSNDC). Houston, Texas, USA. 2026.
