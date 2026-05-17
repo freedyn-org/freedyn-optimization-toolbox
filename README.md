@@ -26,13 +26,24 @@ have to be satisfied.
 - **Optimal Control Problems with free final time** `class_TOCP_MBS.py`
 
 ## Examples
-- [Trajectory Tracking](example_01_two_mass_oscillator_trajectory_tracking/):
+- [Trajectory Tracking](example_01_two_mass_oscillator_trajectory_tracking/)
   
-  $$J = \int_{t_0}^{t_\mathrm{f}} \mathcal{L} (\mathbf{q}(t),\mathbf{v}(t),\mathbf{u}(t))  \mathrm{d}t$$
+$$
+\begin{aligned}
+J = \int_{t_0}^{t_\mathrm{f}} \frac{1}{2} \left( y - \bar{y} \right)^2  \mathrm{d}t
+\end{aligned}
+$$
   
 - [Minimum Control Effort](example_02_nonlinear_spring_pendulum_minimum_control_effort/)
-  
-  $$J = \int_{t_0}^{t_\mathrm{f}} \mathcal{L} (\mathbf{q}(t),\mathbf{v}(t),\mathbf{u}(t))  \mathrm{d}t \quad \boldsymbol{\phi}(\mathbf{q}(t_\mathrm{f}), \mathbf{v}(t_\mathrm{f}), t_\mathrm{f}) = \mathbf{0}$$
+
+$$
+\begin{aligned}
+J = \int_{t_0}^{t_\mathrm{f}} \frac{1}{2} \mathbf{u}^\top \mathbf{u} \mathrm{d}t \quad \left. \begin{pmatrix}
+        \mathbf{x} - \mathbf{x}_\mathrm{f} \\ 
+        \dot{\mathbf{x}}  - \dot{\mathbf{x}}_\mathrm{f}
+    \end{pmatrix} \right|_{t_\mathrm{f}} = \mathbf{0}
+\end{aligned}
+$$
   
 - [Time Optimal Control](example_03_SCARA_time_optimal_control/)
   
