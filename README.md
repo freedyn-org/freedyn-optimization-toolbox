@@ -78,4 +78,4 @@ If you use the FreeDyn Optimization Toolbox in your research, please cite:
 Papers demonstrating the toolbox:
 
 P. Zallinger, L. Buchner, W. Steiner, K. Nachbagauer. A Low-Effort Approach to Adjoint Gradient Computation for Optimal Control Problems Using a Multibody Dynamics Simulation Interface. 
-ASME International Conference on Multibody Systems, Nonlinear Dynamics, and Control, Houston, Texas, USA, 2026.
+Proceedings of the ASME 2026 International Design Engineering Technical Conferences and Computers and Information in Engineering Conference. 22nd International Conference on Multibody Systems, Nonlinear Dynamics, and Control (MSNDC). Houston, Texas, USA. 2026.
