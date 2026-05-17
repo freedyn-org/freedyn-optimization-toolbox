@@ -66,7 +66,7 @@ pathFDdll = '..\\..\\Releases\\freedyn-1.0.6\\bin\\FreeDyn-win-x64_MD\\freedyn.d
 # Path to FreeDyn API
 pathFDApi = '..\\..\\Releases\\freedyn-1.0.6\\bindings\\python'
  ```
-4. Run `main.py`
+3. Run `main.py`
 
 ## Requirements
 - Python 3.8+
