@@ -4,10 +4,25 @@ import numpy as np
 import scipy as sp
 import matplotlib
 import matplotlib.pyplot as plt
-import time
-from pyinstrument import Profiler
-
-
+#
+# -----------------------------------------------------------------------------
+""""
+.\FreeDyn 
+  ├── Releases\
+  │   └── freedyn-1.0.6
+  │       ├── bin\
+  │       │   └── FreeDyn-win-x64_MD   # MD variant: Freedyn_GUI.exe, freedyn.dll, dependencies
+  │       │       └── freedyn.dll
+  │       └── bindings
+  │           └── python               # Python API (source code)
+  └── freedyn-optimization-toolbox
+      ├── core_opt_toolbox             # global methods for optimization
+      ├── example_01
+      ├── example_02
+      └── example_03  <- current working directory
+"""
+# -----------------------------------------------------------------------------
+#
 """ Define paths  """
 # Path to FreeDyn dll
 pathFDdll = '..\\..\\Releases\\freedyn-1.0.6\\bin\\FreeDyn-win-x64_MD\\freedyn.dll'
@@ -23,42 +38,42 @@ sys.path.insert(0, bib_path)
 # Define path and name of *.fds - without file typ!
 path_fds = Path(__file__).resolve().parent
 name_fds = 'OptCtrl_SCARA'
-
-
-"""  Choose OCP Problem """
-# Final time tF is fixed: Optimal control problem with/without final constraints Phi
-# from class_OCP_MBS import Optimization
-
-# Final time tF is free: Time-optimal control problem with/without final constraints Phi
-from class_TOCP_MBS import Optimization     
-
-
+#
+# -----------------------------------------------------------------------------
+#
 """ Define the names of ctrl splines """
 # derivative of sum of external forces w.r.t. parameter given as string
 nameCtrlSpline = ["u1Dach", "u2Dach"]
-
-
+#
+# -----------------------------------------------------------------------------
+#
 """ Define the names of the parameters for dfdu """
 # derivative of sum of external forces w.r.t. parameter given as string
 nameParFdu = ["u1par","u2par"]
-
-
+#
+# -----------------------------------------------------------------------------
+#
 """ Define controls """
-numControls = 2           # number of controls
-numGridNodes = 50        # number of grid nodes per control
+numControls = 2     # number of controls
+numGridNodes = 50   # number of grid nodes per control
+
 uDachInit = np.zeros(numGridNodes*numControls)
-
-
+#
+# -----------------------------------------------------------------------------
+#
 """ Define final state of the MBS system """
 tF_init = 3             # final time
-xF = np.array([1.0, 1.0, 0, 0])   # final constraints, if no constraints are used, set = np.array([])
-
-
+xF = np.array([1.0, 1.0, 0, 0])   # final constraints,
+                                  # if no constraints are used, set = np.array([])
+#
+# -----------------------------------------------------------------------------
+#
 """ Define initial values for optimization variables z0"""
 z0 = np.append(tF_init, uDachInit)    
 numOptVar = len(z0)
-
-
+#
+# -----------------------------------------------------------------------------
+#
 """ Define bounds """
 uLimit = np.array([4,2])        # control limit
 lb = np.array(0.01)
@@ -67,45 +82,53 @@ ub = np.array(np.inf)
 for loop_Limit in range(0, numControls):
     lb = np.append(lb, -uLimit[loop_Limit]*np.ones(numGridNodes))
     ub = np.append(ub, uLimit[loop_Limit]*np.ones(numGridNodes))
-  
-bounds = sp.optimize.Bounds(lb, ub)
+#
+# -----------------------------------------------------------------------------
+#
+"""  Choose OCP Problem """
+# Optimal control problem with/without final constraints Phi
+tF_free = 1   # is final time tF free? no ... 0 || yes ... 1
 
-
-
+if tF_free:
+    from class_TOCP_MBS import Optimization
+else:
+    from class_OCP_MBS import Optimization
 
 optim = Optimization(numOptVar, numControls, numGridNodes, 
                      tF_init, xF,
                      path_fds, name_fds,
                      nameCtrlSpline, nameParFdu,
                      pathFDdll)
-
-
-options = {'disp': True, 'iprint': 2, 'ftol': 1e-8, 'eps':1e-8, 'maxiter': 500}
-constraints = {'type':'eq', 'fun':optim.ceq_tF, 'jac':optim.get_grad_Phi}
-
-profiler = Profiler()
-profiler.start()
-countStart = time.perf_counter()
-res = sp.optimize.minimize(fun         = optim.objective,                    # cost function
-                           x0          = z0,                                 # initial values
-                           method      = 'SLSQP',                            # optimization method
-                           jac         = optim.get_grad_J,                   # gradient of cost function
-                           bounds      = bounds,                             # lower and upper bounds
-                           constraints = constraints,                        # non-linear constraints
-                           options     = options                             # optimization options
-                           )
-countEnd = time.perf_counter()
-profiler.stop()
-timeComp = countEnd - countStart
-print(f"Zeitdauer Optimierung: {timeComp} s")
-
-profiler.open_in_browser("speedscope")  # Öffnet direkt in speedscope.app
-    
+#
 # -----------------------------------------------------------------------------
+#
+"""  Set up of the optimization-toolbox """
+# Add or comment out – according to the optimization problem
+res = sp.optimize.minimize(fun         = optim.objective,                # cost function
+                           x0          = z0,                             # initial values
+                           method      = 'SLSQP',                        # optimization method
+                           jac         = optim.get_grad_J,               # gradient of cost function
+                           bounds      = sp.optimize.Bounds(lb, ub),     # lower and upper bounds
+                           constraints = {'type':'eq', 
+                                          'fun':optim.ceq_tF, 
+                                          'jac':optim.get_grad_Phi},     # non-linear constraints
+                           options     = {'disp': True, 
+                                          'iprint': 2, 
+                                          'ftol': 1e-8, 
+                                          'eps':1e-8, 
+                                          'maxiter': 500}                # optimization options
+                           ) 
+#
+# -----------------------------------------------------------------------------
+#
+""" Update optimization variables in class and rerun simulation """
 optim.update_vars_if_changed(res.x)
 optim.change_tF_in_fds(optim.fds_path_name_optimized)
 optim.write_ctrl_dataSPL()
-
+#
+# -----------------------------------------------------------------------------
+#
+""" Get data for plots """
 t = np.zeros(optim.numTimeSteps)
 tau = np.zeros(optim.numTimeSteps)
 uInit = np.zeros((numControls, optim.numTimeSteps))
@@ -130,9 +153,10 @@ x_COG2 = q[7,:]
 y_COG2 = q[8,:]
 x_COG1 = q[0,:]
 y_COG1 = q[1,:]
-
+#
 # -----------------------------------------------------------------------------
-# plots
+#
+""" Plots """
 matplotlib.rcParams.update({'font.size': 15})
 f = plt.figure(figsize=(12,5))
 
@@ -159,7 +183,7 @@ ax1.grid()
 ax1.set_xlim([0, 1])
 
 plt.show()
-
+#
 # -----------------------------------------------------------------------------
-
+#
 optim.__del__()

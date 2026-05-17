@@ -119,15 +119,15 @@ class FreeDyn():
 # ----------------------------------------------------------------------------   
     
     def change_tF_in_fds(self, fds): 
-        self.fds_data[self.fds_tF_idxLine] =  f"	SimulationTimeEnd = {self.tF}\n"
+        self.fds_data[self.fds_idxLine["SimulationTimeEnd"]] =  f"	SimulationTimeEnd = {self.tF}\n"
         self.write_fds(fds)
         
         return None
        
 # ----------------------------------------------------------------------------   
     
-    def change_outputDeltaT_in_fds(self, fds, tau): 
-        self.fds_data[self.fds_outputDeltaT_idxLine] =  f"	OutputTimeStepSize = {tau}\n"
+    def change_outputDeltaT_in_fds(self, fds, deltaT): 
+        self.fds_data[self.fds_idxLine["OutputTimeStepSize"]] =  f"	OutputTimeStepSize = {deltaT}\n"
         self.write_fds(fds)
 
         return None
