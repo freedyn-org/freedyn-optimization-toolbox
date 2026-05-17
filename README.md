@@ -26,9 +26,9 @@ have to be satisfied.
 - **Optimal Control Problems with free final time** `class_TOCP_MBS.py`
 
 ## Examples
-- [Trajectory Tracking](example_01_two_mass_oscillator_trajectory_tracking/)
-- [Minimum Control Effort](example_02_nonlinear_spring_pendulum_minimum_control_effort/) 
-- [Time Optimal Control](example_03_SCARA_time_optimal_control/) 
+- [Trajectory Tracking](example_01_two_mass_oscillator_trajectory_tracking/): $ J = \int_{t_0}^{t_\mathrm{f}} \mathcal{L} (\mathbf{q}(t),\mathbf{v}(t),\mathbf{u}(t))  \mathrm{d}t$
+- [Minimum Control Effort](example_02_nonlinear_spring_pendulum_minimum_control_effort/)  $ J = \int_{t_0}^{t_\mathrm{f}} \mathcal{L} (\mathbf{q}(t),\mathbf{v}(t),\mathbf{u}(t))  \mathrm{d}t \quad \boldsymbol{\phi}(\mathbf{q}(t_\mathrm{f}), \mathbf{v}(t_\mathrm{f}), t_\mathrm{f}) = \mathbf{0}$
+- [Time Optimal Control](example_03_SCARA_time_optimal_control/) $ J = \int_{t_0}^{t_\mathrm{f}} \mathcal{L} (\mathbf{q}(t),\mathbf{v}(t),\mathbf{u}(t))  \mathrm{d}t \quad \boldsymbol{\phi}(\mathbf{q}(t_\mathrm{f}), \mathbf{v}(t_\mathrm{f}), t_\mathrm{f}) = \mathbf{0}$
 
 ## Citation
 If you use the FreeDyn Optimization Toolbox in your research, please cite:
