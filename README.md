@@ -60,6 +60,21 @@ $$
 1. Download and extract FreeDyn release ZIP
 2. Define paths
 ```bash
+.\FreeDyn 
+  ├── Releases\
+  │   └── freedyn-1.0.6
+  │       ├── bin\
+  │       │   └── FreeDyn-win-x64_MD   # MD variant: Freedyn_GUI.exe, freedyn.dll, dependencies
+  │       │       └── freedyn.dll
+  │       └── bindings
+  │           └── python               # Python API (source code)
+  └── freedyn-optimization-toolbox
+      ├── core_opt_toolbox             # global methods for optimization
+      └── examples
+          ├── example_01
+          ├── example_02
+          └── example_03
+
 # Path to freeDyn.dll
 pathFDdll = '..\\..\\Releases\\freedyn-1.0.6\\bin\\FreeDyn-win-x64_MD\\freedyn.dll'
 
