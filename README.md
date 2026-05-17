@@ -75,11 +75,11 @@ $$
           ├── example_02
           └── example_03
 
-# Path to freeDyn.dll
-pathFDdll = '..\\..\\Releases\\freedyn-1.0.6\\bin\\FreeDyn-win-x64_MD\\freedyn.dll'
+# Path to freedyn.dll
+pathFDdll = '..\\..\\..\\Releases\\freedyn-1.0.6\\bin\\FreeDyn-win-x64_MD\\freedyn.dll'
 
-# Path to FreeDyn API
-pathFDApi = '..\\..\\Releases\\freedyn-1.0.6\\bindings\\python'
+# Path to FreeDyn API 
+pathFDApi = '..\\..\\..\\Releases\\freedyn-1.0.6\\bindings\\python'
  ```
 3. Run `main.py`
 
