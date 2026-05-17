@@ -10,10 +10,10 @@ from pyinstrument import Profiler
 
 """ Define paths  """
 # Path to FreeDyn dll
-pathFDdll = 'C:\\VRoboCoop\\Programme\\FreeDyn\\freedyn_v1.0.6_preview\\freedyn.dll'
+pathFDdll = '..\\..\\Releases\\freedyn-1.0.6\\bin\\FreeDyn-win-x64_MD\\freedyn.dll'
 
 # Path to FreeDyn API """
-pathFDApi = '..\\..\\freedyn\\bindings\\python'
+pathFDApi = '..\\..\\Releases\\freedyn-1.0.6\\bindings\\python'
 sys.path.insert(0, pathFDApi)
 
 # Path to core_opt_toolbox
@@ -103,6 +103,7 @@ profiler.open_in_browser("speedscope")  # Öffnet direkt in speedscope.app
     
 # -----------------------------------------------------------------------------
 optim.update_vars_if_changed(res.x)
+optim.change_tF_in_fds(optim.fds_path_name_optimized)
 optim.write_ctrl_dataSPL()
 
 t = np.zeros(optim.numTimeSteps)

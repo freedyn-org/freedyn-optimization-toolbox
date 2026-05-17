@@ -13,10 +13,15 @@ class FreeDyn():
 
         # Define path and name of *.fds
         self.fds_path = path_fds
-        self.fds_path_name = f'{path_fds}\\{name_fds}.fds'
-               
+        self.fds_path_name_original = f'{path_fds}\\{name_fds}.fds'
+        self.fds_path_name_optimized = f'{path_fds}\\{name_fds}_optimized.fds'
+        
+        # Load and Read *.fds
+        self.load_and_read_fds(self.fds_path_name_original)
+        self.fds_set_writing_to_none(self.fds_path_name_optimized)
+        
         # Create Model
-        self.fd_model = fd.Model(self.fds_path_name, status_output="NO")
+        self.fd_model = fd.Model(self.fds_path_name_optimized, status_output="NO")
         info = self.fd_model.get_info()
         self.nDof = info.num_generalized_coordinates
         self.nConstr = info.num_lagrange_multipliers
@@ -41,23 +46,65 @@ class FreeDyn():
         return None        
 
 # -----------------------------------------------------------------------------     
-    def load_fds(self, fds):
+    def load_and_read_fds(self, fds):
         
-        self.fds_tF_idxLine = None
-        self.fds_outputDeltaT_idxLine = None
+        keys = {"SimulationTimeEnd",
+                "OutputTimeStepSize",
+                #
+                "isExactOutputTimeEnforced",
+                "WriteConstraintForceResultFile",
+                "WriteForceResultFile",
+                "WriteVelocityResultFile",
+                "WriteStateResultFile",
+                "WriteAccelerationResultFile",
+                "WriteExtConstraintLagrangeResultFile",
+                "WriteMeasureResultFile"}
+        self.fds_idxLine = dict.fromkeys(keys, None)
         
         # Open FDS file and store data
         with open(fds, 'r') as inp:
-           self.fds_data = inp.readlines()
-            
+           self.fds_data = inp.readlines()      
         
-        # Get line of final time
+        # Get idex of lines
         for i, zeile in enumerate(self.fds_data):
-            if zeile.startswith("	SimulationTimeEnd ="):
-                self.fds_tF_idxLine = i
-            if zeile.startswith("	OutputTimeStepSize ="):
-                self.fds_outputDeltaT_idxLine = i
+            if zeile.startswith("	SimulationTimeEnd"):
+                self.fds_idxLine["SimulationTimeEnd"] = i
+            if zeile.startswith("	OutputTimeStepSize"):
+                self.fds_idxLine["OutputTimeStepSize"] = i
+            if zeile.startswith("	isExactOutputTimeEnforced"):
+                self.fds_idxLine["isExactOutputTimeEnforced"] = i
+            if zeile.startswith("	WriteConstraintForceResultFile"):
+                self.fds_idxLine["WriteConstraintForceResultFile"] = i
+            if zeile.startswith("	WriteForceResultFile"):
+                self.fds_idxLine["WriteForceResultFile"] = i
+            if zeile.startswith("	WriteVelocityResultFile"):
+                self.fds_idxLine["WriteVelocityResultFile"] = i
+            if zeile.startswith("	WriteStateResultFile"):
+                self.fds_idxLine["WriteStateResultFile"] = i
+            if zeile.startswith("	WriteAccelerationResultFile"):
+                self.fds_idxLine["WriteAccelerationResultFile"] = i
+            if zeile.startswith("	WriteExtConstraintLagrangeResultFile"):
+                self.fds_idxLine["WriteExtConstraintLagrangeResultFile"] = i
+            if zeile.startswith("	WriteMeasureResultFile"):
+                self.fds_idxLine["WriteMeasureResultFile"] = i
+                
            
+        return None
+
+# -----------------------------------------------------------------------------     
+    def fds_set_writing_to_none(self, fds):
+        
+        self.fds_data[self.fds_idxLine["isExactOutputTimeEnforced"]] = "	isExactOutputTimeEnforced = yes\n"
+        self.fds_data[self.fds_idxLine["WriteConstraintForceResultFile"]] = "	WriteConstraintForceResultFile = no\n"
+        self.fds_data[self.fds_idxLine["WriteForceResultFile"]] = "	WriteForceResultFile = no\n"
+        self.fds_data[self.fds_idxLine["WriteVelocityResultFile"]] = "	WriteVelocityResultFile = no\n"
+        self.fds_data[self.fds_idxLine["WriteStateResultFile"]] = "	WriteStateResultFile = no\n"
+        self.fds_data[self.fds_idxLine["WriteAccelerationResultFile"]] = "	WriteAccelerationResultFile = no\n"
+        self.fds_data[self.fds_idxLine["WriteExtConstraintLagrangeResultFile"]] = "	WriteExtConstraintLagrangeResultFile = no\n"
+        self.fds_data[self.fds_idxLine["WriteMeasureResultFile"]] = "	WriteMeasureResultFile = no\n"
+        
+        self.write_fds(fds)
+        
         return None
 
 # -----------------------------------------------------------------------------
@@ -71,17 +118,17 @@ class FreeDyn():
                   
 # ----------------------------------------------------------------------------   
     
-    def change_tF_in_fds(self): 
+    def change_tF_in_fds(self, fds): 
         self.fds_data[self.fds_tF_idxLine] =  f"	SimulationTimeEnd = {self.tF}\n"
-        self.write_fds()
+        self.write_fds(fds)
         
         return None
        
 # ----------------------------------------------------------------------------   
     
-    def change_outputDeltaT_in_fds(self, tau): 
+    def change_outputDeltaT_in_fds(self, fds, tau): 
         self.fds_data[self.fds_outputDeltaT_idxLine] =  f"	OutputTimeStepSize = {tau}\n"
-        self.write_fds()
+        self.write_fds(fds)
 
         return None
        

@@ -24,8 +24,6 @@ class Optimization(Control, FreeDyn, MBS_SysMat, BDF, adjGrads, numDiff, fcts_Us
         self.tF = tF
         self.uDach = None
         self.nameCtrlSpline = nameCtrlSpline
-        
-        
         self.xF = xF
         self.num_xF = len(xF)
 

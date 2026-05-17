@@ -4,14 +4,15 @@ import numpy as np
 import scipy as sp
 import matplotlib
 import matplotlib.pyplot as plt
-
+import time
+from pyinstrument import Profiler
 
 """ Define paths  """
 # Path to FreeDyn dll
-pathFDdll = 'C:\\VRoboCoop\\Programme\\FreeDyn\\freedyn_v1.0.6_preview\\freedyn.dll'
+pathFDdll = '..\\..\\Releases\\freedyn-1.0.6\\bin\\FreeDyn-win-x64_MD\\freedyn.dll'
 
 # Path to FreeDyn API """
-pathFDApi = '..\\..\\freedyn\\bindings\\python'
+pathFDApi = '..\\..\\Releases\\freedyn-1.0.6\\bindings\\python'
 sys.path.insert(0, pathFDApi)
 
 # Path to core_opt_toolbox
@@ -67,7 +68,9 @@ optim = Optimization(numOptVar, numControls, numGridNodes,
 options = {'disp': True, 'iprint': 2, 'ftol': 1e-8, 'eps':1e-8, 'maxiter': 50}
 constraints = {'type':'eq', 'fun':optim.ceq_tF, 'jac':optim.get_grad_Phi}
 
-
+profiler = Profiler()
+profiler.start()
+countStart = time.perf_counter()
 res = sp.optimize.minimize(fun         = optim.objective,                    # cost function
                            x0          = z0,                                 # initial values
                            method      = 'SLSQP',                            # optimization method
@@ -76,10 +79,16 @@ res = sp.optimize.minimize(fun         = optim.objective,                    # c
                            constraints = constraints,                        # non-linear constraints
                            options     = options                             # optimization options
                            )
+countEnd = time.perf_counter()
+profiler.stop()
+timeComp = countEnd - countStart
+print(f"Zeitdauer Optimierung: {timeComp} s")
 
+profiler.open_in_browser("speedscope")  # Öffnet direkt in speedscope.app
 #
 # -----------------------------------------------------------------------------
 optim.update_vars_if_changed(res.x)
+optim.change_tF_in_fds(optim.fds_path_name_optimized)
 optim.write_ctrl_dataSPL()
 
 t = np.zeros(optim.numTimeSteps)
