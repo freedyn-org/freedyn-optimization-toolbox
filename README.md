@@ -46,9 +46,16 @@ J = \int_{t_0}^{t_\mathrm{f}} \frac{1}{2} \mathbf{u}^\top \mathbf{u} \mathrm{d}t
 $$
   
 - [Time Optimal Control](example_03_SCARA_time_optimal_control/)
-  
-  $$J = \int_{t_0}^{t_\mathrm{f}} \mathcal{L} (\mathbf{q}(t),\mathbf{v}(t),\mathbf{u}(t))  \mathrm{d}t \quad \boldsymbol{\phi}(\mathbf{q}(t_\mathrm{f}), \mathbf{v}(t_\mathrm{f}), t_\mathrm{f}) = \mathbf{0}$$
 
+$$
+\begin{aligned}
+J = \int_{t_0}^{t_\mathrm{f}} 1 \mathrm{d}t \quad \left. \begin{pmatrix}
+        \mathbf{x} - \mathbf{x}_\mathrm{f} \\ 
+        \dot{\mathbf{x}}
+    \end{pmatrix} \right|_{t_\mathrm{f}} = \mathbf{0}
+\end{aligned}
+$$
+ 
 ## Citation
 If you use the FreeDyn Optimization Toolbox in your research, please cite:
 
