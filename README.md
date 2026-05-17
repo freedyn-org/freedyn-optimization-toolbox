@@ -58,7 +58,7 @@ $$
 
 ## Quick Start
 1. Download and extract FreeDyn release ZIP
-2. Define paths
+2. Define paths in `main_*.py`
 ```bash
 .\FreeDyn 
   ├── Releases\
@@ -81,7 +81,7 @@ pathFDdll = '..\\..\\..\\Releases\\freedyn-1.0.6\\bin\\FreeDyn-win-x64_MD\\freed
 # Path to FreeDyn API 
 pathFDApi = '..\\..\\..\\Releases\\freedyn-1.0.6\\bindings\\python'
  ```
-3. Run `main.py`
+3. Run `main_*.py`
 
 ## Requirements
 - Python 3.8+
