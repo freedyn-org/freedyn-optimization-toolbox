@@ -26,7 +26,7 @@ have to be satisfied.
 - **Optimal Control Problems with free final time** `class_TOCP_MBS.py`
 
 ## Examples
-- [Trajectory Tracking](example_01_two_mass_oscillator_trajectory_tracking/)
+- [Trajectory Tracking](examples/example_01_two_mass_oscillator_trajectory_tracking/)
   
 $$
 \begin{aligned}
@@ -34,7 +34,7 @@ J = \int_{t_0}^{t_\mathrm{f}} \frac{1}{2} \left( y - \bar{y} \right)^2  \mathrm{
 \end{aligned}
 $$
   
-- [Minimum Control Effort](example_02_nonlinear_spring_pendulum_minimum_control_effort/)
+- [Minimum Control Effort](examples/example_02_nonlinear_spring_pendulum_minimum_control_effort/)
 
 $$
 \begin{aligned}
@@ -45,7 +45,7 @@ J = \int_{t_0}^{t_\mathrm{f}} \frac{1}{2} \mathbf{u}^\top \mathbf{u} \mathrm{d}t
 \end{aligned}
 $$
   
-- [Time Optimal Control](example_03_SCARA_time_optimal_control/)
+- [Time Optimal Control](examples/example_03_SCARA_time_optimal_control/)
 
 $$
 \begin{aligned}
