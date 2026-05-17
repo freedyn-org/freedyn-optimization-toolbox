@@ -17,22 +17,23 @@ import matplotlib.pyplot as plt
   │           └── python               # Python API (source code)
   └── freedyn-optimization-toolbox
       ├── core_opt_toolbox             # global methods for optimization
-      ├── example_01
-      ├── example_02  <- current working directory
-      └── example_03
+      └── examples
+          ├── example_01
+          ├── example_02  <- current working directory
+          └── example_03
 """
 # -----------------------------------------------------------------------------
 #
 """ Define paths  """
 # Path to FreeDyn dll
-pathFDdll = '..\\..\\Releases\\freedyn-1.0.6\\bin\\FreeDyn-win-x64_MD\\freedyn.dll'
+pathFDdll = '..\\..\\..\\Releases\\freedyn-1.0.6\\bin\\FreeDyn-win-x64_MD\\freedyn.dll'
 
-# Path to FreeDyn API """
-pathFDApi = '..\\..\\Releases\\freedyn-1.0.6\\bindings\\python'
+# Path to FreeDyn API 
+pathFDApi = '..\\..\\..\\Releases\\freedyn-1.0.6\\bindings\\python'
 sys.path.insert(0, pathFDApi)
 
 # Path to core_opt_toolbox
-bib_path = '..\\core_opt_toolbox'
+bib_path = '..\\..\\core_opt_toolbox'
 sys.path.insert(0, bib_path)
 
 # Define path and name of *.fds - without file typ!
