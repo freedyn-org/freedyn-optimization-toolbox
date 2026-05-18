@@ -62,7 +62,7 @@ $$
 ```bash
 .\FreeDyn 
   ├── Releases\
-  │   └── freedyn-1.0.6
+  │   └── freedyn-106   !!! MUST NOT USE POINTS HERE !!!
   │       ├── bin\
   │       │   └── FreeDyn-win-x64_MD   # MD variant: Freedyn_GUI.exe, freedyn.dll, dependencies
   │       │       └── freedyn.dll
