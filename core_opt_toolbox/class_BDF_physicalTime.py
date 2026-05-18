@@ -31,7 +31,7 @@ class BDF(BDF_intOrderOne, BDF_intOrderTwo, CoeffMat, spCoeffMat):
         self.BDF_BC_dv_tr = np.zeros((self.nDofConstr, self.num_xF))   # (dPhi / dv)^T        
         
             
-        if self.BDF_modeMAT_sparse:   
+        if self.MBS_modeMAT_sparse:   
             nBDFsys = spCoeffMat.__init__(self)
             self.BDF_BC_eyeMat = scipy.sparse.eye(self.nDof)
             self.compute_consistent_BC_J = self.compute_consistent_BC_J_sparse

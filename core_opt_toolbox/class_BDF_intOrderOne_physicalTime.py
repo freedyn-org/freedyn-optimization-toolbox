@@ -10,7 +10,7 @@ class BDF_intOrderOne:
         self.BDF1_eta0 = 0.0
         self.BDF1_eta1 = 0.0
         
-        if self.BDF_modeMAT_sparse:    
+        if self.MBS_modeMAT_sparse:    
             self.BDForder1_singleStep_J = self.BDForder1_singleStep_J_sparse
             self.BDForder1_singleStep_Phi = self.BDForder1_singleStep_Phi_sparse
         else:

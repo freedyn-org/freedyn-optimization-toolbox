@@ -11,7 +11,7 @@ class BDF_intOrderTwo:
         self.BDF2_eta1 = 0.0
         self.BDF2_eta2 = 0.0
         
-        if self.BDF_modeMAT_sparse:  
+        if self.MBS_modeMAT_sparse:  
             self.BDForder2_singleStep_J = self.BDForder2_singleStep_J_sparse
             self.BDForder2_singleStep_Phi = self.BDForder2_singleStep_Phi_sparse
             
