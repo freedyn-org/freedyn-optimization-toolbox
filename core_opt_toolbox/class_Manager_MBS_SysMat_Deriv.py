@@ -8,7 +8,7 @@ class MBS_SysMat:
                  nameParFdu):
 
         """ Decision on dense or sparse dense_matrices """
-        if self.nDofConstr < (10 * 7 + 1):
+        if self.nDof < (10 * 7 + 1):
             self.MBS_modeMAT_sparse = False  
         else:
             self.MBS_modeMAT_sparse = True
