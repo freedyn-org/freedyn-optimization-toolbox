@@ -19,7 +19,7 @@ class MBS_SysMat:
         
         """ Derivative of sum of external forces w.r.t. parameter given as string """
         self.nameParFdu = nameParFdu
-        self.buffer_MBS_fDu = fd.ForceParameterDerivativeMatrixBuffer(nameParFdu,False)
+        self.buffer_MBS_fDu = fd.ForceParameterDerivativeMatrixBuffer(nameParFdu)
         self.fDu = self.buffer_MBS_fDu.data
                 
         print('class MBS_Sys_mat initialized')

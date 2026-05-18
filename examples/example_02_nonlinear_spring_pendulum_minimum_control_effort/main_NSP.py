@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 """"
 .\FreeDyn 
   ├── Releases\
-  │   └── freedyn-1.0.6
+  │   └── freedyn-106   !!! MUST NOT USE POINTS HERE !!!
   │       ├── bin\
   │       │   └── FreeDyn-win-x64_MD   # MD variant: Freedyn_GUI.exe, freedyn.dll, dependencies
   │       │       └── freedyn.dll
@@ -25,19 +25,22 @@ import matplotlib.pyplot as plt
 # -----------------------------------------------------------------------------
 #
 """ Define paths  """
+# Path of main
+path_main = Path(__file__).resolve().parent
+
 # Path to FreeDyn dll
-pathFDdll = '..\\..\\..\\Releases\\freedyn-1.0.6\\bin\\FreeDyn-win-x64_MD\\freedyn.dll'
+pathFDdll = path_main.parent.parent.parent / 'Releases\\freedyn-106\\bin\\FreeDyn-win-x64_MD\\freedyn.dll'
 
 # Path to FreeDyn API 
-pathFDApi = '..\\..\\..\\Releases\\freedyn-1.0.6\\bindings\\python'
-sys.path.insert(0, pathFDApi)
+path_FDApi = path_main.parent.parent.parent / 'Releases\\freedyn-106\\bindings\\python'
+sys.path.insert(0, str(path_FDApi))
 
 # Path to core_opt_toolbox
-bib_path = '..\\..\\core_opt_toolbox'
-sys.path.insert(0, bib_path)
+bib_path = path_main.parent.parent / 'core_opt_toolbox'
+sys.path.insert(0, str(bib_path))
 
 # Define path and name of *.fds - without file typ!
-path_fds = Path(__file__).resolve().parent
+path_fds = path_main
 name_fds = 'OptCtrl_NonlinearSpringPendulum'
 #
 # -----------------------------------------------------------------------------
