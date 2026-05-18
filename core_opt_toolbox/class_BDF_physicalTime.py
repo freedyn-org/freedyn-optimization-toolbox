@@ -134,7 +134,7 @@ class BDF(BDF_intOrderOne, BDF_intOrderTwo, CoeffMat, spCoeffMat):
                                [self.MBS_Cq, None]], format = 'csc')
         
         
-        coeffMat_P_csc = bmat([[self.M0_csr, self.MBS_Cq.T],
+        coeffMat_P_csc = bmat([[self.MBS_M, self.MBS_Cq.T],
                                [self.MBS_Cq, None]], format = 'csc')
         
         
