@@ -27,7 +27,6 @@ class Optimization(Control, FreeDyn, MBS_SysMat, BDF, adjGrads, numDiff, fcts_Us
         self.xF = xF
         self.num_xF = len(xF)
 
-        
         Control.__init__(self, numControls, numGridNodes)
         FreeDyn.__init__(self, path_fds, name_fds, pathFDdll)
         MBS_SysMat.__init__(self, nameParFdu)
