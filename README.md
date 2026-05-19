@@ -62,7 +62,7 @@ $$
 ```bash
 .\FreeDyn 
   ├── Releases\
-  │   └── freedyn-1.0.6
+  │   └── freedyn_1-0-6   !!! MUST NOT USE POINTS HERE !!!
   │       ├── bin\
   │       │   └── FreeDyn-win-x64_MD   # MD variant: Freedyn_GUI.exe, freedyn.dll, dependencies
   │       │       └── freedyn.dll
@@ -75,11 +75,14 @@ $$
           ├── example_02
           └── example_03
 
-# Path to freedyn.dll
-pathFDdll = '..\\..\\..\\Releases\\freedyn-1.0.6\\bin\\FreeDyn-win-x64_MD\\freedyn.dll'
+# Path of main
+path_main = Path(__file__).resolve().parent
 
-# Path to FreeDyn API 
-pathFDApi = '..\\..\\..\\Releases\\freedyn-1.0.6\\bindings\\python'
+# Path to freedyn.dll
+pathFDdll = path_main.parent.parent.parent / 'Releases\\freedyn_1-0-6\\bin\\FreeDyn-win-x64_MD\\freedyn.dll'
+
+# Path to FreeDyn API
+path_FDApi = path_main.parent.parent.parent / 'Releases\\freedyn_1-0-6\\bindings\\python'
  ```
 3. Run `main_*.py`
 
