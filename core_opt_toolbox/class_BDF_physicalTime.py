@@ -155,11 +155,8 @@ class BDF(BDF_intOrderOne, BDF_intOrderTwo, CoeffMat, spCoeffMat):
 # -----------------------------------------------------------------------------
 
     def update_userFcts_BDF(self, z):
-        
         self.get_LagrangianOCP_dq(z)
         self.get_LagrangianOCP_dv(z)
-        
-        return None
 
 # -----------------------------------------------------------------------------
 

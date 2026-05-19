@@ -4,8 +4,7 @@ class CoeffMat():
     
     def __init__(self):
         
-        nBDFsys = self.nDof+2*self.nConstr
-
+        nBDFsys = self.nDof + 2*self.nConstr
         self.init_coeffMat_AdjSys_dense(nBDFsys)
 
         return nBDFsys
@@ -23,8 +22,6 @@ class CoeffMat():
         self.BDF_coeffMat_view_23 = self.BDF_coeffMat[self.nDof:self.nDofConstr, self.nDofConstr:]
         self.BDF_coeffMat_view_31 = self.BDF_coeffMat[self.nDofConstr:, :self.nDof]
 
-        return None
-
 # -----------------------------------------------------------------------------
 
     def get_coeffMat_AdjSys_dense(self, eta0, eta0_inv):
@@ -36,7 +33,5 @@ class CoeffMat():
         self.BDF_coeffMat_view_22[:] = self.MBS_Cq @ self.MBS_CqvDq.T
         self.BDF_coeffMat_view_23[:] = self.MBS_Cq @ self.MBS_Cq.T
         self.BDF_coeffMat_view_31[:] = self.MBS_Cq
-
-        return None
 
 # -----------------------------------------------------------------------------
