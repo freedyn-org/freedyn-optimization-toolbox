@@ -29,15 +29,15 @@ import matplotlib.pyplot as plt
 path_main = Path(__file__).resolve().parent
 
 # Path to FreeDyn dll
-pathFDdll = path_main.parent.parent.parent / 'Releases\\freedyn_1-0-6\\bin\\FreeDyn-win-x64_MD\\freedyn.dll'
+pathFDdll = str(path_main.parent.parent.parent / 'Releases\\freedyn_1-0-6\\bin\\FreeDyn-win-x64_MD\\freedyn.dll')
 
 # Path to FreeDyn API 
-path_FDApi = path_main.parent.parent.parent / 'Releases\\freedyn_1-0-6\\bindings\\python'
-sys.path.insert(0, str(path_FDApi))
+path_FDApi = str(path_main.parent.parent.parent / 'Releases\\freedyn_1-0-6\\bindings\\python')
+sys.path.insert(0, path_FDApi)
 
 # Path to core_opt_toolbox
-bib_path = path_main.parent.parent / 'core_opt_toolbox'
-sys.path.insert(0, str(bib_path))
+bib_path = str(path_main.parent.parent / 'core_opt_toolbox')
+sys.path.insert(0, bib_path)
 
 # Define path and name of *.fds - without file typ!
 path_fds = path_main
