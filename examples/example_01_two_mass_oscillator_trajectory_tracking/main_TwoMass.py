@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 """"
 .\FreeDyn 
   ├── Releases\
-  │   └── freedyn-106   !!! MUST NOT USE POINTS HERE !!!
+  │   └── freedyn_1-0-6   !!! MUST NOT USE POINTS HERE !!!
   │       ├── bin\
   │       │   └── FreeDyn-win-x64_MD   # MD variant: Freedyn_GUI.exe, freedyn.dll, dependencies
   │       │       └── freedyn.dll
@@ -29,10 +29,10 @@ import matplotlib.pyplot as plt
 path_main = Path(__file__).resolve().parent
 
 # Path to FreeDyn dll
-pathFDdll = path_main.parent.parent.parent / 'Releases\\freedyn-106\\bin\\FreeDyn-win-x64_MD\\freedyn.dll'
+pathFDdll = path_main.parent.parent.parent / 'Releases\\freedyn_1-0-6\\bin\\FreeDyn-win-x64_MD\\freedyn.dll'
 
 # Path to FreeDyn API 
-path_FDApi = path_main.parent.parent.parent / 'Releases\\freedyn-106\\bindings\\python'
+path_FDApi = path_main.parent.parent.parent / 'Releases\\freedyn_1-0-6\\bindings\\python'
 sys.path.insert(0, str(path_FDApi))
 
 # Path to core_opt_toolbox
