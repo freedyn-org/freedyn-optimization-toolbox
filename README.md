@@ -63,33 +63,8 @@ $$
 pip install numpy scipy matplotlib
 pip install freedyn
 ```
-3. Define paths in `main_*.py`
-```bash
-.\FreeDyn 
-  ├── Releases\
-  │   └── freedyn_1-0-6   !!! MUST NOT USE POINTS HERE !!!
-  │       ├── bin\
-  │       │   └── FreeDyn-win-x64_MD   # MD variant: Freedyn_GUI.exe, freedyn.dll, dependencies
-  │       │       └── freedyn.dll
-  │       └── bindings
-  │           └── python               # Python API (source code)
-  └── freedyn-optimization-toolbox
-      ├── core_opt_toolbox             # global methods for optimization
-      └── examples
-          ├── example_01
-          ├── example_02
-          └── example_03
-
-# Path of main
-path_main = Path(__file__).resolve().parent
-
-# Path to freedyn.dll
-pathFDdll = path_main.parent.parent.parent / 'Releases\\freedyn_1-0-6\\bin\\FreeDyn-win-x64_MD\\freedyn.dll'
-
-# Path to FreeDyn API
-path_FDApi = path_main.parent.parent.parent / 'Releases\\freedyn_1-0-6\\bindings\\python'
- ```
-3. Run `main_*.py`
+3. Download Freedyn-optimization-toolbox
+4. Run `main_*.py`
 
 ## Requirements
 - Python 3.8+
