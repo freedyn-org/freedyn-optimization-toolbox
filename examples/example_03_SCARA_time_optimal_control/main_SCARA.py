@@ -6,53 +6,44 @@ import matplotlib
 import matplotlib.pyplot as plt
 #
 # -----------------------------------------------------------------------------
-""""
-.\FreeDyn 
-  ├── Releases\
-  │   └── freedyn_1-0-6   !!! MUST NOT USE POINTS HERE !!!
-  │       ├── bin\
-  │       │   └── FreeDyn-win-x64_MD   # MD variant: Freedyn_GUI.exe, freedyn.dll, dependencies
-  │       │       └── freedyn.dll
-  │       └── bindings
-  │           └── python               # Python API (source code)
-  └── freedyn-optimization-toolbox
-      ├── core_opt_toolbox             # global methods for optimization
-      └── examples
-          ├── example_01
-          ├── example_02
-          └── example_03  <- current working directory
-"""
+#
+# Path of main file
+path_main = Path(__file__).resolve().parent
+#
 # -----------------------------------------------------------------------------
 #
-""" Define paths  """
-# Path of main
-path_main = Path(__file__).resolve().parent
-
+""" FreeDyn dll and Python bindings paths  """
 # Path to FreeDyn dll
-pathFDdll = str(path_main.parent.parent.parent / 'Releases\\freedyn_1-0-6\\bin\\FreeDyn-win-x64_MD\\freedyn.dll')
+# Use None: if pip install freedyn
+# Define path when Python bindings are download from GitHub without installing
+path_FDdll = None
 
 # Path to FreeDyn API 
-path_FDApi = str(path_main.parent.parent.parent / 'Releases\\freedyn_1-0-6\\bindings\\python')
-sys.path.insert(0, path_FDApi)
+# Use None: if pip install freedyn
+# Define path when Python bindings are download from GitHub without installing
+path_FDApi = None
 
+if path_FDApi is not None:
+    sys.path.insert(0, path_FDApi)
+#
+# -----------------------------------------------------------------------------
+#
+""" Freedyn Optimization Toolbox """
 # Path to core_opt_toolbox
-bib_path = str(path_main.parent.parent / 'core_opt_toolbox')
-sys.path.insert(0, bib_path)
-
+path_optToolbox = str(path_main.parent.parent / 'core_opt_toolbox')
+sys.path.insert(0, path_optToolbox)
+#
+# -----------------------------------------------------------------------------
+#
+""" FDS File """
 # Define path and name of *.fds - without file typ!
 path_fds = path_main
 name_fds = 'OptCtrl_SCARA'
-#
-# -----------------------------------------------------------------------------
-#
-""" Define the names of ctrl splines """
-# derivative of sum of external forces w.r.t. parameter given as string
+
+# Define FreeDyn data object spline of the controls
 nameCtrlSpline = ["u1Dach", "u2Dach"]
-#
-# -----------------------------------------------------------------------------
-#
-""" Define the names of the parameters for dfdu """
-# derivative of sum of external forces w.r.t. parameter given as string
+
+# Define FreeDyn parameter for fdu
 nameParFdu = ["u1par","u2par"]
 #
 # -----------------------------------------------------------------------------
@@ -102,7 +93,7 @@ optim = Optimization(numOptVar, numControls, numGridNodes,
                      tF_init, xF,
                      path_fds, name_fds,
                      nameCtrlSpline, nameParFdu,
-                     pathFDdll)
+                     path_FDdll)
 #
 # -----------------------------------------------------------------------------
 #
