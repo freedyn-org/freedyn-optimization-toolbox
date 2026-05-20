@@ -29,8 +29,8 @@ if path_FDApi is not None:
 # -----------------------------------------------------------------------------
 #
 """ Freedyn Optimization Toolbox """
-# Path to core_opt_toolbox
-path_optToolbox = str(path_main.parent.parent / 'core_opt_toolbox')
+# Path to optimization_toolbox
+path_optToolbox = str(path_main.parent.parent / 'optimization_toolbox')
 sys.path.insert(0, path_optToolbox)
 #
 # -----------------------------------------------------------------------------
