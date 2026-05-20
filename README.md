@@ -57,8 +57,13 @@ J = \int_{t_0}^{t_\mathrm{f}} 1 \mathrm{d}t \quad \boldsymbol{\phi} = \left. \be
 $$
 
 ## Quick Start
-1. Download and extract FreeDyn release ZIP
-2. Define paths in `main_*.py`
+1. Create a virtual environment in Python
+2. Install Python packages
+```bash
+pip install numpy scipy matplotlib
+pip install freedyn
+```
+3. Define paths in `main_*.py`
 ```bash
 .\FreeDyn 
   ├── Releases\
