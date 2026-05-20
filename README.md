@@ -67,10 +67,10 @@ pip install freedyn
 4. Run `main_*.py`
 
 ## Requirements
-- Python 3.8+
+- Python 3.8+ (Recommendation: Python 3.13)
 - numpy, scipy
-- freedyn.dll - Core MBS solver (C-interface Dynamic Link Library)
-- FreeDyn API - Python Bindings
+- matplotlib (optional: for plotting results)
+- freedyn 1.0.6.post1 +
  
 ## Citation
 If you use the FreeDyn Optimization Toolbox in your research, please cite:
