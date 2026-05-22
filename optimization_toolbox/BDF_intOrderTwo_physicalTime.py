@@ -1,7 +1,3 @@
-import numpy as np
-import freedyn as fd
-
-
 class BDF_intOrderTwo:
     
     def __init__(self):
@@ -14,15 +10,11 @@ class BDF_intOrderTwo:
         if self.MBS_modeMAT_sparse:  
             self.BDForder2_singleStep_J = self.BDForder2_singleStep_J_sparse
             self.BDForder2_singleStep_Phi = self.BDForder2_singleStep_Phi_sparse
-            
         else:
             self.BDForder2_singleStep_J = self.BDForder2_singleStep_J_dense
             self.BDForder2_singleStep_Phi = self.BDForder2_singleStep_Phi_dense
-            
-            
-        
+
         print('BDF integration order 2 initialized')    
-        
 # -----------------------------------------------------------------------------
 
     def getEta_BDF2(self, idx1, idx2):
@@ -36,9 +28,6 @@ class BDF_intOrderTwo:
         self.BDF2_eta0 = 1 / self.BDF2_eta0_inv                                 # eta_0
         self.BDF2_eta1 = -diff_02 / (diff_01 * diff_12)                         # eta_1
         self.BDF2_eta2 = diff_01 / (diff_02 * diff_12)                          # eta_2
-            
-        return None
-    
 # -----------------------------------------------------------------------------
 
     def BDForder2_singleStep_J_dense(self, z):
@@ -83,9 +72,6 @@ class BDF_intOrderTwo:
         self.adjW_J_buff[self.BDF_idx_buff, :] -= etaTimesW
         self.adjW_J_buff[self.BDF_idx_buff, :] += self.dLdq.T
         self.adjW_J_buff[self.BDF_idx_buff, :] *= self.BDF2_eta0_inv
-
-        return None
-    
 # -----------------------------------------------------------------------------  
 
     def BDForder2_singleStep_J_sparse(self, z):
@@ -119,9 +105,6 @@ class BDF_intOrderTwo:
         # Compute adj p at time idx = 0
         self.adjW_J_buff[self.BDF_idx_buff, :] = vec_W_P_Sig_MU[:self.nDof]
         self.adjP_J_buff[self.BDF_idx_buff, :] = vec_W_P_Sig_MU[self.nDof:2*self.nDof]
-
-        return None
-    
 # ----------------------------------------------------------------------------- 
 
     def BDForder2_singleStep_Phi_dense(self):
@@ -164,9 +147,6 @@ class BDF_intOrderTwo:
         self.adjW_Phi_buff[self.BDF_idx_buff, :, :] += self.MBS_Cq.T @ vec_P_Sig_MU[self.nDofConstr:] 
         self.adjW_Phi_buff[self.BDF_idx_buff, :, :] -= etaTimesW
         self.adjW_Phi_buff[self.BDF_idx_buff, :, :] *= self.BDF2_eta0_inv       
-
-        return None
-
 # ----------------------------------------------------------------------------- 
 
     def BDForder2_singleStep_Phi_sparse(self):
@@ -200,8 +180,4 @@ class BDF_intOrderTwo:
         # Compute adj p at time idx = 0
         self.adjW_Phi_buff[self.BDF_idx_buff, :, :] = vec_W_P_Sig_MU[:self.nDof]
         self.adjP_Phi_buff[self.BDF_idx_buff, :, :] = vec_W_P_Sig_MU[self.nDof:2*self.nDof]
-
-
-        return None
-
 # -----------------------------------------------------------------------------

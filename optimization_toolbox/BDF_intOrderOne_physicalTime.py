@@ -1,7 +1,3 @@
-import numpy as np
-import freedyn as fd
-
-
 class BDF_intOrderOne:
     
     def __init__(self):
@@ -26,10 +22,7 @@ class BDF_intOrderOne:
 
         self.BDF1_eta0_inv = self.BDF_diff_tau[idx1]
         self.BDF1_eta0 = 1 / self.BDF1_eta0_inv
-        self.BDF1_eta1 = -self.BDF1_eta0
-            
-        return None
-  
+        self.BDF1_eta1 = -self.BDF1_eta0 
 # -----------------------------------------------------------------------------
 
     def BDForder1_singleStep_J_dense(self, z):
@@ -73,10 +66,6 @@ class BDF_intOrderOne:
         self.adjW_J_buff[self.BDF_idx_buff, :] -= etaTimesW
         self.adjW_J_buff[self.BDF_idx_buff, :] += self.dLdq.T
         self.adjW_J_buff[self.BDF_idx_buff, :] *= self.BDF1_eta0_inv
-
-        return None           
- 
-
 # -----------------------------------------------------------------------------
 
     def BDForder1_singleStep_J_sparse(self, z):
@@ -110,10 +99,6 @@ class BDF_intOrderOne:
         # Compute adj p at time idx = 0
         self.adjW_J_buff[self.BDF_idx_buff, :] = vec_W_P_Sig_MU[:self.nDof]
         self.adjP_J_buff[self.BDF_idx_buff, :] = vec_W_P_Sig_MU[self.nDof:2*self.nDof]
-        
-
-        return None           
- 
 # ----------------------------------------------------------------------------- 
 
     def BDForder1_singleStep_Phi_dense(self):
@@ -155,11 +140,6 @@ class BDF_intOrderOne:
         self.adjW_Phi_buff[self.BDF_idx_buff, :, :] += self.MBS_Cq.T @ vec_P_Sig_MU[self.nDofConstr:] 
         self.adjW_Phi_buff[self.BDF_idx_buff, :, :] -= etaTimesW
         self.adjW_Phi_buff[self.BDF_idx_buff, :, :] *= self.BDF1_eta0_inv
-
-        return None
-           
-
- 
 # ----------------------------------------------------------------------------- 
 
     def BDForder1_singleStep_Phi_sparse(self):
@@ -192,8 +172,4 @@ class BDF_intOrderOne:
         # Compute adj p at time idx = 0
         self.adjW_Phi_buff[self.BDF_idx_buff, :, :] = vec_W_P_Sig_MU[:self.nDof]
         self.adjP_Phi_buff[self.BDF_idx_buff, :, :] = vec_W_P_Sig_MU[self.nDof:2*self.nDof]
-
-
-        return None           
- 
 # -----------------------------------------------------------------------------

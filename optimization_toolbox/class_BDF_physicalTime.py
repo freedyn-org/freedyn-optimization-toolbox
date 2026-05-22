@@ -6,8 +6,8 @@ from scipy.sparse.linalg import factorized
 from scipy.sparse import bmat
 
 
-from class_BDF_intOrderOne_physicalTime import BDF_intOrderOne 
-from class_BDF_intOrderTwo_physicalTime import BDF_intOrderTwo 
+from BDF_intOrderOne_physicalTime import BDF_intOrderOne 
+from BDF_intOrderTwo_physicalTime import BDF_intOrderTwo 
 
 from AdjSys_coeffMat import CoeffMat
 
