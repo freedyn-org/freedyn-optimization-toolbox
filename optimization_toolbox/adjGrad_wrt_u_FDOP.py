@@ -4,14 +4,14 @@ class adjGrads:
     
     def __init__(self):
         
-        self.adjGrad_J_buff = np.zeros((2, self.numCtrls, self.numNodes))
+        self.adjGrad_J_buff = np.zeros((2, self.num_ctrls, self.num_ctrl_gridNodes))
         self.adjGrad_J_buff_view0 = self.adjGrad_J_buff[0].reshape(-1)
         self.adjGrad_J_buff_view1 = self.adjGrad_J_buff[1].reshape(-1)
         
         
-        self.adjGrad_Phi_buff = np.zeros((2, self.num_xF, self.numCtrls, self.numNodes))
-        self.adjGrad_Phi_buff_view0 = self.adjGrad_Phi_buff[0].reshape(self.num_xF, self.numCtrls*self.numNodes)
-        self.adjGrad_Phi_buff_view1 = self.adjGrad_Phi_buff[1].reshape(self.num_xF, self.numCtrls*self.numNodes)
+        self.adjGrad_Phi_buff = np.zeros((2, self.num_xF, self.num_ctrls, self.num_ctrl_gridNodes))
+        self.adjGrad_Phi_buff_view0 = self.adjGrad_Phi_buff[0].reshape(self.num_xF, self.num_ctrls*self.num_ctrl_gridNodes)
+        self.adjGrad_Phi_buff_view1 = self.adjGrad_Phi_buff[1].reshape(self.num_xF, self.num_ctrls*self.num_ctrl_gridNodes)
 
 # -----------------------------------------------------------------------------
     
@@ -30,7 +30,7 @@ class adjGrads:
         
         idx_buff = 0
         
-        tRight = self.adjGrad_updates(self.numTimeSteps-1)
+        tRight = self.adjGrad_updates(self.num_time_steps-1)
         
         self.get_consistent_BC_J() 
         self.get_LagrangianOCP_du(z)
@@ -42,7 +42,7 @@ class adjGrads:
         """ BDF order 1 """
         idx_buff = 1 - idx_buff
         
-        tLeft = self.adjGrad_updates(self.numTimeSteps-2)
+        tLeft = self.adjGrad_updates(self.num_time_steps-2)
         
         deltaT = tRight - tLeft
         self.BDF_diff_tau[self.BDF_idx_buff] = deltaT
@@ -60,7 +60,7 @@ class adjGrads:
                 
         """ BDF order 2 """        
         
-        for i in range(self.numTimeSteps-3, -1, -1):
+        for i in range(self.num_time_steps-3, -1, -1):
             idx_buff = 1 - idx_buff
             
             tRight = tLeft
@@ -90,7 +90,7 @@ class adjGrads:
         
         idx_buff = 0
 
-        tRight = self.adjGrad_updates(self.numTimeSteps-1)
+        tRight = self.adjGrad_updates(self.num_time_steps-1)
 
         self.get_consistent_BC_Phi() 
 
@@ -101,7 +101,7 @@ class adjGrads:
         """ BDF order 1 """ 
         idx_buff = 1 - idx_buff
         
-        tLeft = self.adjGrad_updates(self.numTimeSteps-2)
+        tLeft = self.adjGrad_updates(self.num_time_steps-2)
         
         deltaT = tRight - tLeft
         self.BDF_diff_tau[self.BDF_idx_buff] = deltaT
@@ -118,7 +118,7 @@ class adjGrads:
         
         """ BDF order 2 """      
         
-        for i in range(self.numTimeSteps-3, -1, -1):
+        for i in range(self.num_time_steps-3, -1, -1):
             idx_buff = 1 - idx_buff
             tRight = tLeft
             

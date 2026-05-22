@@ -74,9 +74,9 @@ num_optVars = len(zInit)
 tF_free = 0   # is final time tF free? no ... 0 || yes ... 1
 
 if tF_free:
-    from class_TOCP_MBS import Optimization
+    from class_TOCP_FDOP import Optimization
 else:
-    from class_OCP_MBS import Optimization
+    from class_OCP_FDOP import Optimization
 
 optim = Optimization(num_optVars, num_ctrls, num_ctrl_gridNodes,
                      tF, xF,

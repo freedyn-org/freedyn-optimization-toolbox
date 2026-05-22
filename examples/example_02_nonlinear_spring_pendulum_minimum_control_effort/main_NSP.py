@@ -41,18 +41,18 @@ path_fds = path_main
 name_fds = 'OptCtrl_NonlinearSpringPendulum'
 
 # Define FreeDyn data object spline of the controls
-nameCtrlSpline = ["uDach_x", "uDach_y", "uDach_z"]
+name_ctrlSPL = ["uDach_x", "uDach_y", "uDach_z"]
 
 # Define FreeDyn parameter for fdu
-nameParFdu = ["fdu_x","fdu_y","fdu_z"]
+name_fDu_par = ["fdu_x","fdu_y","fdu_z"]
 #
 # -----------------------------------------------------------------------------
 #
 """ Define controls """
-numControls = 3     # number of controls
-numGridNodes = 10   # number of grid nodes per control
+num_ctrls = 3     # number of controls
+num_ctrl_gridNodes = 10   # number of grid nodes per control
 
-uDachInit = np.zeros(numGridNodes*numControls)
+uDachInit = np.zeros(num_ctrl_gridNodes*num_ctrls)
 #
 # -----------------------------------------------------------------------------
 #
@@ -63,9 +63,9 @@ xF = np.array([2,-10,-4,0,0,0])   # final constraints,
 #
 # -----------------------------------------------------------------------------
 #
-""" Define initial values for optimization variables z0"""
-z0 = uDachInit      
-numOptVar = len(z0)
+""" Define initial values for optimization variables zInit"""
+zInit = uDachInit      
+num_optVars = len(zInit)
 #
 # -----------------------------------------------------------------------------
 #
@@ -74,14 +74,14 @@ numOptVar = len(z0)
 tF_free = 0   # is final time tF free? no ... 0 || yes ... 1
 
 if tF_free:
-    from class_TOCP_MBS import Optimization
+    from class_TOCP_FDOP import Optimization
 else:
-    from class_OCP_MBS import Optimization
+    from class_OCP_FDOP import Optimization
 
-optim = Optimization(numOptVar, numControls, numGridNodes,
+optim = Optimization(num_optVars, num_ctrls, num_ctrl_gridNodes,
                      tF, xF,
                      path_fds, name_fds,
-                     nameCtrlSpline, nameParFdu,
+                     name_ctrlSPL, name_fDu_par,
                      path_FDdll)
 #
 # -----------------------------------------------------------------------------
@@ -89,7 +89,7 @@ optim = Optimization(numOptVar, numControls, numGridNodes,
 """  Set up of the optimization-toolbox """
 # Add or comment out – according to the optimization problem
 res = sp.optimize.minimize(fun         = optim.objective,                # cost function
-                           x0          = z0,                             # initial values
+                           x0          = zInit,                             # initial values
                            method      = 'SLSQP',                        # optimization method
                            jac         = optim.get_grad_J,               # gradient of cost function
                            # bounds      = sp.optimize.Bounds(lb, ub),     # lower and upper bounds
@@ -107,21 +107,20 @@ res = sp.optimize.minimize(fun         = optim.objective,                # cost 
 #
 """ Update optimization variables in class and rerun simulation """
 optim.update_vars_if_changed(res.x)
-optim.change_tF_in_fds(optim.fds_path_name_optimized)
 optim.write_ctrl_dataSPL()
 #
 # -----------------------------------------------------------------------------
 #
 """ Get data for plots """
-t = np.zeros(optim.numTimeSteps)
-tau = np.zeros(optim.numTimeSteps)
-uInit = np.zeros((numControls, optim.numTimeSteps))
-u = np.zeros((numControls, optim.numTimeSteps))
-q = np.zeros((optim.nDof, optim.numTimeSteps))
-qD = np.zeros((optim.nDof, optim.numTimeSteps))
-spring_l = np.zeros(optim.numTimeSteps)
+t = np.zeros(optim.num_time_steps)
+tau = np.zeros(optim.num_time_steps)
+uInit = np.zeros((num_ctrls, optim.num_time_steps))
+u = np.zeros((num_ctrls, optim.num_time_steps))
+q = np.zeros((optim.nDof, optim.num_time_steps))
+qD = np.zeros((optim.nDof, optim.num_time_steps))
+spring_l = np.zeros(optim.num_time_steps)
 
-for i in range(optim.numTimeSteps-1, -1, -1): 
+for i in range(optim.num_time_steps-1, -1, -1): 
    optim.fd_model.fetch_states_at_index(i)
    optim.fd_model.update_state_at_index(i)
    t[i] = optim.fd_model.t

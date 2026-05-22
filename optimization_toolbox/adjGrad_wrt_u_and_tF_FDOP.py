@@ -4,13 +4,13 @@ class adjGrads:
     
     def __init__(self):
         
-        self.adjGrad_J_uDach_buff = np.zeros((2, self.numCtrls, self.numNodes))
+        self.adjGrad_J_uDach_buff = np.zeros((2, self.num_ctrls, self.num_ctrl_gridNodes))
         self.adjGrad_J_uDach_buff_view0 = self.adjGrad_J_uDach_buff[0].reshape(-1)
         self.adjGrad_J_uDach_buff_view1 = self.adjGrad_J_uDach_buff[1].reshape(-1)
         
-        self.adjGrad_Phi_uDach_buff = np.zeros((2, self.num_xF, self.numCtrls, self.numNodes))
-        self.adjGrad_Phi_uDach_buff_view0 = self.adjGrad_Phi_uDach_buff[0].reshape(self.num_xF, self.numCtrls*self.numNodes)
-        self.adjGrad_Phi_uDach_buff_view1 = self.adjGrad_Phi_uDach_buff[1].reshape(self.num_xF, self.numCtrls*self.numNodes)
+        self.adjGrad_Phi_uDach_buff = np.zeros((2, self.num_xF, self.num_ctrls, self.num_ctrl_gridNodes))
+        self.adjGrad_Phi_uDach_buff_view0 = self.adjGrad_Phi_uDach_buff[0].reshape(self.num_xF, self.num_ctrls*self.num_ctrl_gridNodes)
+        self.adjGrad_Phi_uDach_buff_view1 = self.adjGrad_Phi_uDach_buff[1].reshape(self.num_xF, self.num_ctrls*self.num_ctrl_gridNodes)
  
 # -----------------------------------------------------------------------------
     
@@ -29,11 +29,11 @@ class adjGrads:
         
         vecC_dtF_invariant = self.init_invariant_vec_c_dtF()
         
-        gradJ = np.zeros(self.numOptVar)
+        gradJ = np.zeros(self.num_optVars)
         
         idx_buff = 0
         
-        tRight = self.adjGrad_updates(self.numTimeSteps-1)
+        tRight = self.adjGrad_updates(self.num_time_steps-1)
         self.get_consistent_BC_J() 
         self.get_LagrangianOCP_du(z)
         
@@ -48,7 +48,7 @@ class adjGrads:
         """ BDF order 1 """
         idx_buff = 1 - idx_buff
         
-        tLeft = self.adjGrad_updates(self.numTimeSteps-2)
+        tLeft = self.adjGrad_updates(self.num_time_steps-2)
         
         deltaT = tRight - tLeft
         self.BDF_diff_tau[self.BDF_idx_buff] = deltaT
@@ -67,7 +67,7 @@ class adjGrads:
                 
         """ BDF order 2 """        
         
-        for i in range(self.numTimeSteps-3, -1, -1):
+        for i in range(self.num_time_steps-3, -1, -1):
             idx_buff = 1 - idx_buff
             integrand_tF_Right = integrand_tF_Left
             tRight = tLeft
@@ -103,11 +103,11 @@ class adjGrads:
         
         vecC_dtF_invariant = self.init_invariant_vec_c_dtF()
         
-        gradPhi = np.zeros([self.num_xF, self.numOptVar])
+        gradPhi = np.zeros([self.num_xF, self.num_optVars])
         
         idx_buff = 0
 
-        tRight = self.adjGrad_updates(self.numTimeSteps-1)
+        tRight = self.adjGrad_updates(self.num_time_steps-1)
         
         self.get_consistent_BC_Phi() # this updates self.dPhidq and self.dPhidv
         
@@ -123,7 +123,7 @@ class adjGrads:
         """ BDF order 1 """ 
         idx_buff = 1 - idx_buff
         
-        tLeft = self.adjGrad_updates(self.numTimeSteps-2)
+        tLeft = self.adjGrad_updates(self.num_time_steps-2)
         
         deltaT = tRight - tLeft
         self.BDF_diff_tau[self.BDF_idx_buff] = deltaT
@@ -141,7 +141,7 @@ class adjGrads:
         
         """ BDF order 2 """      
         
-        for i in range(self.numTimeSteps-3, -1, -1):
+        for i in range(self.num_time_steps-3, -1, -1):
             idx_buff = 1 - idx_buff
             integrand_tF_Right = integrand_tF_Left
             tRight = tLeft
