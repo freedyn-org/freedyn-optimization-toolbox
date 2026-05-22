@@ -74,25 +74,3 @@ class MBS_SysMat:
         self.MBS_G_tr = getattr(self.slot_MBS_G_tr, attr_name) 
         
 # -----------------------------------------------------------------------------
-
-    def update_MBS_SysMat_dll_nonzeros(self):
-        
-        self.slot_MBS_M.update_from_dll()
-        self.slot_MBS_Cq.update_from_dll()
-        self.slot_MBS_CqvDq.update_from_dll()
-        self.slot_MBS_fv.update_from_dll()
-        self.slot_MBS_G_tr.update_from_dll()      
-
-# -----------------------------------------------------------------------------
-
-    def update_MBS_SysMat(self):
-        
-        self.update_MBS_SysMat_dll_nonzeros()
-        
-        self.slot_MBS_M.apply_to_cached_matrix()
-        self.slot_MBS_Cq.apply_to_cached_matrix()
-        self.slot_MBS_CqvDq.apply_to_cached_matrix()
-        self.slot_MBS_fv.apply_to_cached_matrix()
-        self.slot_MBS_G_tr.apply_to_cached_matrix()               
-
-# -----------------------------------------------------------------------------

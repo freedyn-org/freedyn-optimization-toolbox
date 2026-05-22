@@ -1,5 +1,4 @@
 import numpy as np
-import freedyn as fd
 
 import scipy
 from scipy.sparse.linalg import factorized
@@ -17,6 +16,7 @@ class BDF(BDF_intOrderOne, BDF_intOrderTwo, CoeffMat):
         
         self.BDF_idx_buff = 0
         self.BDF_diff_tau = np.zeros(2)
+        
         self.adjW_J_buff = np.empty((2, self.nDof))
         self.adjP_J_buff = np.empty((2, self.nDof))
         self.BDF_J_Mp_buff = np.zeros((2, self.nDof))
@@ -27,10 +27,12 @@ class BDF(BDF_intOrderOne, BDF_intOrderTwo, CoeffMat):
                
         
         self.BDF_BC_dq_tr = np.zeros((self.nDofConstr, self.num_xF))   # (dPhi / dq)^T
-        self.BDF_BC_dv_tr = np.zeros((self.nDofConstr, self.num_xF))   # (dPhi / dv)^T        
+        self.BDF_BC_dv_tr = np.zeros((self.nDofConstr, self.num_xF))   # (dPhi / dv)^T
         
         nBDFsys = CoeffMat.__init__(self)
-            
+        self.BDF_solVec_J = np.zeros(nBDFsys)
+        self.BDF_solVec_Phi = np.zeros((nBDFsys, self.num_xF))
+
         if self.MBS_modeMAT_sparse:   
             self.BDF_BC_eyeMat = scipy.sparse.eye(self.nDof)
             self.compute_consistent_BC_J = self.compute_consistent_BC_J_sparse
@@ -42,9 +44,6 @@ class BDF(BDF_intOrderOne, BDF_intOrderTwo, CoeffMat):
             self.BDF_BC_eyeMat = np.eye(self.nDof)
             self.BDF_BC_zeroMat = np.zeros((self.nConstr, self.nConstr))
 
-        
-        self.BDF_solVec_J = np.zeros(nBDFsys)
-        self.BDF_solVec_Phi = np.zeros((nBDFsys, self.num_xF))
 
         BDF_intOrderOne.__init__(self)
         BDF_intOrderTwo.__init__(self)
@@ -61,10 +60,7 @@ class BDF(BDF_intOrderOne, BDF_intOrderTwo, CoeffMat):
         self.compute_consistent_BC_J()
         
         self.adjP_J_buff[self.BDF_idx_buff, :].fill(0.0)
-        self.adjW_J_buff[self.BDF_idx_buff, :].fill(0.0)
-        
-        return None
-        
+        self.adjW_J_buff[self.BDF_idx_buff, :].fill(0.0)  
 # -----------------------------------------------------------------------------
     
     def compute_consistent_BC_J_dense(self):
@@ -149,6 +145,28 @@ class BDF(BDF_intOrderOne, BDF_intOrderTwo, CoeffMat):
         WL_tF = solve_W(self.BDF_BC_dq_tr)
 
         return WL_tF, PU_tF
+
+# -----------------------------------------------------------------------------
+
+    def update_MBS_SysMat_dll_nonzeros(self):
+        
+        self.slot_MBS_M.update_from_dll()
+        self.slot_MBS_Cq.update_from_dll()
+        self.slot_MBS_CqvDq.update_from_dll()
+        self.slot_MBS_fv.update_from_dll()
+        self.slot_MBS_G_tr.update_from_dll()      
+
+# -----------------------------------------------------------------------------
+
+    def update_MBS_SysMat(self):
+        
+        self.update_MBS_SysMat_dll_nonzeros()
+        
+        self.slot_MBS_M.apply_to_cached_matrix()
+        self.slot_MBS_Cq.apply_to_cached_matrix()
+        self.slot_MBS_CqvDq.apply_to_cached_matrix()
+        self.slot_MBS_fv.apply_to_cached_matrix()
+        self.slot_MBS_G_tr.apply_to_cached_matrix()               
 
 # -----------------------------------------------------------------------------
 
