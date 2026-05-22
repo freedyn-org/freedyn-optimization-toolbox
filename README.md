@@ -22,10 +22,13 @@ $$
 have to be satisfied.
 
 ## Features
-- **Optimal Control Problems with fixed final time** `class_OCP_MBS.py`
-- **Optimal Control Problems with free final time** `class_TOCP_MBS.py`
+- **Optimal Control Problems with fixed final time** `class_OCP_FDOP.py`
+- **Optimal Control Problems with free final time** `class_TOCP_FDOP.py`
 
 ## Examples
+[Short Overwiew of Examples](examples/GitHub_Examples_Description.pdf)
+
+
 - [Trajectory Tracking](examples/example_01_two_mass_oscillator_trajectory_tracking/)
   
 $$
