@@ -9,7 +9,7 @@ class fcts_User():
         """   Allocate   L_q   L_v   L_u   Phi_q   Phi_v   """
         self.dLdq = np.zeros(self.nDof)                         # do not change 
         self.dLdv = np.zeros(self.nDof)                         # do not change 
-        self.dLdu = np.zeros(self.numCtrls)                     # do not change 
+        self.dLdu = np.zeros(self.num_ctrls)                     # do not change 
         
         if self.num_xF > 0:
             self.dPhidq = np.zeros((self.num_xF, self.nDof))    # do not change 
