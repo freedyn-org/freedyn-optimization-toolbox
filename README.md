@@ -26,6 +26,9 @@ have to be satisfied.
 - **Optimal Control Problems with free final time** `class_TOCP_FDOP.py`
 
 ## Examples
+[Short Overwiew of Examples](examples/GitHub_Examples_Description.pdf)
+
+
 - [Trajectory Tracking](examples/example_01_two_mass_oscillator_trajectory_tracking/)
   
 $$
