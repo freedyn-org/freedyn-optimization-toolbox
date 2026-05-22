@@ -1,21 +1,56 @@
 import numpy as np
-
 import scipy
 from scipy.sparse import bmat
 
-class spCoeffMat():
+class CoeffMat():
     
     def __init__(self):
         
-        nBDFsys = 2*self.nDof+2*self.nConstr
-        self.init_coeffMat_AdjSys_sparse('csc')
-        
+        if self.MBS_modeMAT_sparse:  
+            nBDFsys = self.init_coeffMat_AdjSys_sparse('csc')
+        else:
+            nBDFsys = self.init_coeffMat_AdjSys_dense()
+
         return nBDFsys
         
+# =============================================================================
+# BDF System - Matrix layout dense
+# =============================================================================
+
+    def init_coeffMat_AdjSys_dense(self):
         
+        nBDFsys = self.nDof + 2*self.nConstr
+        
+        self.BDF_coeffMat = np.zeros((nBDFsys, nBDFsys))
+        self.BDF_coeffMat_view_11 = self.BDF_coeffMat[:self.nDof, :self.nDof] 
+        self.BDF_coeffMat_view_12 = self.BDF_coeffMat[:self.nDof, self.nDof:self.nDofConstr]
+        self.BDF_coeffMat_view_13 = self.BDF_coeffMat[:self.nDof, self.nDofConstr:]
+        self.BDF_coeffMat_view_21 = self.BDF_coeffMat[self.nDof:self.nDofConstr, :self.nDof]
+        self.BDF_coeffMat_view_22 = self.BDF_coeffMat[self.nDof:self.nDofConstr, self.nDof:self.nDofConstr]
+        self.BDF_coeffMat_view_23 = self.BDF_coeffMat[self.nDof:self.nDofConstr, self.nDofConstr:]
+        self.BDF_coeffMat_view_31 = self.BDF_coeffMat[self.nDofConstr:, :self.nDof]
+        
+        return nBDFsys
 # -----------------------------------------------------------------------------
 
+    def get_coeffMat_AdjSys_dense(self, eta0, eta0_inv):
+        
+        self.BDF_coeffMat_view_11[:] = eta0 * self.MBS_M - eta0_inv * self.MBS_G_tr.T - self.MBS_fv.T
+        self.BDF_coeffMat_view_12[:] = -eta0_inv * self.MBS_CqvDq.T - self.MBS_Cq.T
+        self.BDF_coeffMat_view_13[:] = -eta0_inv * self.MBS_Cq.T
+        self.BDF_coeffMat_view_21[:] = self.MBS_Cq @ self.MBS_G_tr.T
+        self.BDF_coeffMat_view_22[:] = self.MBS_Cq @ self.MBS_CqvDq.T
+        self.BDF_coeffMat_view_23[:] = self.MBS_Cq @ self.MBS_Cq.T
+        self.BDF_coeffMat_view_31[:] = self.MBS_Cq
+# -----------------------------------------------------------------------------
+
+# =============================================================================
+# BDF System - Matrix layout sparse
+# =============================================================================
+
     def init_coeffMat_AdjSys_sparse(self, formatMAT):
+        
+        nBDFsys = 2*self.nDof+2*self.nConstr
 
         self.update_MBS_SysMat() 
         eyeMat_sp = scipy.sparse.eye(self.nDof, format='csr')
@@ -26,7 +61,6 @@ class spCoeffMat():
         dummy_fv.data.fill(1.0)        
         sumA22 = dummy_M + dummy_fv.T
 
-        
         offset = 0
         
         offset, A11_idx = self.idx_temp_init_coeffMat_AdjSys_sparse(offset, eyeMat_sp)  
@@ -49,7 +83,6 @@ class spCoeffMat():
         
         # Mapping
         self.BDF_spCoeffMat_map = np.argsort(self.BDF_spCoeffMat.data)
-        
 
         self.map_A11 = self.BDF_spCoeffMat_map[self.build_map_coeffMAT(eyeMat_sp, A11_idx)]
         self.map_A12 = self.BDF_spCoeffMat_map[self.build_map_coeffMAT(self.MBS_G_tr, A12_idx, transpose=True)]
@@ -63,11 +96,9 @@ class spCoeffMat():
         self.map_A32 = self.BDF_spCoeffMat_map[self.build_map_coeffMAT(self.MBS_Cq, A32_idx)]
         self.map_A41 = self.BDF_spCoeffMat_map[self.build_map_coeffMAT(self.MBS_Cq, A41_idx)]
         
-        
         self.BDF_spCoeffMat.data[self.map_A21] = -1.0
-
-        return None
-
+        
+        return nBDFsys
 # -----------------------------------------------------------------------------
 
     def idx_temp_init_coeffMat_AdjSys_sparse(self, offset, mtx, transpose=False):
@@ -76,20 +107,17 @@ class spCoeffMat():
         tpl.data = np.arange(offset, offset + tpl.nnz, dtype=int) + 1
         offset += tpl.nnz       
         return offset, tpl
-
 # -----------------------------------------------------------------------------        
     
     def build_map_coeffMAT(self, sub_mat, block_idx_mat, transpose=False):
         
         num_cols = block_idx_mat.shape[1]
-        
-        
+
         target_coo = block_idx_mat.tocoo()
         target_keys = target_coo.row * num_cols + target_coo.col
         sort_idx = np.argsort(target_keys)
         sorted_target_keys = target_keys[sort_idx]
-        
-        
+
         sub_coo = sub_mat.tocoo()
         
         if transpose:
@@ -98,12 +126,9 @@ class spCoeffMat():
         else:
             sub_keys = sub_coo.row * num_cols + sub_coo.col
         
-        
         matched_pos = np.searchsorted(sorted_target_keys, sub_keys)
         
-        
-        return (block_idx_mat.data[sort_idx[matched_pos]] - 1).astype(np.int32)
-        
+        return (block_idx_mat.data[sort_idx[matched_pos]] - 1).astype(np.int32)      
 # -----------------------------------------------------------------------------
 
     def get_coeffMat_AdjSys_sparse(self, eta0):
@@ -126,7 +151,4 @@ class spCoeffMat():
         
         # Row 4
         self.BDF_spCoeffMat.data[self.map_A41] = self.slot_MBS_Cq.dll_nonzeros 
-
-        return None
-
 # -----------------------------------------------------------------------------

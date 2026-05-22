@@ -9,10 +9,9 @@ from scipy.sparse import bmat
 from class_BDF_intOrderOne_physicalTime import BDF_intOrderOne 
 from class_BDF_intOrderTwo_physicalTime import BDF_intOrderTwo 
 
-from AdjSys_coeffMat_dense import CoeffMat
-from AdjSys_coeffMat_sparse import spCoeffMat
+from AdjSys_coeffMat import CoeffMat
 
-class BDF(BDF_intOrderOne, BDF_intOrderTwo, CoeffMat, spCoeffMat):
+class BDF(BDF_intOrderOne, BDF_intOrderTwo, CoeffMat):
     
     def __init__(self):
         
@@ -30,15 +29,14 @@ class BDF(BDF_intOrderOne, BDF_intOrderTwo, CoeffMat, spCoeffMat):
         self.BDF_BC_dq_tr = np.zeros((self.nDofConstr, self.num_xF))   # (dPhi / dq)^T
         self.BDF_BC_dv_tr = np.zeros((self.nDofConstr, self.num_xF))   # (dPhi / dv)^T        
         
+        nBDFsys = CoeffMat.__init__(self)
             
         if self.MBS_modeMAT_sparse:   
-            nBDFsys = spCoeffMat.__init__(self)
             self.BDF_BC_eyeMat = scipy.sparse.eye(self.nDof)
             self.compute_consistent_BC_J = self.compute_consistent_BC_J_sparse
             self.compute_consistent_BC_Phi = self.compute_consistent_BC_Phi_sparse
 
         else:
-            nBDFsys = CoeffMat.__init__(self)
             self.compute_consistent_BC_J = self.compute_consistent_BC_J_dense
             self.compute_consistent_BC_Phi = self.compute_consistent_BC_Phi_dense
             self.BDF_BC_eyeMat = np.eye(self.nDof)
