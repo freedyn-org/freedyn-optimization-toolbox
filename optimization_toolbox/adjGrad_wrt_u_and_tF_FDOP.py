@@ -34,7 +34,7 @@ class adjGrads:
         idx_buff = 0
         
         tRight = self.adjGrad_updates(self.num_time_steps-1)
-        self.get_consistent_BC_J() 
+        self.get_consistent_BC_J_FDOP() 
         self.get_LagrangianOCP_du(z)
         
         
@@ -109,7 +109,7 @@ class adjGrads:
 
         tRight = self.adjGrad_updates(self.num_time_steps-1)
         
-        self.get_consistent_BC_Phi() # this updates self.dPhidq and self.dPhidv
+        self.get_consistent_BC_Phi_FDOP() # this updates self.dPhidq and self.dPhidv
         
         dPhidt_tF = self.dPhidq @ self.fd_model.Qd[:, 0] + self.dPhidv @ self.fd_model.Qdd[:, 0]  # is added at the end, otherwise multiplied by 0.5y()
         

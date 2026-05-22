@@ -32,7 +32,7 @@ class adjGrads:
         
         tRight = self.adjGrad_updates(self.num_time_steps-1)
         
-        self.get_consistent_BC_J() 
+        self.get_consistent_BC_J_FDOP() 
         self.get_LagrangianOCP_du(z)
 
         vec_C = self.get_vec_c(tRight/self.tF)
@@ -92,7 +92,7 @@ class adjGrads:
 
         tRight = self.adjGrad_updates(self.num_time_steps-1)
 
-        self.get_consistent_BC_Phi() 
+        self.get_consistent_BC_Phi_FDOP() 
 
         vec_C = self.get_vec_c(tRight/self.tF)
         adjP_fdu = self.adjP_Phi_buff[self.BDF_idx_buff,:,:].T @ self.fDu

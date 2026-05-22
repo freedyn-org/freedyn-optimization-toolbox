@@ -1,7 +1,7 @@
 import numpy as np
 import freedyn as fd
 
-from control_zeroClamped_cubSPL import Control
+from control_cubSPL_zeroClamped import Control
 from Management_FreeDyn import FreeDyn
 from BDF_physicalTime import BDF
 from adjGrad_wrt_u_and_tF_FDOP import adjGrads
@@ -91,7 +91,7 @@ class Optimization(Control, FreeDyn, BDF, adjGrads, numDiff, fcts_User):
         self.update_vars_if_changed(z)   
         grad_J = self.adjGrad_J(z)        
 
-        """ Numerischer Gradient - all """
+        """ Verification of the adjoint gradient via numerical differentiation """
         #numGrad_J = self.numGrad_J(z)
         #error =  numGrad_J - grad_J
         
@@ -110,7 +110,7 @@ class Optimization(Control, FreeDyn, BDF, adjGrads, numDiff, fcts_User):
         self.update_vars_if_changed(z)
         grad_Phi = self.adjGrad_Phi(z)
         
-        """ Numerischer Gradient - all """
+        """ Verification of the adjoint gradient via numerical differentiation """
         # numGrad_Phi = self.numGrad_Phi(z)
         # error = numGrad_Phi - grad_Phi
         
