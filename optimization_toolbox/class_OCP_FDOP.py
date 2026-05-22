@@ -2,10 +2,10 @@ import numpy as np
 import freedyn as fd
 
 from control_cubSPL_zeroClamped import Control
-from Management_FreeDyn import FreeDyn
+from management_FreeDyn import FreeDyn
 from BDF_physicalTime import BDF
 from adjGrad_wrt_u_FDOP import adjGrads
-from numDiff_MBS import numDiff
+from numerical_differentiation import numDiff
 from user_fcts import fcts_User
 
 

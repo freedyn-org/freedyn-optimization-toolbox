@@ -2,11 +2,10 @@ import numpy as np
 import scipy
 from scipy.sparse.linalg import factorized
 
-from consistent_Boundary_conditions import BC_consistent
+from consistent_boundary_conditions import BC_consistent
 from BDF_intOrderOne_physicalTime import BDF_intOrderOne 
 from BDF_intOrderTwo_physicalTime import BDF_intOrderTwo 
-
-from AdjSys_coeffMat import CoeffMat
+from BDF_coeffMat import CoeffMat
 
 class BDF(BC_consistent, BDF_intOrderOne, BDF_intOrderTwo, CoeffMat):
     
