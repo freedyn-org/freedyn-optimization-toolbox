@@ -36,6 +36,13 @@ $$
 J = \int_{t_0}^{t_\mathrm{f}} \frac{1}{2} \left( y - \bar{y} \right)^2  \mathrm{d}t
 \end{aligned}
 $$
+
+$$
+\begin{aligned}
+y(t) \dots \text{Trajectory due to the selected control}~u(t)\\
+\bar{y}(t) \dots \text{Desired trajectory}\\
+\end{aligned}
+$$
   
 - [Minimum Control Effort](examples/example_02_nonlinear_spring_pendulum_minimum_control_effort/)
 
