@@ -54,6 +54,13 @@ J = \int_{t_0}^{t_\mathrm{f}} \frac{1}{2} \mathbf{u}^\top \mathbf{u} \mathrm{d}t
     \end{pmatrix} \right|_{t_\mathrm{f}} = \mathbf{0}
 \end{aligned}
 $$
+
+$$
+\begin{aligned}
+x(t) \dots \text{Trajectory due to the selected control}~u(t)\\
+\bar{y}(t) \dots \text{Desired trajectory}\\
+\end{aligned}
+$$
   
 - [Time Optimal Control](examples/example_03_SCARA_time_optimal_control/)
 
