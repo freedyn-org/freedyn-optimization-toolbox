@@ -54,7 +54,7 @@ $$
 \begin{aligned}
 J = \int_{t_0}^{t_\mathrm{f}} 1 \mathrm{d}t \quad \boldsymbol{\phi} = \left. \begin{pmatrix}
         \mathbf{x} - \mathbf{x}_\mathrm{f} \\ 
-        \dot{\mathbf{x}}
+        \dot{\mathbf{x}} - \dot{\mathbf{x}}_\mathrm{f}
     \end{pmatrix} \right|_{t_\mathrm{f}} = \mathbf{0}
 \end{aligned}
 $$
