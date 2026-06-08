@@ -122,7 +122,6 @@ class CoeffMat():
         
         if transpose:
             sub_keys = sub_coo.col * num_cols + sub_coo.row
-            
         else:
             sub_keys = sub_coo.row * num_cols + sub_coo.col
         

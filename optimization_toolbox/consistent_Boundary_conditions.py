@@ -30,6 +30,7 @@ class BC_consistent():
         
         self.compute_consistent_BC_J_FDOP()
         
+        self.BDF_idx_buff = 0
         self.adjP_J_buff[self.BDF_idx_buff, :].fill(0.0)
         self.adjW_J_buff[self.BDF_idx_buff, :].fill(0.0)  
 # -----------------------------------------------------------------------------
@@ -56,16 +57,12 @@ class BC_consistent():
         self.slot_MBS_Cq.apply_to_cached_matrix()
         self.slot_MBS_CqvDq.update_from_dll()
         self.slot_MBS_CqvDq.apply_to_cached_matrix()
-        
-        self.BDF_idx_buff = 0
-        
-        
+
         WL_tF, PU_tF = self.compute_consistent_BC_Phi_FDOP()
         
+        self.BDF_idx_buff = 0
         self.adjW_Phi_buff[self.BDF_idx_buff, :, :] = WL_tF[:self.nDof, :]     # W_tF
         self.adjP_Phi_buff[self.BDF_idx_buff, :, :] = PU_tF[:self.nDof, :]     # P_tF
-
-        return None
 # -----------------------------------------------------------------------------
     
     def compute_consistent_BC_Phi_FDOP_dense(self):        
