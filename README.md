@@ -49,16 +49,18 @@ $$
 $$
 \begin{aligned}
 J = \int_{t_0}^{t_\mathrm{f}} \frac{1}{2} \mathbf{u}^\top \mathbf{u} \mathrm{d}t \quad \boldsymbol{\phi} = \left. \begin{pmatrix}
-        \mathbf{x} - \mathbf{x}_\mathrm{f} \\ 
-        \dot{\mathbf{x}}  - \dot{\mathbf{x}}_\mathrm{f}
+        \phi_1 - \phi_{1,\mathrm{f}} \\ 
+        \vdots \\
+        \phi_r  - \phi_{r,\mathrm{f}}
     \end{pmatrix} \right|_{t_\mathrm{f}} = \mathbf{0}
 \end{aligned}
 $$
 
 $$
 \begin{aligned}
-x(t) \dots \text{Trajectory due to the selected control}~u(t)\\
-\bar{y}(t) \dots \text{Desired trajectory}\\
+\mathbf{u} \dots Control vector\\
+\phi_{1} \dots \phi_{r} \dots \text{Final constraints due to the selected control}~u(t)\\
+\phi_{1,\mathrm{f}} \dots \phi_{r,\mathrm{f}} \dots \text{Desired final constraints}\\
 \end{aligned}
 $$
   
