@@ -18,7 +18,7 @@ class FreeDyn():
         
         # Load and Read *.fds
         self.load_and_read_fds(self.fds_path_name)
-        self.fds_set_writing_to_none(self.fds_path_name)
+        self.fds_set_writing_to_none(self.fds_path_name) # set any file writing of FreeDyn to no
         
         # Create Model
         self.fd_model = fd.Model(self.fds_path_name, status_output="NO")
@@ -56,6 +56,7 @@ class FreeDyn():
 
     def init_MBS_SysMat_slots(self):
         
+        # Set up the memory layout either as sparse or dense
         attr_name = 'sp_mat' if self.MBS_modeMAT_sparse else 'dense_mat'
         
         # Mass matrix M
@@ -98,13 +99,27 @@ class FreeDyn():
         self.slot_MBS_G_tr = fd.ModelRelatedMatrixBuffer(G_idx, self.MBS_modeMAT_sparse)
         self.MBS_G_tr = getattr(self.slot_MBS_G_tr, attr_name) 
         
-# -----------------------------------------------------------------------------
-     
-    def exec_FreeDyn(self):
-        self.fd_model.compute_initial_conditions()
-        self.fd_model.solve_until(self.tF) 
-        self.num_time_steps = self.fd_model.get_num_time_steps()       
-# -----------------------------------------------------------------------------  
+# =============================================================================
+# Commands concerning splines
+# =============================================================================
+    
+    def update_ctrl_gridNodes(self):
+        
+        realT = self.tF * self.ctrl_gridNodes_tau
+        
+        for i, SPL in enumerate(self.name_ctrlSPL):
+            self.fd_model.set_spline(SPL, realT, self.ctrl_gridNodes[:,i])
+# -----------------------------------------------------------------------------              
+            
+    def write_ctrl_dataSPL(self):
+        
+        realT = self.tF * self.ctrl_gridNodes_tau
+        data = np.column_stack((realT, self.ctrl_gridNodes))
+        np.savetxt(f'{self.fds_path}\\dataSPL.txt', data, fmt='%.10f')   
+
+# =============================================================================
+# Commands concerning file.fds
+# =============================================================================
    
     def load_and_read_fds(self, fds):
         
@@ -128,7 +143,13 @@ class FreeDyn():
                 if line.lstrip().startswith(key):
                     self.fds_idxLine[key] = i
 # -----------------------------------------------------------------------------    
- 
+
+    def write_fds(self, fds):
+        
+        with open(fds, 'w') as target:
+           target.writelines(self.fds_data)           
+# ---------------------------------------------------------------------------- 
+
     def fds_set_writing_to_none(self, fds):
         
         self.fds_data[self.fds_idxLine["isExactOutputTimeEnforced"]] = "	isExactOutputTimeEnforced = yes\n"
@@ -141,25 +162,4 @@ class FreeDyn():
         self.fds_data[self.fds_idxLine["WriteMeasureResultFile"]] = "	WriteMeasureResultFile = no\n"
         
         self.write_fds(fds)
-# -----------------------------------------------------------------------------
-    
-    def write_fds(self, fds):
-        
-        with open(fds, 'w') as target:
-           target.writelines(self.fds_data)           
-# ----------------------------------------------------------------------------   
-
-    def write_ctrl_dataSPL(self):
-        
-        realT = self.tF * self.ctrl_gridNodes_tau
-        data = np.column_stack((realT, self.ctrl_gridNodes))
-        np.savetxt(f'{self.fds_path}\\dataSPL.txt', data, fmt='%.10f')   
-# -----------------------------------------------------------------------------          
-    
-    def update_ctrl_gridNodes(self):
-        
-        realT = self.tF * self.ctrl_gridNodes_tau
-        
-        for i, SPL in enumerate(self.name_ctrlSPL):
-            self.fd_model.set_spline(SPL, realT, self.ctrl_gridNodes[:,i])
 # ----------------------------------------------------------------------------- 

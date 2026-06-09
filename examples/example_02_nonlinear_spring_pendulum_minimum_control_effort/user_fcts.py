@@ -6,29 +6,29 @@ class fcts_User():
     
     def __init__(self):
         
-        """   Allocate   L_q   L_v   L_u   Phi_q   Phi_v   """
+        # Allocate matrices for derivatives of Lagrangian: L_q , L_v , L_u
         self.dLdq = np.zeros(self.nDof)                         # do not change 
         self.dLdv = np.zeros(self.nDof)                         # do not change 
-        self.dLdu = np.zeros(self.num_ctrls)                     # do not change 
+        self.dLdu = np.zeros(self.num_ctrls)                    # do not change 
         
+        # Allocate matrices for derivatives of final constraints: Phi_q , Phi_v
         if self.num_xF > 0:
             self.dPhidq = np.zeros((self.num_xF, self.nDof))    # do not change 
             self.dPhidv = np.zeros((self.num_xF, self.nDof))    # do not change
         
-        
         print("User functions loaded")
-
 # -----------------------------------------------------------------------------
 
-    def get_LagrangianOCP(self, z):
+    def get_Lagrangian(self, z):
+        
+        # Lagrangian of the optimization problem: J = \int_{t_0}^{t_f} L dt
         
         u = self.get_u(self.fd_model.t / self.tF)
 
         return 0.5 * np.dot(u, u)
-
 # -----------------------------------------------------------------------------
 
-    def get_LagrangianOCP_dq(self, z):
+    def get_Lagrangian_dq(self, z):
         
         # Allocate in __init__ as self.dLdq = np.zeros(self.nDof)
         # If you want to zero all entries, use self.dLdq.fill(0.0)
@@ -36,10 +36,9 @@ class fcts_User():
         # If dLdq = 0, then only use "return None"
         
         return None
-
 # -----------------------------------------------------------------------------
 
-    def get_LagrangianOCP_dv(self, z):
+    def get_Lagrangian_dv(self, z):
         
         # Allocate in __init__ as self.dLdv = np.zeros(self.nDof)
         # If you want to zero all entries, use self.dLdv.fill(0.0)
@@ -47,10 +46,9 @@ class fcts_User():
         # If dLdv = 0, then only use "return None"
         
         return None
-
 # -----------------------------------------------------------------------------
 
-    def get_LagrangianOCP_du(self, z):
+    def get_Lagrangian_du(self, z):
         
         # Allocate in __init__ as self.dLdu = np.zeros(self.nDof)
         # If you want to zero all entries, use self.dLdu.fill(0.0)
@@ -60,15 +58,17 @@ class fcts_User():
         self.dLdu = self.get_u(self.fd_model.t / self.tF).T
         
         return None
-    
 # -----------------------------------------------------------------------------
 
     def eval_Phi(self):
         
-        x = np.concatenate([self.fd_model.Q[0:3,0], self.fd_model.Qd[0:3,0]])
+        # Final constraints: Phi(t_f) = 0
+        # If no final constraints are imposed, then only use "return None"
+        
+        x = np.concatenate([self.fd_model.Q[0:3,0],     # q - translational DOFs
+                            self.fd_model.Qd[0:3,0]])   # \dot{q} - transl. DOFs
         
         return x - self.xF
-
 # -----------------------------------------------------------------------------
 
     def get_Phi_dq(self):
@@ -83,7 +83,6 @@ class fcts_User():
         self.dPhidq[2,2] = 1
         
         return None
-
 # -----------------------------------------------------------------------------
 
     def get_Phi_dv(self):
@@ -98,7 +97,8 @@ class fcts_User():
         self.dPhidv[5,2] = 1
         
         return None
-
 # -----------------------------------------------------------------------------
-    """ Define here your own functions """
+#
+        """        Define here your own functions        """
+#
 # -----------------------------------------------------------------------------

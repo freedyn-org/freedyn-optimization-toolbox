@@ -69,14 +69,11 @@ num_optVars = len(zInit)
 #
 # -----------------------------------------------------------------------------
 #
-"""  Choose OCP Problem """
-# Optimal control problem with/without final constraints Phi
-tF_free = 0   # is final time tF free? no ... 0 || yes ... 1
+"""  Choose Optimal Control Problem (OCP) with/without final constraints Phi """
+# Commenting in and out – according to the optimization problem
 
-if tF_free:
-    from class_TOCP_FDOP import Optimization
-else:
-    from class_OCP_FDOP import Optimization
+from class_OCP_FDOP import Optimization   # OCP with fixed final time 
+#  from class_TOCP_FDOP import Optimization  # OCP with free final time 
 
 optim = Optimization(num_optVars, num_ctrls, num_ctrl_gridNodes,
                      tF, xF,
@@ -88,14 +85,14 @@ optim = Optimization(num_optVars, num_ctrls, num_ctrl_gridNodes,
 #
 """  Set up of the optimization-toolbox """
 # Add or comment out – according to the optimization problem
-res = sp.optimize.minimize(fun         = optim.objective,                # cost function
+res = sp.optimize.minimize(fun         = optim.costFct_J,                # cost function
                            x0          = zInit,                             # initial values
                            method      = 'SLSQP',                        # optimization method
-                           jac         = optim.get_grad_J,               # gradient of cost function
+                           jac         = optim.grad_costFct_J,               # gradient of cost function
                            # bounds      = sp.optimize.Bounds(lb, ub),     # lower and upper bounds
                            # constraints = {'type':'eq', 
-                           #                'fun':optim.ceq_tF, 
-                           #                'jac':optim.get_grad_Phi},     # non-linear constraints
+                           #                'fun':optim.finalConstr_Phi, 
+                           #                'jac':optim.grad_finalConstr_Phi},     # non-linear constraints
                            options     = {'disp': True, 
                                           'iprint': 2, 
                                           'ftol': 1e-8, 
@@ -107,51 +104,50 @@ res = sp.optimize.minimize(fun         = optim.objective,                # cost 
 #
 """ Update optimization variables in class and rerun simulation """
 optim.update_vars_if_changed(res.x)
-optim.write_ctrl_dataSPL()
+# optim.write_ctrl_dataSPL()
 #
 # -----------------------------------------------------------------------------
 #
 """ Get data for plots """
-t = np.zeros(optim.num_time_steps)
-tau = np.zeros(optim.num_time_steps)
-uInit = np.zeros((num_ctrls, optim.num_time_steps))
-u = np.zeros((num_ctrls, optim.num_time_steps))
-y = np.zeros(optim.num_time_steps)
-ybar = np.zeros(optim.num_time_steps)
+t = np.zeros(optim.num_time_steps)                    # physical time t
+tau = np.zeros(optim.num_time_steps)                  # normalized time scale [0;1]
+uInit = np.zeros((num_ctrls, optim.num_time_steps))   # initial control
+u = np.zeros((num_ctrls, optim.num_time_steps))       # optimal control
+y = np.zeros(optim.num_time_steps)                    # x2 - x1
+ybar = np.zeros(optim.num_time_steps)                 # target path
 
 for i in range(optim.num_time_steps-1, -1, -1): 
    optim.fd_model.fetch_states_at_index(i)
    t[i] = optim.fd_model.t
    tau[i] = t[i]/optim.tF
-   
-   q = optim.fd_model.Q[:, 0]
-   y[i] = q[7] - q[0]
-   ybar[i] = optim.get_target_path(t[i])
-   
    uInit[:,i] = optim.get_u_for_GridNodes(tau[i], uDachInit)
    u[:,i] = optim.get_u(tau[i])
+   q = optim.fd_model.Q[:, 0]
+   y[i] = q[7] - q[0]
+   ybar[i] = optim.get_target_path(t[i])  
 #
 # -----------------------------------------------------------------------------
 #
 """ Plots """
-matplotlib.rcParams.update({'font.size': 15})
-f = plt.figure(figsize=(10,5))
+matplotlib.rcParams.update({'font.size': 12})
+f = plt.figure(figsize=(12,4))
 
 # plot relative motion
-ax2 = f.add_subplot(1, 2, 1)
-ax2.plot(t, y, linewidth = 1)
-ax2.plot(t, ybar, linewidth = 1)
-ax2.set_xlabel('normalized time')
-ax2.set_ylabel('y in m')
-ax2.grid()
+ax1 = f.add_subplot(1, 2, 1)
+ax1.plot(t, y, linewidth = 1, label = "y")
+ax1.plot(t, ybar, '--', linewidth = 1, label = "y_bar")
+ax1.set_xlabel('normalized time')
+ax1.set_ylabel('y in m')
+ax1.legend(loc='upper right',ncols = 2)
+ax1.grid()
 
 # plot control
-ax1 = f.add_subplot(1, 2, 2)
-ax1.plot(tau, u.T, linewidth = 2)
-ax1.set_ylabel('control in N')
-ax1.set_xlabel('normalized time')
-ax1.grid()
-ax1.set_xlim([0, 1])
+ax2 = f.add_subplot(1, 2, 2)
+ax2.plot(tau, u.T, linewidth = 2)
+ax2.set_ylabel('control in N')
+ax2.set_xlabel('normalized time')
+ax2.grid()
+ax2.set_xlim([0, 1])
 
 plt.show()
 #

@@ -6,30 +6,31 @@ class fcts_User():
     
     def __init__(self):
         
-        """   Allocate   L_q   L_v   L_u   Phi_q   Phi_v   """
+        # Allocate matrices for derivatives of Lagrangian: L_q , L_v , L_u
         self.dLdq = np.zeros(self.nDof)                         # do not change 
         self.dLdv = np.zeros(self.nDof)                         # do not change 
-        self.dLdu = np.zeros(self.num_ctrls)                     # do not change 
+        self.dLdu = np.zeros(self.num_ctrls)                    # do not change 
         
+        # Allocate matrices for derivatives of final constraints: Phi_q , Phi_v
         if self.num_xF > 0:
             self.dPhidq = np.zeros((self.num_xF, self.nDof))    # do not change 
             self.dPhidv = np.zeros((self.num_xF, self.nDof))    # do not change
         
-        
         print("User functions loaded")
-    
 # -----------------------------------------------------------------------------
 
-    def get_LagrangianOCP(self, z):
+    def get_Lagrangian(self, z):
+        
+        # Lagrangian of the optimization problem: J = \int_{t_0}^{t_f} L dt
         
         ybar = self.get_target_path(self.fd_model.t)
-        delta = self.fd_model.Q[7,0] - self.fd_model.Q[0,0] - ybar
+        y = self.fd_model.Q[7,0] - self.fd_model.Q[0,0]   # x2(t) - x1(t)
+        delta = y - ybar
 
         return 0.5 * delta * delta
-
 # -----------------------------------------------------------------------------
 
-    def get_LagrangianOCP_dq(self, z):
+    def get_Lagrangian_dq(self, z):
         
         # Allocate in __init__ as self.dLdq = np.zeros(self.nDof)
         # If you want to zero all entries, use self.dLdq.fill(0.0)
@@ -37,16 +38,16 @@ class fcts_User():
         # If dLdq = 0, then only use "return None"
         
         ybar = self.get_target_path(self.fd_model.t)
-        delta = self.fd_model.Q[7,0] - self.fd_model.Q[0,0] - ybar
+        y = self.fd_model.Q[7,0] - self.fd_model.Q[0,0]   # x2(t) - x1(t)
+        delta = y - ybar
            
         self.dLdq[0] = - delta
         self.dLdq[7] = delta
         
         return None
-
 # -----------------------------------------------------------------------------
 
-    def get_LagrangianOCP_dv(self, z):
+    def get_Lagrangian_dv(self, z):
         
         # Allocate in __init__ as self.dLdv = np.zeros(self.nDof)
         # If you want to zero all entries, use self.dLdv.fill(0.0)
@@ -54,10 +55,9 @@ class fcts_User():
         # If dLdv = 0, then only use "return None"
         
         return None
-
 # -----------------------------------------------------------------------------
 
-    def get_LagrangianOCP_du(self, z):
+    def get_Lagrangian_du(self, z):
         
         # Allocate in __init__ as self.dLdu = np.zeros(self.nDof)
         # If you want to zero all entries, use self.dLdu.fill(0.0)
@@ -65,13 +65,14 @@ class fcts_User():
         # If dLdu = 0, then only use "return None"
         
         return None
-    
 # -----------------------------------------------------------------------------
 
     def eval_Phi(self):
         
+        # Final constraints: Phi(t_f) = 0
+        # If no final constraints are imposed, then only use "return None"
+        
         return None
-
 # -----------------------------------------------------------------------------
 
     def get_Phi_dq(self):
@@ -82,7 +83,6 @@ class fcts_User():
         # If dPhidq = 0, then only use "return None"
         
         return None
-
 # -----------------------------------------------------------------------------
 
     def get_Phi_dv(self):
@@ -93,20 +93,18 @@ class fcts_User():
         # If dPhidq = 0, then only use "return None"
         
         return None
-
 # -----------------------------------------------------------------------------
-    """ Define here your own functions """
+#
+        """        Define here your own functions        """
+#
 # -----------------------------------------------------------------------------
 
     def get_target_path(self, t):
         
         return math.sin(t) + 0.7 * math.sin(math.pi*t) + 0.5 * math.sin(math.sqrt(2)*t)
-        
-
 # -----------------------------------------------------------------------------
 
     def get_target_path_dt(self, t):
         
         return math.cos(t) + 0.7 * math.pi* math.cos(math.pi*t) + 0.5 * math.sqrt(2)* math.cos(math.sqrt(2)*t)
-
 # -----------------------------------------------------------------------------
