@@ -13,7 +13,7 @@ class BDF(BDF_intOrderOne, BDF_intOrderTwo):
         
         # Allocate memory for the coeff. Matrix of the adj Sys
         if self.MBS_modeMAT_sparse:  
-            nBDFsys = coeffMat.init_coeffMat_AdjSys_sparse('csc')
+            nBDFsys = coeffMat.init_coeffMat_AdjSys_sparse(self,'csc')
         else:
             nBDFsys = coeffMat.init_coeffMat_AdjSys_dense(self)
             

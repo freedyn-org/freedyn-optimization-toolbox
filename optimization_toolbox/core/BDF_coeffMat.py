@@ -61,15 +61,15 @@ def init_coeffMat_AdjSys_sparse(self, formatMAT):
     sumA22 = dummy_M + dummy_fv.T
 
     offset = 0
-    offset, A11_idx = self.idx_temp_init_coeffMat_AdjSys_sparse(offset, eyeMat_sp)  
-    offset, A12_idx = self.idx_temp_init_coeffMat_AdjSys_sparse(offset, self.MBS_G_tr, transpose=True) 
-    offset, A13_idx = self.idx_temp_init_coeffMat_AdjSys_sparse(offset, self.MBS_CqvDq, transpose=True)
-    offset, A14_idx = self.idx_temp_init_coeffMat_AdjSys_sparse(offset, self.MBS_Cq, transpose=True) 
-    offset, A21_idx = self.idx_temp_init_coeffMat_AdjSys_sparse(offset, eyeMat_sp)
-    offset, A22_idx = self.idx_temp_init_coeffMat_AdjSys_sparse(offset, sumA22)        
-    offset, A23_idx = self.idx_temp_init_coeffMat_AdjSys_sparse(offset, self.MBS_Cq, transpose=True)
-    offset, A32_idx = self.idx_temp_init_coeffMat_AdjSys_sparse(offset, self.MBS_Cq)  
-    offset, A41_idx = self.idx_temp_init_coeffMat_AdjSys_sparse(offset, self.MBS_Cq)
+    offset, A11_idx = idx_temp_init_coeffMat_AdjSys_sparse(offset, eyeMat_sp)  
+    offset, A12_idx = idx_temp_init_coeffMat_AdjSys_sparse(offset, self.MBS_G_tr, transpose=True) 
+    offset, A13_idx = idx_temp_init_coeffMat_AdjSys_sparse(offset, self.MBS_CqvDq, transpose=True)
+    offset, A14_idx = idx_temp_init_coeffMat_AdjSys_sparse(offset, self.MBS_Cq, transpose=True) 
+    offset, A21_idx = idx_temp_init_coeffMat_AdjSys_sparse(offset, eyeMat_sp)
+    offset, A22_idx = idx_temp_init_coeffMat_AdjSys_sparse(offset, sumA22)        
+    offset, A23_idx = idx_temp_init_coeffMat_AdjSys_sparse(offset, self.MBS_Cq, transpose=True)
+    offset, A32_idx = idx_temp_init_coeffMat_AdjSys_sparse(offset, self.MBS_Cq)  
+    offset, A41_idx = idx_temp_init_coeffMat_AdjSys_sparse(offset, self.MBS_Cq)
     
     layout = [[A11_idx, A12_idx, A13_idx, A14_idx],
               [A21_idx, A22_idx, A23_idx, None],
@@ -82,17 +82,17 @@ def init_coeffMat_AdjSys_sparse(self, formatMAT):
     # Mapping
     self.BDF_spCoeffMat_map = np.argsort(self.BDF_spCoeffMat.data)
 
-    self.BDF_coeffMat_map_A11 = self.BDF_spCoeffMat_map[self.build_map_coeffMAT(eyeMat_sp, A11_idx)]
-    self.BDF_coeffMat_map_A12 = self.BDF_spCoeffMat_map[self.build_map_coeffMAT(self.MBS_G_tr, A12_idx, transpose=True)]
-    self.BDF_coeffMat_map_A13 = self.BDF_spCoeffMat_map[self.build_map_coeffMAT(self.MBS_CqvDq, A13_idx, transpose=True)]
-    self.BDF_coeffMat_map_A14 = self.BDF_spCoeffMat_map[self.build_map_coeffMAT(self.MBS_Cq, A14_idx, transpose=True)]
-    self.BDF_coeffMat_map_A21 = self.BDF_spCoeffMat_map[self.build_map_coeffMAT(eyeMat_sp, A21_idx)]
-    self.BDF_coeffMat_map_M_A22 = self.BDF_spCoeffMat_map[self.build_map_coeffMAT(self.MBS_M, A22_idx)]
-    self.BDF_coeffMat_map_fv_A22 = self.BDF_spCoeffMat_map[self.build_map_coeffMAT(self.MBS_fv, A22_idx, transpose=True)]
+    self.BDF_coeffMat_map_A11 = self.BDF_spCoeffMat_map[build_map_coeffMAT(eyeMat_sp, A11_idx)]
+    self.BDF_coeffMat_map_A12 = self.BDF_spCoeffMat_map[build_map_coeffMAT(self.MBS_G_tr, A12_idx, transpose=True)]
+    self.BDF_coeffMat_map_A13 = self.BDF_spCoeffMat_map[build_map_coeffMAT(self.MBS_CqvDq, A13_idx, transpose=True)]
+    self.BDF_coeffMat_map_A14 = self.BDF_spCoeffMat_map[build_map_coeffMAT(self.MBS_Cq, A14_idx, transpose=True)]
+    self.BDF_coeffMat_map_A21 = self.BDF_spCoeffMat_map[build_map_coeffMAT(eyeMat_sp, A21_idx)]
+    self.BDF_coeffMat_map_M_A22 = self.BDF_spCoeffMat_map[build_map_coeffMAT(self.MBS_M, A22_idx)]
+    self.BDF_coeffMat_map_fv_A22 = self.BDF_spCoeffMat_map[build_map_coeffMAT(self.MBS_fv, A22_idx, transpose=True)]
     self.BDF_coeffMat_map_A22 = np.unique(np.concatenate([self.BDF_coeffMat_map_M_A22,self.BDF_coeffMat_map_fv_A22]))
-    self.BDF_coeffMat_map_A23 = self.BDF_spCoeffMat_map[self.build_map_coeffMAT(self.MBS_Cq, A23_idx, transpose=True)]
-    self.BDF_coeffMat_map_A32 = self.BDF_spCoeffMat_map[self.build_map_coeffMAT(self.MBS_Cq, A32_idx)]
-    self.BDF_coeffMat_map_A41 = self.BDF_spCoeffMat_map[self.build_map_coeffMAT(self.MBS_Cq, A41_idx)]
+    self.BDF_coeffMat_map_A23 = self.BDF_spCoeffMat_map[build_map_coeffMAT(self.MBS_Cq, A23_idx, transpose=True)]
+    self.BDF_coeffMat_map_A32 = self.BDF_spCoeffMat_map[build_map_coeffMAT(self.MBS_Cq, A32_idx)]
+    self.BDF_coeffMat_map_A41 = self.BDF_spCoeffMat_map[build_map_coeffMAT(self.MBS_Cq, A41_idx)]
     
     # A21 is set here, as these are const. values
     self.BDF_spCoeffMat.data[self.BDF_coeffMat_map_A21] = -1.0
@@ -100,7 +100,7 @@ def init_coeffMat_AdjSys_sparse(self, formatMAT):
     return nBDFsys
 # -----------------------------------------------------------------------------
 
-def idx_temp_init_coeffMat_AdjSys_sparse(self, offset, mtx, transpose=False):
+def idx_temp_init_coeffMat_AdjSys_sparse(offset, mtx, transpose=False):
     
     tpl = mtx.T.copy() if transpose else mtx.copy()
     tpl.data = np.arange(offset, offset + tpl.nnz, dtype=int) + 1
@@ -108,7 +108,7 @@ def idx_temp_init_coeffMat_AdjSys_sparse(self, offset, mtx, transpose=False):
     return offset, tpl
 # -----------------------------------------------------------------------------        
     
-def build_map_coeffMAT(self, sub_mat, block_idx_mat, transpose=False):
+def build_map_coeffMAT(sub_mat, block_idx_mat, transpose=False):
     
     num_cols = block_idx_mat.shape[1]
 
