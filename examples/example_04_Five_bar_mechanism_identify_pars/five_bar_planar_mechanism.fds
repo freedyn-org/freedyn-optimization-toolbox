@@ -1,0 +1,299 @@
+Header freeDynHeader
+EndHeader
+%
+Body Rigid_EulerParameter_PAI
+	ID = 1f40dc9d-4e67-4964-a603-daa8cd55db83
+	Name = Body_1
+	InitialVelocityVector = 0.000000,0.000000,0.000000
+	InitialOmegaVector = 0.000000,0.000000,0.000000
+	RegardVelocityInertiaForcesInsideJacobian = no
+	Mass = 1.000000
+	LocationCenterMass = -1.000000,-0.500000,0.000000
+	Inertia = 0.000000,0.000000,0.166667
+	OrientationPAI = 0.707107,0.707107,0.000000,-0.707107,0.707107,0.000000,0.000000,-0.000000,1.000000
+	Geometry = Box 1.414214 0.250000 0.100000
+	Geometry Position = -1.000000,-0.500000,0.000000
+	Geometry Orientation = 0.707107,0.707107,0.000000,-0.707107,0.707107,0.000000,0.000000,-0.000000,1.000000
+	Geometry Color = 200,200,200,200
+	Geometry Transparency = 50
+EndBody
+%
+Body Rigid_EulerParameter_PAI
+	ID = 8e2171d0-b701-49d8-922e-154bab84f12c
+	Name = Body_2
+	InitialVelocityVector = 0.000000,0.000000,0.000000
+	InitialOmegaVector = 0.000000,0.000000,0.000000
+	RegardVelocityInertiaForcesInsideJacobian = no
+	Mass = 1.500000
+	LocationCenterMass = -0.750000,-1.500000,0.000000
+	Inertia = 0.000000,0.000000,0.406250
+	OrientationPAI = 0.832050,-0.554700,0.000000,0.554700,0.832050,-0.000000,0.000000,0.000000,1.000000
+	Geometry = Box 1.802776 0.250000 0.100000
+	Geometry Position = -0.750000,-1.500000,0.000000
+	Geometry Orientation = 0.832050,-0.554700,0.000000,0.554700,0.832050,0.000000,-0.000000,0.000000,1.000000
+	Geometry Color = 200,200,200,200
+	Geometry Transparency = 50
+EndBody
+%
+Body Rigid_EulerParameter_PAI
+	ID = a1524d66-e4e8-4ca0-96c9-fc95e73fed0b
+	Name = Body_3
+	InitialVelocityVector = 0.000000,0.000000,0.000000
+	InitialOmegaVector = 0.000000,0.000000,0.000000
+	RegardVelocityInertiaForcesInsideJacobian = no
+	Mass = 1.500000
+	LocationCenterMass = 0.750000,-1.500000,0.000000
+	Inertia = 0.000000,0.000000,0.406250
+	OrientationPAI = 0.832050,0.554700,0.000000,-0.554700,0.832050,0.000000,0.000000,-0.000000,1.000000
+	Geometry = Box 1.802776 0.250000 0.100000
+	Geometry Position = 0.750000,-1.500000,0.000000
+	Geometry Orientation = 0.832050,0.554700,0.000000,-0.554700,0.832050,0.000000,0.000000,-0.000000,1.000000
+	Geometry Color = 200,200,200,200
+	Geometry Transparency = 50
+EndBody
+%
+Body Rigid_EulerParameter_PAI
+	ID = 2a53f08c-bd61-4da8-9f55-64ec3fdda7c1
+	Name = Body_4
+	InitialVelocityVector = 0.000000,0.000000,0.000000
+	InitialOmegaVector = 0.000000,0.000000,0.000000
+	RegardVelocityInertiaForcesInsideJacobian = no
+	Mass = 1.000000
+	LocationCenterMass = 1.000000,-0.500000,0.000000
+	Inertia = 0.000000,0.000000,0.166667
+	OrientationPAI = 0.707107,-0.707107,0.000000,0.707107,0.707107,-0.000000,0.000000,0.000000,1.000000
+	Geometry = Box 1.414214 0.250000 0.100000
+	Geometry Position = 1.000000,-0.500000,0.000000
+	Geometry Orientation = 0.707107,-0.707107,0.000000,0.707107,0.707107,0.000000,-0.000000,0.000000,1.000000
+	Geometry Color = 200,200,200,200
+	Geometry Transparency = 50
+EndBody
+%
+Constraint Generic
+	ID = a4354a0c-6522-4d8a-aac8-0461e9ab218e
+	Name = A
+	BodyIDs = 1f40dc9d-4e67-4964-a603-daa8cd55db83, 0
+	dxFixed = yes
+	dyFixed = yes
+	dzFixed = yes
+	axFixed = yes
+	ayFixed = yes
+	azFixed = no
+	Location = -0.500000,0.000000,0.000000
+	ConstraintOrientation = 1.000000,0.000000,0.000000,0.000000,1.000000,0.000000,0.000000,0.000000,1.000000
+EndConstraint
+%
+Constraint Generic
+	ID = e369b18c-17fb-48dc-87e8-d423e499e0a2
+	Name = P1
+	BodyIDs = 8e2171d0-b701-49d8-922e-154bab84f12c, 1f40dc9d-4e67-4964-a603-daa8cd55db83
+	dxFixed = yes
+	dyFixed = yes
+	dzFixed = yes
+	axFixed = yes
+	ayFixed = yes
+	azFixed = no
+	Location = -1.500000,-1.000000,0.000000
+	ConstraintOrientation = 1.000000,0.000000,0.000000,0.000000,1.000000,0.000000,0.000000,0.000000,1.000000
+EndConstraint
+%
+Constraint Generic
+	ID = 751eeff4-e931-4ff1-bb19-4bf0f22f2d4c
+	Name = P2
+	BodyIDs = a1524d66-e4e8-4ca0-96c9-fc95e73fed0b, 8e2171d0-b701-49d8-922e-154bab84f12c
+	dxFixed = yes
+	dyFixed = yes
+	dzFixed = yes
+	axFixed = yes
+	ayFixed = yes
+	azFixed = no
+	Location = 0.000000,-2.000000,0.000000
+	ConstraintOrientation = 1.000000,0.000000,0.000000,0.000000,1.000000,0.000000,0.000000,0.000000,1.000000
+EndConstraint
+%
+Constraint Generic
+	ID = a047fe18-0ba1-4de3-8e24-7d68131592bb
+	Name = P3
+	BodyIDs = 2a53f08c-bd61-4da8-9f55-64ec3fdda7c1, a1524d66-e4e8-4ca0-96c9-fc95e73fed0b
+	dxFixed = yes
+	dyFixed = yes
+	dzFixed = yes
+	axFixed = yes
+	ayFixed = yes
+	azFixed = no
+	Location = 1.500000,-1.000000,0.000000
+	ConstraintOrientation = 1.000000,0.000000,0.000000,0.000000,1.000000,0.000000,0.000000,0.000000,1.000000
+EndConstraint
+%
+Constraint Generic
+	ID = 5b702adb-eb47-4293-a866-c829a2ad36f3
+	Name = B
+	BodyIDs = 2a53f08c-bd61-4da8-9f55-64ec3fdda7c1, 0
+	dxFixed = yes
+	dyFixed = yes
+	dzFixed = no
+	axFixed = no
+	ayFixed = no
+	azFixed = no
+	Location = 0.500000,0.000000,0.000000
+	ConstraintOrientation = 1.000000,0.000000,0.000000,0.000000,1.000000,0.000000,0.000000,0.000000,1.000000
+EndConstraint
+%
+Force Gravity
+	ID = 1
+	Name = 
+	GravityAccVector = 0.000000,-9.810000,0.000000
+	ActivationTime = 0.000000
+EndForce
+%
+Force GenericForce
+	ID = 417fbc0b-7514-4249-bc3a-c880ddf10d5c
+	Name = ForceSpring1
+	BodyIDs = 8e2171d0-b701-49d8-922e-154bab84f12c, 2a53f08c-bd61-4da8-9f55-64ec3fdda7c1
+	PointOfApplication_Body1 = -1.500000,-1.000000,0.000000
+	PointOfApplication_Body2 = 0.500000,0.000000,0.000000
+	ForceDirectionType = In-line-of-sight
+	ForceDirection = 0.894427,0.447214,0.000000
+	ForceExpression = PARVAL[c_Springs] * (MEAVAL[l_Spring1]-PARVAL[springOneLengthNature])
+EndForce
+%
+Force GenericForce
+	ID = f658e6ce-e773-4348-aa33-b90ccc55139c
+	Name = ForceSpring2
+	BodyIDs = 8e2171d0-b701-49d8-922e-154bab84f12c, 2a53f08c-bd61-4da8-9f55-64ec3fdda7c1
+	PointOfApplication_Body1 = 0.000000,-2.000000,0.000000
+	PointOfApplication_Body2 = 0.500000,0.000000,0.000000
+	ForceDirectionType = In-line-of-sight
+	ForceDirection = 0.242536,0.970142,0.000000
+	ForceExpression = PARVAL[c_Springs] * (MEAVAL[l_Spring2]-PARVAL[springTwoLengthNature])
+EndForce
+%
+DataObject Parameter
+	ID = unassignedParamOne
+	Name = springOneLengthNature
+	InitialValue = 2.23607
+EndDataObject
+%
+DataObject Parameter
+	ID = unassignedParamTwo
+	Name = springTwoLengthNature
+	InitialValue = 2.06155
+EndDataObject
+%
+DataObject Parameter
+	ID = unassignedParamThree
+	Name = c_Springs
+	InitialValue = 100.000000
+EndDataObject
+%
+Measure Translational
+	ID = 0bb3f0a4-4f7d-4c66-a37e-7b5a139094d3
+	Name = l_Spring1
+	BodyIDs = 8e2171d0-b701-49d8-922e-154bab84f12c, 0
+	MeasureMode = disp
+	MeasureCoordinate = XYZ
+	MeasureLocation_Body1 = -1.500000,-1.000000,0.000000
+	MeasureLocation_Body2 = 0.500000,0.000000,0.000000
+	UseInitialValueAsOffset = no
+EndMeasure
+%
+Measure Translational
+	ID = dedf0d1c-014b-4443-addf-e5f280ea55e9
+	Name = l_Spring2
+	BodyIDs = 8e2171d0-b701-49d8-922e-154bab84f12c, 0
+	MeasureMode = disp
+	MeasureCoordinate = XYZ
+	MeasureLocation_Body1 = 0.000000,-2.000000,0.000000
+	MeasureLocation_Body2 = 0.500000,0.000000,0.000000
+	UseInitialValueAsOffset = no
+EndMeasure
+%
+Measure Translational
+	ID = 1b992ac2-caa7-49b0-9bb7-b9a7790ba95a
+	Name = veloX_P2
+	BodyIDs = 8e2171d0-b701-49d8-922e-154bab84f12c, 0
+	MeasureMode = vel
+	MeasureCoordinate = X
+	MeasureLocation_Body1 = 0.000000,-2.000000,0.000000
+	MeasureLocation_Body2 = 0.000000,0.000000,0.000000
+	UseInitialValueAsOffset = no
+EndMeasure
+%
+Measure Translational
+	ID = 44260804-7f0e-449f-8a7a-c5b042c5406d
+	Name = veloY_P2
+	BodyIDs = 8e2171d0-b701-49d8-922e-154bab84f12c, 0
+	MeasureMode = vel
+	MeasureCoordinate = Y
+	MeasureLocation_Body1 = 0.000000,-2.000000,0.000000
+	MeasureLocation_Body2 = 0.000000,0.000000,0.000000
+	UseInitialValueAsOffset = no
+EndMeasure
+%
+Measure Translational
+	ID = abd85a0f-ffd1-4302-a6a2-337bffeac73c
+	Name = dispX_P2
+	BodyIDs = 8e2171d0-b701-49d8-922e-154bab84f12c, 0
+	MeasureMode = disp
+	MeasureCoordinate = X
+	MeasureLocation_Body1 = 0.000000,-2.000000,0.000000
+	MeasureLocation_Body2 = 0.000000,0.000000,0.000000
+	UseInitialValueAsOffset = no
+EndMeasure
+%
+Measure Translational
+	ID = dc2d0d63-9045-4c06-988a-07bae7543f13
+	Name = dispY_P2
+	BodyIDs = 8e2171d0-b701-49d8-922e-154bab84f12c, 0
+	MeasureMode = disp
+	MeasureCoordinate = Y
+	MeasureLocation_Body1 = 0.000000,-2.000000,0.000000
+	MeasureLocation_Body2 = 0.000000,0.000000,0.000000
+	UseInitialValueAsOffset = no
+EndMeasure
+%
+Simulation Dynamic
+	ID = 
+	Name = 
+	SimulationTimeBegin = 0.000000
+	InitialPositionFromFile = 0
+	InitialVelocityFromFile = 0
+	SimulationTimeEnd = 5.000000
+	OutputTimeBegin = 0.000000
+	OutputTimeStepSize = 5.000000e-03
+	isExactOutputTimeEnforced = yes
+	WriteConstraintForceResultFile = no
+	WriteForceResultFile = no
+	WriteVelocityResultFile = no
+	WriteStateResultFile = no
+	WriteAccelerationResultFile = no
+	WriteExtConstraintLagrangeResultFile = no
+	WriteMeasureResultFile = no
+EndSimulation
+%
+Solver HHT
+	ID = 
+	Name = 
+	Alpha = -0.300000
+	MaxNumberOfInnerIterations = 5,5
+	GlobalErrorTolerance = 1.000000e-05
+	SolverMinTimeStep = 1.000000e-10
+	SolverMaxTimeStep = 5.000000e-03
+	ModifyNewmark = no
+	MaxNumOfTimeStepsUsingSameFactorizedJacobian = 0
+	UsePardisoScalingAndMatching = no
+	DebugLevel = 0
+	DebugTimeBegin = 0.000000
+	DebugTimeEnd = 5.000000
+EndSolver
+%
+Globals Settings
+	ID = 
+	Name = 
+	BackgroundColor = 255,255,255,255
+	BoundingMode = 0
+	COGMarkerScale = 0.250000
+	ConstraintIconScale = 0.250000
+	ForceIconScale = 0.250000
+EndGlobals
+%
