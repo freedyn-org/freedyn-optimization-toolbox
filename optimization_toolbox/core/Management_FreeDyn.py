@@ -98,6 +98,15 @@ class FreeDyn():
                                                    np.array([1.0, -1.0, -1.0, -1.0]))
         self.slot_MBS_G_tr = fd.ModelRelatedMatrixBuffer(G_idx, self.MBS_modeMAT_sparse)
         self.MBS_G_tr = getattr(self.slot_MBS_G_tr, attr_name) 
+
+# =============================================================================
+# Commands concerning FD pars 
+# =============================================================================
+    
+    def update_FD_pars(self, param_names, values):
+        
+        for name, value in zip(param_names, values, strict=True):
+            self.fd_model.set_parameter(name, value)
         
 # =============================================================================
 # Commands concerning splines
