@@ -7,7 +7,7 @@ class FreeDyn():
     
     def __init__(self,
                  path_FDdll, path_fds, name_fds,
-                 name_ctrlSPL, name_fDu_par):
+                 name_ctrlSPL, name_dForce_dparam):
         
         # Initialize FreeDyn API
         fd.initialize(path_FDdll)
@@ -38,8 +38,8 @@ class FreeDyn():
         self.init_MBS_SysMat_slots()
         
         # Derivative of sum of external forces w.r.t. parameter given as string
-        self.buffer_MBS_dVecForce_dFDparam = fd.ForceParameterDerivativeMatrixBuffer(name_fDu_par)
-        self.dVecForce_dFDparam = self.buffer_MBS_dVecForce_dFDparam.data
+        self.buffer_MBS_dForce_dFDparam = fd.ForceParameterDerivativeMatrixBuffer(name_dForce_dparam)
+        self.dForce_dFDparam = self.buffer_MBS_dForce_dFDparam.data
         
         # FreeDyn data object spline of the controls 
         self.name_ctrlSPL = name_ctrlSPL
@@ -103,6 +103,26 @@ class FreeDyn():
         
         for name, val in zip(param_names, values): #, strict=True
             self.API.set_parameter(name, val)
+ 
+ # -----------------------------------------------------------------------------              
+
+    # def overwrite_param_val_FDS(self):
+        
+    #     # Open FDS file and store data
+    #     with open(self.fds_path_name, 'r') as inp:
+    #        self.fds_data = inp.readlines()      
+        
+    #     tempVar = 0
+        
+    #     # Get idex of lines
+    #     for i, line in enumerate(self.fds_data):
+    #         if line.lstrip().startswith("InitialValue"):
+    #             self.fds_data[i] = f"	InitialValue = {self.opt_pars[tempVar]}\n"
+    #             tempVar = tempVar + 1
+    #             if tempVar == 2:
+    #                 break
+                    
+    #     self.write_fds(self.fds_path_name)
         
 # =============================================================================
 # Commands concerning splines
