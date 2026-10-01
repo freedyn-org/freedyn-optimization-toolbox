@@ -124,24 +124,24 @@ for i in range(0,num_optVars):
 # -----------------------------------------------------------------------------
 #
 """ Get data for plots """
-t = np.zeros(optim.num_time_steps)                    # physical time t
-tau = np.zeros(optim.num_time_steps)                  # normalized time scale [0;1]
-rx_P2 =  np.zeros(optim.num_time_steps)           # 
-ry_P2 =  np.zeros(optim.num_time_steps)            # 
-vx_P2 =  np.zeros(optim.num_time_steps)            # 
-vy_P2 =  np.zeros(optim.num_time_steps)            # 
+t = np.zeros(optim.FreeDyn.num_time_steps)                    # physical time t
+tau = np.zeros(optim.FreeDyn.num_time_steps)                  # normalized time scale [0;1]
+rx_P2 =  np.zeros(optim.FreeDyn.num_time_steps)           # 
+ry_P2 =  np.zeros(optim.FreeDyn.num_time_steps)            # 
+vx_P2 =  np.zeros(optim.FreeDyn.num_time_steps)            # 
+vy_P2 =  np.zeros(optim.FreeDyn.num_time_steps)            # 
 
-for i in range(optim.num_time_steps-1, -1, -1): 
-   optim.fd_model.fetch_states_at_index(i)
-   optim.fd_model.update_state_at_index(i)   # necessary, if measures are used in get_Lagrangian()
-   t[i] = optim.fd_model.t
+for i in range(optim.FreeDyn.num_time_steps-1, -1, -1): 
+   optim.FreeDyn.API.fetch_states_at_index(i)
+   optim.FreeDyn.API.update_state_at_index(i)   # necessary, if measures are used in get_Lagrangian()
+   t[i] = optim.FreeDyn.API.t
    tau[i] = t[i]/optim.tF
-   q = optim.fd_model.Q[:, 0]
+   q = optim.FreeDyn.API.Q[:, 0]
    
-   rx_P2[i] = optim.fd_model.get_measure_value("dispX_P2")
-   ry_P2[i] = optim.fd_model.get_measure_value("dispY_P2")
-   vx_P2[i] = optim.fd_model.get_measure_value("veloX_P2")
-   vy_P2[i] = optim.fd_model.get_measure_value("veloY_P2")
+   rx_P2[i] = optim.FreeDyn.API.get_measure_value("dispX_P2")
+   ry_P2[i] = optim.FreeDyn.API.get_measure_value("dispY_P2")
+   vx_P2[i] = optim.FreeDyn.API.get_measure_value("veloX_P2")
+   vy_P2[i] = optim.FreeDyn.API.get_measure_value("veloY_P2")
    
 #
 # -----------------------------------------------------------------------------
