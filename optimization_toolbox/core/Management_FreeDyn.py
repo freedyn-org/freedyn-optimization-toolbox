@@ -21,8 +21,8 @@ class FreeDyn():
         self.fds_set_writing_to_none(self.fds_path_name) # set any file writing of FreeDyn to no
         
         # Create Model
-        self.fd_model = fd.Model(self.fds_path_name, status_output="NO")
-        info = self.fd_model.get_info()
+        self.API = fd.Model(self.fds_path_name, status_output="NO")
+        info = self.API.get_info()
         self.nDof = info.num_generalized_coordinates
         self.nConstr = info.num_lagrange_multipliers
         self.nDofConstr = self.nDof + self.nConstr 
@@ -49,7 +49,7 @@ class FreeDyn():
         
     def __del__(self):
         
-        self.fd_model.__del__()
+        self.API.__del__()
         print('Model deleted')   
         
 # -----------------------------------------------------------------------------
@@ -101,19 +101,19 @@ class FreeDyn():
     
     def update_FD_pars(self, param_names, values):
         
-        for name, value in zip(param_names, values, strict=True):
-            self.fd_model.set_parameter(name, value)
+        for name, val in zip(param_names, values): #, strict=True
+            self.API.set_parameter(name, val)
         
 # =============================================================================
 # Commands concerning splines
 # =============================================================================
     
-    def update_ctrl_gridNodes(self):
+    def update_ctrl_gridNodes(self, tF, ctrl_gridNodes_tau, ctrl_gridNodes):
         
-        realT = self.tF * self.ctrl_gridNodes_tau
+        realT = tF * ctrl_gridNodes_tau
         
         for i, SPL in enumerate(self.name_ctrlSPL):
-            self.fd_model.set_spline(SPL, realT, self.ctrl_gridNodes[:,i])
+            self.API.set_spline(SPL, realT, ctrl_gridNodes[:,i])
 # -----------------------------------------------------------------------------              
             
     def write_ctrl_dataSPL(self):
