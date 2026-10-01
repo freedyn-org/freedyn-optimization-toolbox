@@ -38,8 +38,8 @@ class FreeDyn():
         self.init_MBS_SysMat_slots()
         
         # Derivative of sum of external forces w.r.t. parameter given as string
-        self.buffer_MBS_fDu = fd.ForceParameterDerivativeMatrixBuffer(name_fDu_par)
-        self.fDu = self.buffer_MBS_fDu.data
+        self.buffer_MBS_dVecForce_dFDparam = fd.ForceParameterDerivativeMatrixBuffer(name_fDu_par)
+        self.dVecForce_dFDparam = self.buffer_MBS_dVecForce_dFDparam.data
         
         # FreeDyn data object spline of the controls 
         self.name_ctrlSPL = name_ctrlSPL

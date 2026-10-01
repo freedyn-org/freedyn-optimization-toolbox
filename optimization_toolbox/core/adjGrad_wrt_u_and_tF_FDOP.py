@@ -20,7 +20,7 @@ class adjGrads:
         self.fd_model.fetch_states_at_index(idx)
         self.fd_model.update_state_at_index(idx)
         self.fd_model.update_jacobian()
-        self.buffer_MBS_fDu.update_from_dll()
+        self.buffer_MBS_dVecForce_dFDparam.update_from_dll()
         
         return self.fd_model.t
 # -----------------------------------------------------------------------------
@@ -37,7 +37,7 @@ class adjGrads:
         tRight = self.adjGrad_updates(self.num_time_steps-1)
         self.get_consistent_BC_J() 
         self.get_Lagrangian_du(z)
-        dLdu_adjP_fdu = self.dLdu + self.get_adjVar_p_J().T @ self.fDu
+        dLdu_adjP_fdu = self.dLdu + self.get_adjVar_p_J().T @ self.dVecForce_dFDparam
         vec_C, dCdtau_times_uDach = self.get_vec_c_AND_dCdtau_times_uDach(tRight/self.tF)
         np.outer(dLdu_adjP_fdu, vec_C, out = self.adjGrad_J_uDach_buff[idx_buff])
         integrand_tF_Right = tRight * (dLdu_adjP_fdu @ dCdtau_times_uDach)
@@ -49,7 +49,7 @@ class adjGrads:
         deltaT = tRight - tLeft
         self.BDForder1_singleStep_J(z, deltaT)        
         self.get_Lagrangian_du(z)
-        dLdu_adjP_fdu = self.dLdu + self.get_adjVar_p_J().T @ self.fDu
+        dLdu_adjP_fdu = self.dLdu + self.get_adjVar_p_J().T @ self.dVecForce_dFDparam
         vec_C, dCdtau_times_uDach = self.get_vec_c_AND_dCdtau_times_uDach(tLeft/self.tF)
         np.outer(dLdu_adjP_fdu, vec_C, out = self.adjGrad_J_uDach_buff[idx_buff])
         integrand_tF_Left = tLeft * (dLdu_adjP_fdu @ dCdtau_times_uDach)
@@ -65,7 +65,7 @@ class adjGrads:
             deltaT = tRight - tLeft
             self.BDForder2_singleStep_J(z, deltaT)
             self.get_Lagrangian_du(z)
-            dLdu_adjP_fdu = self.dLdu + self.get_adjVar_p_J().T @ self.fDu
+            dLdu_adjP_fdu = self.dLdu + self.get_adjVar_p_J().T @ self.dVecForce_dFDparam
             vec_C, dCdtau_times_uDach = self.get_vec_c_AND_dCdtau_times_uDach(tLeft/self.tF)
             np.outer(dLdu_adjP_fdu, vec_C, out = self.adjGrad_J_uDach_buff[idx_buff])
             integrand_tF_Left = tLeft * (dLdu_adjP_fdu @ dCdtau_times_uDach)
@@ -90,7 +90,7 @@ class adjGrads:
         tRight = self.adjGrad_updates(self.num_time_steps-1)
         self.get_consistent_BC_Phi() # this updates self.dPhidq and self.dPhidv
         dPhidt_tF = self.dPhidq @ self.fd_model.Qd[:, 0] + self.dPhidv @ self.fd_model.Qdd[:, 0]  # is added at the end, otherwise multiplied by 0.5y()
-        adjP_fdu = self.get_adjVar_P_Phi().T @ self.fDu
+        adjP_fdu = self.get_adjVar_P_Phi().T @ self.dVecForce_dFDparam
         vec_C, dCdtau_times_uDach = self.get_vec_c_AND_dCdtau_times_uDach(tRight/self.tF)
         np.multiply(adjP_fdu[:,:,np.newaxis], vec_C, out = self.adjGrad_Phi_uDach_buff[idx_buff])        
         integrand_tF_Right = tRight * (adjP_fdu @ dCdtau_times_uDach)
@@ -100,7 +100,7 @@ class adjGrads:
         tLeft = self.adjGrad_updates(self.num_time_steps-2)
         deltaT = tRight - tLeft
         self.BDForder1_singleStep_Phi(deltaT)
-        adjP_fdu = self.get_adjVar_P_Phi().T @ self.fDu
+        adjP_fdu = self.get_adjVar_P_Phi().T @ self.dVecForce_dFDparam
         vec_C, dCdtau_times_uDach = self.get_vec_c_AND_dCdtau_times_uDach(tLeft/self.tF)
         np.multiply(adjP_fdu[:,:,np.newaxis], vec_C, out = self.adjGrad_Phi_uDach_buff[idx_buff])
         integrand_tF_Left = tLeft * (adjP_fdu @ dCdtau_times_uDach)
@@ -115,7 +115,7 @@ class adjGrads:
             tLeft = self.adjGrad_updates(i)
             deltaT = tRight - tLeft
             self.BDForder2_singleStep_Phi(deltaT)
-            adjP_fdu = self.get_adjVar_P_Phi().T @ self.fDu
+            adjP_fdu = self.get_adjVar_P_Phi().T @ self.dVecForce_dFDparam
             vec_C, dCdtau_times_uDach = self.get_vec_c_AND_dCdtau_times_uDach(tLeft/self.tF)
             np.multiply(adjP_fdu[:,:,np.newaxis], vec_C, out = self.adjGrad_Phi_uDach_buff[idx_buff])
             integrand_tF_Left = tLeft * (adjP_fdu @ dCdtau_times_uDach)
