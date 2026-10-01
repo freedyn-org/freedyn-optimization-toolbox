@@ -11,7 +11,7 @@ from user_fcts import fcts_User
 import core.numerical_differentiation as numDiff
 
 
-class Optimization(Control, FreeDyn, BC_FDOP, BDF, adjGrads, fcts_User):
+class Optimization(Control, BC_FDOP, BDF, adjGrads, fcts_User):
     
     def __init__(self,
                       num_optVars, num_ctrls, num_ctrl_gridNodes,
@@ -27,7 +27,7 @@ class Optimization(Control, FreeDyn, BC_FDOP, BDF, adjGrads, fcts_User):
         self.num_xF = len(xF)
         
         Control.__init__(self, num_ctrls, num_ctrl_gridNodes)
-        FreeDyn.__init__(self, path_FDdll, path_fds, name_fds, name_ctrlSPL, name_fDu_par)
+        self.FreeDyn = FreeDyn(path_FDdll, path_fds, name_fds, name_ctrlSPL, name_fDu_par)
         BC_FDOP.__init__(self)
         BDF.__init__(self)
         adjGrads.__init__(self)
@@ -56,11 +56,11 @@ class Optimization(Control, FreeDyn, BC_FDOP, BDF, adjGrads, fcts_User):
         if tf_changed or u_changed:
             self.tF = new_tf
             self.ctrl_gridNodes = mat_ctrl_gridNodes_new.copy()
-            self.update_ctrl_gridNodes()
-            self.fd_model.reset_for_rerun()
-            self.fd_model.compute_initial_conditions()
-            self.fd_model.solve_until(self.tF) 
-            self.num_time_steps = self.fd_model.get_num_time_steps()
+            self.FreeDyn.update_ctrl_gridNodes(self.tF, self.ctrl_gridNodes_tau, self.ctrl_gridNodes)
+            self.FreeDyn.API.reset_for_rerun()
+            self.FreeDyn.API.compute_initial_conditions()
+            self.FreeDyn.API.solve_until(self.tF) 
+            self.FreeDyn.num_time_steps = self.FreeDyn.API.get_num_time_steps()
 # -----------------------------------------------------------------------------
 
     def costFct_J(self, z):
@@ -75,16 +75,16 @@ class Optimization(Control, FreeDyn, BC_FDOP, BDF, adjGrads, fcts_User):
         J = 0
         
         # compute t = t_f as t_i+1
-        self.fd_model.fetch_states_at_index(self.num_time_steps-1)
-        self.fd_model.update_state_at_index(self.num_time_steps-1)   # necessary, if measures are used in get_Lagrangian()
-        t_right = self.fd_model.t
+        self.FreeDyn.API.fetch_states_at_index(self.FreeDyn.num_time_steps-1)
+        self.FreeDyn.API.update_state_at_index(self.FreeDyn.num_time_steps-1)   # necessary, if measures are used in get_Lagrangian()
+        t_right = self.FreeDyn.API.t
         integrand_right = self.get_Lagrangian(z)
         
         # t_i are computed, t_i+1 are the old values of t_i
-        for i in range(self.num_time_steps-2, -1, -1):
-            self.fd_model.fetch_states_at_index(i)
-            self.fd_model.update_state_at_index(i)   # necessary, if measures are used in get_Lagrangian()
-            t_left = self.fd_model.t
+        for i in range(self.FreeDyn.num_time_steps-2, -1, -1):
+            self.FreeDyn.API.fetch_states_at_index(i)
+            self.FreeDyn.API.update_state_at_index(i)   # necessary, if measures are used in get_Lagrangian()
+            t_left = self.FreeDyn.API.t
             integrand_left = self.get_Lagrangian(z)
 
             J += (t_right - t_left) * (integrand_left + integrand_right)
@@ -122,8 +122,8 @@ class Optimization(Control, FreeDyn, BC_FDOP, BDF, adjGrads, fcts_User):
         
         # set t = t_f
         # Phi is evaluted in user_fcts.py
-        self.fd_model.fetch_states_at_index(self.num_time_steps-1)
-        self.fd_model.update_state_at_index(self.num_time_steps-1)   # necessary, if measures are used in eval_Phi()
+        self.FreeDyn.API.fetch_states_at_index(self.FreeDyn.num_time_steps-1)
+        self.FreeDyn.API.update_state_at_index(self.FreeDyn.num_time_steps-1)   # necessary, if measures are used in eval_Phi()
         return self.eval_Phi()
 # -----------------------------------------------------------------------------
     
