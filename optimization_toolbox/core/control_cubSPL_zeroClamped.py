@@ -4,13 +4,16 @@ class Control:
     
     def __init__(self, 
                  num_ctrls, num_ctrl_gridNodes):
-                
-        self.num_ctrls = num_ctrls
-        self.num_ctrl_gridNodes = num_ctrl_gridNodes
-        self.ctrl_gridNodes_tau = np.linspace(0, 1, num_ctrl_gridNodes)
-        self.spline_time_invariant()
         
-        print('class Control initialized')
+        if num_ctrls > 0:
+            self.num_ctrls = num_ctrls
+            self.num_ctrl_gridNodes = num_ctrl_gridNodes
+            self.ctrl_gridNodes_tau = np.linspace(0, 1, num_ctrl_gridNodes)
+            self.spline_time_invariant()
+            print('class Control initialized')
+            
+        else:
+            print('class Control not initialized - no control defined!')
 
 # -----------------------------------------------------------------------------
 
