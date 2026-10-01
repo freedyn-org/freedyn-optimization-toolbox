@@ -7,15 +7,15 @@ class fcts_User():
     def __init__(self):
         
         # Allocate matrices for derivatives of Lagrangian: L_q , L_v , L_u
-        self.dLdq = np.zeros(self.nDof)                         # do not change 
-        self.dLdv = np.zeros(self.nDof)                         # do not change 
+        self.dLdq = np.zeros(self.FreeDyn.nDof)                         # do not change 
+        self.dLdv = np.zeros(self.FreeDyn.nDof)                         # do not change 
         # self.dLdu = np.zeros(self.num_ctrls)                    # do not change
         self.dLdpars = np.zeros(self.num_pars)                  # do not change
         
         # Allocate matrices for derivatives of final constraints: Phi_q , Phi_v
         if self.num_xF > 0:
-            self.dPhidq = np.zeros((self.num_xF, self.nDof))    # do not change 
-            self.dPhidv = np.zeros((self.num_xF, self.nDof))    # do not change
+            self.dPhidq = np.zeros((self.num_xF, self.FreeDyn.nDof))    # do not change 
+            self.dPhidv = np.zeros((self.num_xF, self.FreeDyn.nDof))    # do not change
         
         print("User functions loaded")
 # -----------------------------------------------------------------------------
@@ -27,7 +27,7 @@ class fcts_User():
         # r_P2 = np.zeros(2)
         
         # for i, par in enumerate(self.name_fDmeas):
-        #     r_P2[i] = self.fd_model.get_measure_value(self.name_fDmeas[i])
+        #     r_P2[i] = self.API.get_measure_value(self.name_fDmeas[i])
         
         
         # r_P2_init = np.array([0.0, -2.0])
@@ -36,8 +36,8 @@ class fcts_User():
         
         r_COM1 = np.zeros(2)
         
-        r_COM1[0] = self.fd_model.Q[0,0]
-        r_COM1[1] = self.fd_model.Q[1,0] 
+        r_COM1[0] = self.FreeDyn.API.Q[0,0]
+        r_COM1[1] = self.FreeDyn.API.Q[1,0] 
         
         
         r_COM1_init = np.array([-1.0, -0.5])
@@ -50,15 +50,15 @@ class fcts_User():
 
     def get_Lagrangian_dq(self, z):
         
-        # Allocate in __init__ as self.dLdq = np.zeros(self.nDof)
+        # Allocate in __init__ as self.dLdq = np.zeros(self.FreeDyn.nDof)
         # If you want to zero all entries, use self.dLdq.fill(0.0)
         # If you want to access an element, use self.dLdq[i] = ...
         # If dLdq = 0, then only use "return None"
         
         r_COM1 = np.zeros(2)
         
-        r_COM1[0] = self.fd_model.Q[0,0]
-        r_COM1[1] = self.fd_model.Q[1,0] 
+        r_COM1[0] = self.FreeDyn.API.Q[0,0]
+        r_COM1[1] = self.FreeDyn.API.Q[1,0] 
         
         
         r_COM1_init = np.array([-1.0, -0.5])
@@ -72,7 +72,7 @@ class fcts_User():
 
     def get_Lagrangian_dv(self, z):
         
-        # Allocate in __init__ as self.dLdv = np.zeros(self.nDof)
+        # Allocate in __init__ as self.dLdv = np.zeros(self.FreeDyn.nDof)
         # If you want to zero all entries, use self.dLdv.fill(0.0)
         # If you want to access an element, use self.dLdv[i] = ...
         # If dLdv = 0, then only use "return None"
@@ -82,7 +82,7 @@ class fcts_User():
 
     def get_Lagrangian_du(self, z):
         
-        # Allocate in __init__ as self.dLdu = np.zeros(self.nDof)
+        # Allocate in __init__ as self.dLdu = np.zeros(self.FreeDyn.nDof)
         # If you want to zero all entries, use self.dLdu.fill(0.0)
         # If you want to access an element, use self.dLdu[i] = ...
         # If dLdu = 0, then only use "return None"
@@ -92,7 +92,7 @@ class fcts_User():
 
     def get_Lagrangian_dpars(self, z):
         
-        # Allocate in __init__ as self.dLdpars = np.zeros(self.nDof)
+        # Allocate in __init__ as self.dLdpars = np.zeros(self.FreeDyn.nDof)
         # If you want to zero all entries, use self.dLdpars.fill(0.0)
         # If you want to access an element, use self.dLdpars[i] = ...
         # If dLdpars = 0, then only use "return None"
@@ -110,7 +110,7 @@ class fcts_User():
 
     def get_Phi_dq(self):
         
-        # Allocate in __init__ as self.dPhidq = np.zeros(self.nDof)
+        # Allocate in __init__ as self.dPhidq = np.zeros(self.FreeDyn.nDof)
         # If you want to zero all entries, use self.dPhidq.fill(0.0)
         # If you want to access an element, use self.dPhidq[i,j] = ...
         # If dPhidq = 0, then only use "return None"
@@ -120,7 +120,7 @@ class fcts_User():
 
     def get_Phi_dv(self):
         
-        # Allocate in __init__ as self.dPhidq = np.zeros(self.nDof)
+        # Allocate in __init__ as self.dPhidq = np.zeros(self.FreeDyn.nDof)
         # If you want to zero all entries, use self.dPhidq.fill(0.0)
         # If you want to access an element, use self.dPhidq[i,j] = ...
         # If dPhidq = 0, then only use "return None"
