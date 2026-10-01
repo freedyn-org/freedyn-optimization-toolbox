@@ -80,7 +80,7 @@ Constraint Generic
 	ayFixed = yes
 	azFixed = no
 	Location = -0.500000,0.000000,0.000000
-	ConstraintOrientation = 1.000000,0.000000,0.000000,0.000000,1.000000,0.000000,0.000000,0.000000,1.000000
+	    ConstraintOrientation = 1.000000,0.000000,0.000000,0.000000,1.000000,0.000000,0.000000,0.000000,1.000000
 EndConstraint
 %
 Constraint Generic
@@ -94,7 +94,7 @@ Constraint Generic
 	ayFixed = yes
 	azFixed = no
 	Location = -1.500000,-1.000000,0.000000
-	ConstraintOrientation = 1.000000,0.000000,0.000000,0.000000,1.000000,0.000000,0.000000,0.000000,1.000000
+	    ConstraintOrientation = 1.000000,0.000000,0.000000,0.000000,1.000000,0.000000,0.000000,0.000000,1.000000
 EndConstraint
 %
 Constraint Generic
@@ -108,7 +108,7 @@ Constraint Generic
 	ayFixed = yes
 	azFixed = no
 	Location = 0.000000,-2.000000,0.000000
-	ConstraintOrientation = 1.000000,0.000000,0.000000,0.000000,1.000000,0.000000,0.000000,0.000000,1.000000
+	    ConstraintOrientation = 1.000000,0.000000,0.000000,0.000000,1.000000,0.000000,0.000000,0.000000,1.000000
 EndConstraint
 %
 Constraint Generic
@@ -122,7 +122,7 @@ Constraint Generic
 	ayFixed = yes
 	azFixed = no
 	Location = 1.500000,-1.000000,0.000000
-	ConstraintOrientation = 1.000000,0.000000,0.000000,0.000000,1.000000,0.000000,0.000000,0.000000,1.000000
+	    ConstraintOrientation = 1.000000,0.000000,0.000000,0.000000,1.000000,0.000000,0.000000,0.000000,1.000000
 EndConstraint
 %
 Constraint Generic
@@ -136,7 +136,7 @@ Constraint Generic
 	ayFixed = no
 	azFixed = no
 	Location = 0.500000,0.000000,0.000000
-	ConstraintOrientation = 1.000000,0.000000,0.000000,0.000000,1.000000,0.000000,0.000000,0.000000,1.000000
+	    ConstraintOrientation = 1.000000,0.000000,0.000000,0.000000,1.000000,0.000000,0.000000,0.000000,1.000000
 EndConstraint
 %
 Force Gravity
@@ -171,13 +171,13 @@ EndForce
 DataObject Parameter
 	ID = unassignedParamOne
 	Name = springOneLengthNature
-	InitialValue = 2.23607
+	InitialValue = 2.236070
 EndDataObject
 %
 DataObject Parameter
 	ID = unassignedParamTwo
 	Name = springTwoLengthNature
-	InitialValue = 2.06155
+	InitialValue = 2.061550
 EndDataObject
 %
 DataObject Parameter
@@ -189,23 +189,23 @@ EndDataObject
 Measure Translational
 	ID = 0bb3f0a4-4f7d-4c66-a37e-7b5a139094d3
 	Name = l_Spring1
-	BodyIDs = 8e2171d0-b701-49d8-922e-154bab84f12c, 0
+	BodyIDs = 8e2171d0-b701-49d8-922e-154bab84f12c, 2a53f08c-bd61-4da8-9f55-64ec3fdda7c1
 	MeasureMode = disp
-	MeasureCoordinate = XYZ
+	    MeasureCoordinate = XYZ
 	MeasureLocation_Body1 = -1.500000,-1.000000,0.000000
 	MeasureLocation_Body2 = 0.500000,0.000000,0.000000
-	UseInitialValueAsOffset = no
+	 UseInitialValueAsOffset = no
 EndMeasure
 %
 Measure Translational
 	ID = dedf0d1c-014b-4443-addf-e5f280ea55e9
 	Name = l_Spring2
-	BodyIDs = 8e2171d0-b701-49d8-922e-154bab84f12c, 0
+	BodyIDs = 8e2171d0-b701-49d8-922e-154bab84f12c, 2a53f08c-bd61-4da8-9f55-64ec3fdda7c1
 	MeasureMode = disp
-	MeasureCoordinate = XYZ
+	    MeasureCoordinate = XYZ
 	MeasureLocation_Body1 = 0.000000,-2.000000,0.000000
 	MeasureLocation_Body2 = 0.500000,0.000000,0.000000
-	UseInitialValueAsOffset = no
+	 UseInitialValueAsOffset = no
 EndMeasure
 %
 Measure Translational
@@ -216,7 +216,7 @@ Measure Translational
 	MeasureCoordinate = X
 	MeasureLocation_Body1 = 0.000000,-2.000000,0.000000
 	MeasureLocation_Body2 = 0.000000,0.000000,0.000000
-	UseInitialValueAsOffset = no
+	 UseInitialValueAsOffset = no
 EndMeasure
 %
 Measure Translational
@@ -227,7 +227,7 @@ Measure Translational
 	MeasureCoordinate = Y
 	MeasureLocation_Body1 = 0.000000,-2.000000,0.000000
 	MeasureLocation_Body2 = 0.000000,0.000000,0.000000
-	UseInitialValueAsOffset = no
+	 UseInitialValueAsOffset = no
 EndMeasure
 %
 Measure Translational
@@ -238,7 +238,7 @@ Measure Translational
 	MeasureCoordinate = X
 	MeasureLocation_Body1 = 0.000000,-2.000000,0.000000
 	MeasureLocation_Body2 = 0.000000,0.000000,0.000000
-	UseInitialValueAsOffset = no
+	 UseInitialValueAsOffset = no
 EndMeasure
 %
 Measure Translational
@@ -249,7 +249,7 @@ Measure Translational
 	MeasureCoordinate = Y
 	MeasureLocation_Body1 = 0.000000,-2.000000,0.000000
 	MeasureLocation_Body2 = 0.000000,0.000000,0.000000
-	UseInitialValueAsOffset = no
+	 UseInitialValueAsOffset = no
 EndMeasure
 %
 Simulation Dynamic
