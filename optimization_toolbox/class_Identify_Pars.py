@@ -16,7 +16,7 @@ class Optimization(Control, BC_FDOP, BDF, adjGrads, fcts_User):
                       num_optVars, num_ctrls, num_ctrl_gridNodes,
                       tF, xF,
                       path_fds, name_fds,
-                      name_ctrlSPL, name_fDpar,
+                      name_ctrlSPL, name_dForce_dparam,
                       name_fDmeas,
                       path_FDdll):
         
@@ -26,7 +26,7 @@ class Optimization(Control, BC_FDOP, BDF, adjGrads, fcts_User):
         self.xF = xF
         self.num_xF = len(xF)
         
-        self.name_fDpar = name_fDpar
+        self.name_dForce_dparam = name_dForce_dparam
         self.num_pars = num_optVars
         self.opt_pars = None
         self.name_fDmeas = name_fDmeas
@@ -122,7 +122,7 @@ class Optimization(Control, BC_FDOP, BDF, adjGrads, fcts_User):
         Phi (t_f) = 0 """
         
         # Check if solution is already computed for z, otherwise reset + recompute
-        # self.update_vars_if_changed(z)
+        self.update_vars_if_changed(z)
         
         # set t = t_f
         # Phi is evaluted in user_fcts.py
