@@ -16,12 +16,12 @@ class adjGrads:
     
     def adjGrad_updates(self, idx):
         
-        self.fd_model.fetch_states_at_index(idx)
-        self.fd_model.update_state_at_index(idx)
-        self.fd_model.update_jacobian()
-        self.buffer_MBS_dVecForce_dFDparam.update_from_dll()
+        self.FreeDyn.API.fetch_states_at_index(idx)
+        self.FreeDyn.API.update_state_at_index(idx)
+        self.FreeDyn.API.update_jacobian()
+        self.FreeDyn.buffer_MBS_dForce_dFDparam.update_from_dll()
         
-        return self.fd_model.t
+        return self.FreeDyn.API.t
 # -----------------------------------------------------------------------------        
 
     def adjGrad_J(self, z):
@@ -31,14 +31,14 @@ class adjGrads:
         
         """ t = t_f / init BDF routine """
         idx_buff = 0
-        tRight = self.adjGrad_updates(self.num_time_steps-1)
+        tRight = self.adjGrad_updates(self.FreeDyn.num_time_steps-1)
         self.get_consistent_BC_J() 
         self.get_Lagrangian_dpars(z)
         self.adjGrad_J_buff[idx_buff] = self.dLdpars + self.get_adjVar_p_J().T @ self.dVecForce_dFDparam
         
         """ BDF order 1 """
         idx_buff = 1 - idx_buff
-        tLeft = self.adjGrad_updates(self.num_time_steps-2)
+        tLeft = self.adjGrad_updates(self.FreeDyn.num_time_steps-2)
         deltaT = tRight - tLeft
         self.BDForder1_singleStep_J(z, deltaT)        
         self.get_Lagrangian_dpars(z)
@@ -47,7 +47,7 @@ class adjGrads:
         dJdu = deltaT * (self.adjGrad_J_buff_view0 + self.adjGrad_J_buff_view1)
                 
         """ BDF order 2 """        
-        for i in range(self.num_time_steps-3, -1, -1):
+        for i in range(self.FreeDyn.num_time_steps-3, -1, -1):
             idx_buff = 1 - idx_buff
             tRight = tLeft
             tLeft = self.adjGrad_updates(i)
@@ -70,14 +70,14 @@ class adjGrads:
         
         """ t = t_f / init BDF routine """
         idx_buff = 0
-        tRight = self.adjGrad_updates(self.num_time_steps-1)
+        tRight = self.adjGrad_updates(self.FreeDyn.num_time_steps-1)
         self.get_consistent_BC_Phi() 
         self.adjGrad_Phi_buff[idx_buff] = self.get_adjVar_P_Phi().T @ self.dVecForce_dFDparam
 
         
         """ BDF order 1 """ 
         idx_buff = 1 - idx_buff
-        tLeft = self.adjGrad_updates(self.num_time_steps-2)
+        tLeft = self.adjGrad_updates(self.FreeDyn.num_time_steps-2)
         deltaT = tRight - tLeft
         self.BDForder1_singleStep_Phi(deltaT)
         self.adjGrad_Phi_buff[idx_buff] = self.get_adjVar_P_Phi().T @ self.dVecForce_dFDparam
@@ -85,7 +85,7 @@ class adjGrads:
         dPhidu = deltaT * (self.adjGrad_Phi_buff_view0 + self.adjGrad_Phi_buff_view1)
         
         """ BDF order 2 """      
-        for i in range(self.num_time_steps-3, -1, -1):
+        for i in range(self.FreeDyn.num_time_steps-3, -1, -1):
             idx_buff = 1 - idx_buff
             tRight = tLeft
             tLeft = self.adjGrad_updates(i)
