@@ -3,15 +3,15 @@ import freedyn as fd
 
 from core.control_cubSPL_zeroClamped import Control
 from core.Management_FreeDyn import FreeDyn
-#from core.consistent_boundary_conditions import BC_FDOP
-#from core.BDF_physicalTime import BDF
-#from core.adjGrad_wrt_pars import adjGrads
+from core.consistent_boundary_conditions import BC_FDOP
+from core.BDF_physicalTime import BDF
+from core.adjGrad_wrt_FD_param import adjGrads
 from user_fcts import fcts_User
 
 import core.numerical_differentiation as numDiff
 
 
-class Optimization(Control, FreeDyn, fcts_User): #BC_FDOP, BDF, adjGrads,
+class Optimization(Control, FreeDyn, BC_FDOP, BDF, adjGrads, fcts_User):
     
     def __init__(self,
                       num_optVars, num_ctrls, num_ctrl_gridNodes,
@@ -32,11 +32,11 @@ class Optimization(Control, FreeDyn, fcts_User): #BC_FDOP, BDF, adjGrads,
         self.opt_pars = None
         self.name_fDmeas = name_fDmeas
 
-        #Control.__init__(self, num_ctrls, num_ctrl_gridNodes)
+        Control.__init__(self, num_ctrls, num_ctrl_gridNodes)
         FreeDyn.__init__(self, path_FDdll, path_fds, name_fds, name_ctrlSPL, name_fDpar)
-        # BC_FDOP.__init__(self)
-        # BDF.__init__(self)
-        # adjGrads.__init__(self)
+        BC_FDOP.__init__(self)
+        BDF.__init__(self)
+        adjGrads.__init__(self)
         fcts_User.__init__(self)
 
         print('class Optimization initialized \n')
@@ -109,10 +109,10 @@ class Optimization(Control, FreeDyn, fcts_User): #BC_FDOP, BDF, adjGrads,
         # error = numDiff.check_grad_J(self, z)
         
         # Check if solution is already computed for z, otherwise reset + recompute
-        # self.update_vars_if_changed(z)   
+        self.update_vars_if_changed(z)   
         
         # Returns the gradient by the adjoint method
-        # return self.adjGrad_J(z)            
+        return self.adjGrad_J(z)            
 # -----------------------------------------------------------------------------
 
     def finalConstr_Phi(self, z):
@@ -121,13 +121,13 @@ class Optimization(Control, FreeDyn, fcts_User): #BC_FDOP, BDF, adjGrads,
         Phi (t_f) = 0 """
         
         # Check if solution is already computed for z, otherwise reset + recompute
-        #self.update_vars_if_changed(z)
+        # self.update_vars_if_changed(z)
         
         # set t = t_f
         # Phi is evaluted in user_fcts.py
-        #self.fd_model.fetch_states_at_index(self.num_time_steps-1)
-        #self.fd_model.update_state_at_index(self.num_time_steps-1)   # necessary, if measures are used in eval_Phi()
-        #return self.eval_Phi()
+        # self.fd_model.fetch_states_at_index(self.num_time_steps-1)
+        # self.fd_model.update_state_at_index(self.num_time_steps-1)   # necessary, if measures are used in eval_Phi()
+        # return self.eval_Phi()
 # -----------------------------------------------------------------------------
     
     def grad_finalConstr_Phi(self, z):
@@ -138,8 +138,8 @@ class Optimization(Control, FreeDyn, fcts_User): #BC_FDOP, BDF, adjGrads,
         # error = numDiff.check_grad_Phi(self, z)
         
         # Check if solution is already computed for z, otherwise reset + recompute
-        #self.update_vars_if_changed(z)
+        self.update_vars_if_changed(z)
         
         # Returns the gradient by the adjoint method
-        #return self.adjGrad_Phi(z)
+        return self.adjGrad_Phi(z)
 # -----------------------------------------------------------------------------

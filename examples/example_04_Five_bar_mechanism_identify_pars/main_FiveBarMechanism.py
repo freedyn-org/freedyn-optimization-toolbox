@@ -101,7 +101,7 @@ optim = Optimization(num_optVars, num_ctrls, num_ctrl_gridNodes,
 res = sp.optimize.minimize(fun         = optim.costFct_J,                # cost function
                            x0          = zInit,                             # initial values
                            method      = 'SLSQP',                        # optimization method
-                           # jac         = optim.grad_costFct_J,               # gradient of cost function
+                           jac         = optim.grad_costFct_J,               # gradient of cost function
                            # bounds      = sp.optimize.Bounds(lb, ub),     # lower and upper bounds
                            # constraints = {'type':'eq', 
                            #                'fun':optim.finalConstr_Phi, 

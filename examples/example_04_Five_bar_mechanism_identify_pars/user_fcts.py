@@ -24,15 +24,27 @@ class fcts_User():
         
         # Lagrangian of the optimization problem: J = \int_{t_0}^{t_f} L dt
         
-        r_P2 = np.zeros(2)
+        # r_P2 = np.zeros(2)
         
-        for i, par in enumerate(self.name_fDmeas):
-            r_P2[i] = self.fd_model.get_measure_value(self.name_fDmeas[i])
+        # for i, par in enumerate(self.name_fDmeas):
+        #     r_P2[i] = self.fd_model.get_measure_value(self.name_fDmeas[i])
         
         
-        r_P2_init = np.array([0.0, -2.0])
-        delta = r_P2 - r_P2_init
+        # r_P2_init = np.array([0.0, -2.0])
+        # delta = r_P2 - r_P2_init
+        
+        
+        r_COM1 = np.zeros(2)
+        
+        r_COM1[0] = self.fd_model.Q[0,0]
+        r_COM1[1] = self.fd_model.Q[1,0] 
+        
+        
+        r_COM1_init = np.array([-1.0, -0.5])
+        delta = r_COM1 - r_COM1_init
 
+        
+        
         return 0.5 * np.dot(delta, delta)
 # -----------------------------------------------------------------------------
 
@@ -43,12 +55,17 @@ class fcts_User():
         # If you want to access an element, use self.dLdq[i] = ...
         # If dLdq = 0, then only use "return None"
         
-        ybar = self.get_target_path(self.fd_model.t)
-        y = self.fd_model.Q[7,0] - self.fd_model.Q[0,0]   # x2(t) - x1(t)
-        delta = y - ybar
+        r_COM1 = np.zeros(2)
+        
+        r_COM1[0] = self.fd_model.Q[0,0]
+        r_COM1[1] = self.fd_model.Q[1,0] 
+        
+        
+        r_COM1_init = np.array([-1.0, -0.5])
+        delta = r_COM1 - r_COM1_init
            
-        self.dLdq[0] = - delta
-        self.dLdq[7] = delta
+        self.dLdq[0] = delta[0]
+        self.dLdq[1] = delta[1]
         
         return None
 # -----------------------------------------------------------------------------
