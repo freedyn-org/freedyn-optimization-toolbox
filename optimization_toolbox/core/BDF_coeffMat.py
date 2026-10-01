@@ -45,17 +45,16 @@ def update_coeffMat_AdjSys_dense(self, eta0, eta0_inv):
 # BDF System - Matrix layout sparse
 # =============================================================================
 
-def init_coeffMat_AdjSys_sparse(self, formatMAT):
+def init_coeffMat_AdjSys_sparse(self, nDof, formatMAT):
     
     """ Allocate the coefficient matrix and create maps of the individual blocks """
-    
-    nBDFsys = 2 * (self.FreeDyn.nDof + self.FreeDyn.nConstr)
+    nBDFsys = 2 * (nDof + self.FreeDyn.nConstr)
 
     self.update_MBS_SysMat() 
-    eyeMat_sp = scipy.sparse.eye(self.FreeDyn.nDof, format='csr')
+    eyeMat_sp = scipy.sparse.eye(nDof, format='csr')
     
-    dummy_M = self.slot_MBS_M.sp_mat.copy()
-    dummy_fv = self.slot_MBS_fv.sp_mat.copy()
+    dummy_M = self.FreeDyn.slot_MBS_M.sp_mat.copy()
+    dummy_fv = self.FreeDyn.slot_MBS_fv.sp_mat.copy()
     dummy_M.data.fill(1.0)
     dummy_fv.data.fill(1.0)        
     sumA22 = dummy_M + dummy_fv.T
@@ -135,20 +134,20 @@ def update_coeffMat_AdjSys_sparse(self, eta0):
     
     # Row 1
     self.BDF_spCoeffMat.data[self.BDF_coeffMat_map_A11] = eta0 
-    self.BDF_spCoeffMat.data[self.BDF_coeffMat_map_A12] = -self.slot_MBS_G_tr.dll_nonzeros
-    self.BDF_spCoeffMat.data[self.BDF_coeffMat_map_A13] = -self.slot_MBS_CqvDq.dll_nonzeros
-    self.BDF_spCoeffMat.data[self.BDF_coeffMat_map_A14] = -self.slot_MBS_Cq.dll_nonzeros
+    self.BDF_spCoeffMat.data[self.BDF_coeffMat_map_A12] = -self.FreeDyn.slot_MBS_G_tr.dll_nonzeros
+    self.BDF_spCoeffMat.data[self.BDF_coeffMat_map_A13] = -self.FreeDyn.slot_MBS_CqvDq.dll_nonzeros
+    self.BDF_spCoeffMat.data[self.BDF_coeffMat_map_A14] = -self.FreeDyn.slot_MBS_Cq.dll_nonzeros
     
     # Row 2
     # A21 is already set in self.init_coeffMat_AdjSys_sparse
     self.BDF_spCoeffMat.data[self.BDF_coeffMat_map_A22] = 0.0
-    self.BDF_spCoeffMat.data[self.BDF_coeffMat_map_M_A22] = eta0 * self.slot_MBS_M.dll_nonzeros
-    self.BDF_spCoeffMat.data[self.BDF_coeffMat_map_fv_A22] -= self.slot_MBS_fv.dll_nonzeros
-    self.BDF_spCoeffMat.data[self.BDF_coeffMat_map_A23] = -self.slot_MBS_Cq.dll_nonzeros
+    self.BDF_spCoeffMat.data[self.BDF_coeffMat_map_M_A22] = eta0 * self.FreeDyn.slot_MBS_M.dll_nonzeros
+    self.BDF_spCoeffMat.data[self.BDF_coeffMat_map_fv_A22] -= self.FreeDyn.slot_MBS_fv.dll_nonzeros
+    self.BDF_spCoeffMat.data[self.BDF_coeffMat_map_A23] = -self.FreeDyn.slot_MBS_Cq.dll_nonzeros
 
     # Row 3
-    self.BDF_spCoeffMat.data[self.BDF_coeffMat_map_A32] = self.slot_MBS_Cq.dll_nonzeros 
+    self.BDF_spCoeffMat.data[self.BDF_coeffMat_map_A32] = self.FreeDyn.slot_MBS_Cq.dll_nonzeros 
     
     # Row 4
-    self.BDF_spCoeffMat.data[self.BDF_coeffMat_map_A41] = self.slot_MBS_Cq.dll_nonzeros 
+    self.BDF_spCoeffMat.data[self.BDF_coeffMat_map_A41] = self.FreeDyn.slot_MBS_Cq.dll_nonzeros 
 # -----------------------------------------------------------------------------
