@@ -97,7 +97,7 @@ res = sp.optimize.minimize(fun         = optim.costFct_J,                # cost 
                                           'iprint': 2, 
                                           'ftol': 1e-8, 
                                           'eps':1e-8, 
-                                          'maxiter': 100}                 # optimization options
+                                          'maxiter': 1}                 # optimization options
                            )
 #
 # -----------------------------------------------------------------------------
@@ -109,24 +109,24 @@ optim.update_vars_if_changed(res.x)
 # -----------------------------------------------------------------------------
 #
 """ Get data for plots """
-t = np.zeros(optim.num_time_steps)                    # physical time t
-tau = np.zeros(optim.num_time_steps)                  # normalized time scale [0;1]
-uInit = np.zeros((num_ctrls, optim.num_time_steps))   # initial control
-u = np.zeros((num_ctrls, optim.num_time_steps))       # optimal control
-q = np.zeros((optim.nDof, optim.num_time_steps))      # gen. red. coordinates
-qD = np.zeros((optim.nDof, optim.num_time_steps))     # gen. red. velocities
-spring_l = np.zeros(optim.num_time_steps)             # length of the spring
+t = np.zeros(optim.FreeDyn.num_time_steps)                    # physical time t
+tau = np.zeros(optim.FreeDyn.num_time_steps)                  # normalized time scale [0;1]
+uInit = np.zeros((num_ctrls, optim.FreeDyn.num_time_steps))   # initial control
+u = np.zeros((num_ctrls, optim.FreeDyn.num_time_steps))       # optimal control
+q = np.zeros((optim.FreeDyn.nDof, optim.FreeDyn.num_time_steps))      # gen. red. coordinates
+qD = np.zeros((optim.FreeDyn.nDof, optim.FreeDyn.num_time_steps))     # gen. red. velocities
+spring_l = np.zeros(optim.FreeDyn.num_time_steps)             # length of the spring
 
-for i in range(optim.num_time_steps-1, -1, -1): 
-   optim.fd_model.fetch_states_at_index(i)
-   optim.fd_model.update_state_at_index(i)
-   t[i] = optim.fd_model.t
-   tau[i] = t[i]/optim.tF
-   uInit[:,i] = optim.get_u_for_GridNodes(tau[i], uDachInit)
-   u[:,i] = optim.get_u(tau[i])  
-   q[:,i] = optim.fd_model.Q[:, 0]
-   qD[:,i] = optim.fd_model.Qd[:, 0]
-   spring_l[i] = optim.fd_model.get_measure_value("l") 
+for i in range(optim.FreeDyn.num_time_steps-1, -1, -1): 
+   optim.FreeDyn.API.fetch_states_at_index(i)
+   optim.FreeDyn.API.update_state_at_index(i)
+   t[i] = optim.FreeDyn.API.t
+   tau[i] = t[i]/optim.data_opt.final_time
+   uInit[:,i] = optim.ctrl.get_u_for_GridNodes(tau[i], uDachInit)
+   u[:,i] = optim.ctrl.get_u(tau[i])  
+   q[:,i] = optim.FreeDyn.API.Q[:, 0]
+   qD[:,i] = optim.FreeDyn.API.Qd[:, 0]
+   spring_l[i] = optim.FreeDyn.API.get_measure_value("l") 
 #
 # -----------------------------------------------------------------------------
 #
@@ -178,4 +178,4 @@ plt.show()
 #
 # -----------------------------------------------------------------------------
 #
-optim.__del__()
+optim.FreeDyn.delete_model()

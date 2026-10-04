@@ -97,7 +97,7 @@ res = sp.optimize.minimize(fun         = optim.costFct_J,                # cost 
                                           'iprint': 2, 
                                           'ftol': 1e-8, 
                                           'eps':1e-8, 
-                                          'maxiter': 150}                # optimization options
+                                          'maxiter': 1}                # optimization options
                            )
 #
 # -----------------------------------------------------------------------------
@@ -109,22 +109,22 @@ optim.update_vars_if_changed(res.x)
 # -----------------------------------------------------------------------------
 #
 """ Get data for plots """
-t = np.zeros(optim.num_time_steps)                    # physical time t
-tau = np.zeros(optim.num_time_steps)                  # normalized time scale [0;1]
-uInit = np.zeros((num_ctrls, optim.num_time_steps))   # initial control
-u = np.zeros((num_ctrls, optim.num_time_steps))       # optimal control
-y = np.zeros(optim.num_time_steps)                    # x2 - x1
-ybar = np.zeros(optim.num_time_steps)                 # target path
+t = np.zeros(optim.FreeDyn.num_time_steps)                    # physical time t
+tau = np.zeros(optim.FreeDyn.num_time_steps)                  # normalized time scale [0;1]
+uInit = np.zeros((num_ctrls, optim.FreeDyn.num_time_steps))   # initial control
+u = np.zeros((num_ctrls, optim.FreeDyn.num_time_steps))       # optimal control
+y = np.zeros(optim.FreeDyn.num_time_steps)                    # x2 - x1
+ybar = np.zeros(optim.FreeDyn.num_time_steps)                 # target path
 
-for i in range(optim.num_time_steps-1, -1, -1): 
-   optim.fd_model.fetch_states_at_index(i)
-   t[i] = optim.fd_model.t
-   tau[i] = t[i]/optim.tF
-   uInit[:,i] = optim.get_u_for_GridNodes(tau[i], uDachInit)
-   u[:,i] = optim.get_u(tau[i])
-   q = optim.fd_model.Q[:, 0]
+for i in range(optim.FreeDyn.num_time_steps-1, -1, -1): 
+   optim.FreeDyn.API.fetch_states_at_index(i)
+   t[i] = optim.FreeDyn.API.t
+   tau[i] = t[i]/optim.data_opt.final_time
+   uInit[:,i] = optim.ctrl.get_u_for_GridNodes(tau[i], uDachInit)
+   u[:,i] = optim.ctrl.get_u(tau[i])
+   q = optim.FreeDyn.API.Q[:, 0]
    y[i] = q[7] - q[0]
-   ybar[i] = optim.get_target_path(t[i])  
+   ybar[i] = optim.user_Fcts.get_target_path(t[i])  
 #
 # -----------------------------------------------------------------------------
 #
@@ -153,4 +153,4 @@ plt.show()
 #
 # -----------------------------------------------------------------------------
 #
-optim.__del__()
+optim.FreeDyn.delete_model()

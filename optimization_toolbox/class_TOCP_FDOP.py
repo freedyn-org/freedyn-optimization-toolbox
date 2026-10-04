@@ -1,5 +1,4 @@
 import numpy as np
-import freedyn as fd
 
 from core.control_cubSPL_zeroClamped import Control
 from core.Management_FreeDyn import FreeDyn
@@ -10,8 +9,19 @@ from user_fcts import fcts_User
 
 import core.numerical_differentiation as numDiff
 
+class dataOpt:
+    
+    def __init__(self, nOptVars,
+                 tF, xF):
+        
+        self.num_opt_vars = nOptVars
+        self.num_xF = len(xF)
+        
+        self.final_time = tF
+        self.xF = xF
 
-class Optimization(Control, BC_FDOP, BDF, adjGrads, fcts_User):
+
+class Optimization():
     
     def __init__(self,
                       num_optVars, num_ctrls, num_ctrl_gridNodes,
@@ -20,24 +30,14 @@ class Optimization(Control, BC_FDOP, BDF, adjGrads, fcts_User):
                       name_ctrlSPL, name_fDu_par,
                       path_FDdll):
         
-        self.num_optVars = num_optVars
-        self.tF = tF
-        self.ctrl_gridNodes = None
-        self.xF = xF
-        self.num_xF = len(xF)
+        self.data_opt = dataOpt(num_optVars, tF, xF)
         
-        Control.__init__(self, num_ctrls, num_ctrl_gridNodes)
+        self.ctrl = Control(num_ctrls, num_ctrl_gridNodes)
         self.FreeDyn = FreeDyn(path_FDdll, path_fds, name_fds, name_ctrlSPL, name_fDu_par)
-        BC_FDOP.__init__(self)
-        BDF.__init__(self)
-        adjGrads.__init__(self)
-        fcts_User.__init__(self)
+        self.user_Fcts = fcts_User(self.FreeDyn.nDof, self.data_opt.num_xF, num_ctrls)
+        self.adjGrads = adjGrads(self.data_opt, self.FreeDyn, self.ctrl)
 
         print('class Optimization initialized \n')
-# -----------------------------------------------------------------------------
-        
-    def __del__(self):
-        FreeDyn.__del__(self)
 # -----------------------------------------------------------------------------
             
     def update_vars_if_changed(self, z):
@@ -46,20 +46,20 @@ class Optimization(Control, BC_FDOP, BDF, adjGrads, fcts_User):
         
         # Get new values of z
         new_tf = z[0]
-        mat_ctrl_gridNodes_new = z[1:].reshape((self.num_ctrl_gridNodes, self.num_ctrls),order='F')
+        mat_ctrl_gridNodes_new = z[1:].reshape((self.ctrl.num_grid_nodes, self.ctrl.num_ctrls),order='F')
         
         # compare of change
-        tf_changed = (new_tf != self.tF)
-        u_changed = not np.array_equal(self.ctrl_gridNodes, mat_ctrl_gridNodes_new)
+        tf_changed = (new_tf != self.data_opt.final_time)
+        u_changed = not np.array_equal(self.ctrl.grid_nodes, mat_ctrl_gridNodes_new)
         
         # reuse or compute solution, only assign and compute if changed
         if tf_changed or u_changed:
-            self.tF = new_tf
-            self.ctrl_gridNodes = mat_ctrl_gridNodes_new.copy()
-            self.FreeDyn.update_ctrl_gridNodes(self.tF, self.ctrl_gridNodes_tau, self.ctrl_gridNodes)
+            self.data_opt.final_time = new_tf
+            self.ctrl.grid_nodes = mat_ctrl_gridNodes_new.copy()
+            self.FreeDyn.update_ctrl_gridNodes(self.data_opt, self.ctrl)
             self.FreeDyn.API.reset_for_rerun()
             self.FreeDyn.API.compute_initial_conditions()
-            self.FreeDyn.API.solve_until(self.tF) 
+            self.FreeDyn.API.solve_until(self.data_opt.final_time) 
             self.FreeDyn.num_time_steps = self.FreeDyn.API.get_num_time_steps()
 # -----------------------------------------------------------------------------
 
@@ -78,14 +78,14 @@ class Optimization(Control, BC_FDOP, BDF, adjGrads, fcts_User):
         self.FreeDyn.API.fetch_states_at_index(self.FreeDyn.num_time_steps-1)
         self.FreeDyn.API.update_state_at_index(self.FreeDyn.num_time_steps-1)   # necessary, if measures are used in get_Lagrangian()
         t_right = self.FreeDyn.API.t
-        integrand_right = self.get_Lagrangian(z)
+        integrand_right = self.user_Fcts.get_Lagrangian(self.data_opt, self.FreeDyn, self.ctrl, z)
         
         # t_i are computed, t_i+1 are the old values of t_i
         for i in range(self.FreeDyn.num_time_steps-2, -1, -1):
             self.FreeDyn.API.fetch_states_at_index(i)
             self.FreeDyn.API.update_state_at_index(i)   # necessary, if measures are used in get_Lagrangian()
             t_left = self.FreeDyn.API.t
-            integrand_left = self.get_Lagrangian(z)
+            integrand_left = self.user_Fcts.get_Lagrangian(self.data_opt, self.FreeDyn, self.ctrl, z)
 
             J += (t_right - t_left) * (integrand_left + integrand_right)
             
@@ -109,7 +109,7 @@ class Optimization(Control, BC_FDOP, BDF, adjGrads, fcts_User):
         self.update_vars_if_changed(z)
         
         # Returns the gradient by the adjoint method
-        return self.adjGrad_J(z)        
+        return self.adjGrads.adjGrad_J(self.data_opt, self.user_Fcts, self.FreeDyn, self.ctrl, z)        
 # -----------------------------------------------------------------------------
 
     def finalConstr_Phi(self, z):
@@ -124,7 +124,7 @@ class Optimization(Control, BC_FDOP, BDF, adjGrads, fcts_User):
         # Phi is evaluted in user_fcts.py
         self.FreeDyn.API.fetch_states_at_index(self.FreeDyn.num_time_steps-1)
         self.FreeDyn.API.update_state_at_index(self.FreeDyn.num_time_steps-1)   # necessary, if measures are used in eval_Phi()
-        return self.eval_Phi()
+        return self.user_Fcts.eval_Phi(self.data_opt, self.FreeDyn)
 # -----------------------------------------------------------------------------
     
     def grad_finalConstr_Phi(self, z):
@@ -138,5 +138,5 @@ class Optimization(Control, BC_FDOP, BDF, adjGrads, fcts_User):
         self.update_vars_if_changed(z)      
 
         # Returns the gradient by the adjoint method
-        return self.adjGrad_Phi(z)
+        return self.adjGrads.adjGrad_Phi(self.data_opt, self.user_Fcts, self.FreeDyn, self.ctrl, z)
 # -----------------------------------------------------------------------------

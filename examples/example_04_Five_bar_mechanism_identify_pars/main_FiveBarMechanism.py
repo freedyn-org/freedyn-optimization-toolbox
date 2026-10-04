@@ -110,7 +110,7 @@ res = sp.optimize.minimize(fun         = optim.costFct_J,                # cost 
                                           'iprint': 2, 
                                           'ftol': 1e-8, 
                                           'eps':1e-8, 
-                                          'maxiter': 50}                # optimization options
+                                          'maxiter': 1}                # optimization options
                            )
 #
 # -----------------------------------------------------------------------------
@@ -135,7 +135,7 @@ for i in range(optim.FreeDyn.num_time_steps-1, -1, -1):
    optim.FreeDyn.API.fetch_states_at_index(i)
    optim.FreeDyn.API.update_state_at_index(i)   # necessary, if measures are used in get_Lagrangian()
    t[i] = optim.FreeDyn.API.t
-   tau[i] = t[i]/optim.tF
+   tau[i] = t[i]/optim.data_opt.final_time
    q = optim.FreeDyn.API.Q[:, 0]
    
    rx_P2[i] = optim.FreeDyn.API.get_measure_value("dispX_P2")
@@ -172,4 +172,4 @@ plt.show()
 #
 # -----------------------------------------------------------------------------
 #
-optim.__del__()
+optim.FreeDyn.delete_model()

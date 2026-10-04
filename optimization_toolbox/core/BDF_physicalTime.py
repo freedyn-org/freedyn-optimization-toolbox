@@ -9,32 +9,33 @@ import core.BDF_coeffMat as coeffMat
 
 class BDF(BDF_intOrderOne, BDF_intOrderTwo):
     
-    def __init__(self):
+    def __init__(self, dataOpt, FreeDyn):
         
         # Allocate memory for the coeff. Matrix of the adj Sys
-        if self.FreeDyn.MBS_modeMAT_sparse:  
-            nBDFsys = coeffMat.init_coeffMat_AdjSys_sparse(self, self.FreeDyn.nDof, 'csc')
+        if FreeDyn.MBS_modeMAT_sparse:  
+            nBDFsys = coeffMat.init_coeffMat_AdjSys_sparse(self, FreeDyn, 'csc')
         else:
-            nBDFsys = coeffMat.init_coeffMat_AdjSys_dense(self)
+            nBDFsys = coeffMat.init_coeffMat_AdjSys_dense(self, FreeDyn)
             
         # Create buffers for fast access
         self.BDF_idx_buff = 0
         num_buffs = 2   # do not change - buffer layout changes require fixes in many places
         self.BDF_diff_tau = np.zeros(num_buffs)
         
-        self.adjW_J_buff = np.empty((num_buffs, self.FreeDyn.nDof))
-        self.adjP_J_buff = np.empty((num_buffs, self.FreeDyn.nDof))
-        self.BDF_J_buff_M_times_p = np.zeros((num_buffs, self.FreeDyn.nDof))
+        self.adjW_J_buff = np.empty((num_buffs, FreeDyn.nDof))
+        self.adjP_J_buff = np.empty((num_buffs, FreeDyn.nDof))
+        self.BDF_J_buff_M_times_p = np.zeros((num_buffs, FreeDyn.nDof))
         self.BDF_solVec_J = np.zeros(nBDFsys)
         
-        if self.num_xF > 0:
-            self.adjW_Phi_buff = np.empty((num_buffs, self.FreeDyn.nDof, self.num_xF))
-            self.adjP_Phi_buff = np.empty((num_buffs, self.FreeDyn.nDof, self.num_xF))
-            self.BDF_Phi_buff_M_times_P = np.zeros((num_buffs, self.FreeDyn.nDof, self.num_xF))
-            self.BDF_solVec_Phi = np.zeros((nBDFsys, self.num_xF))
+        if dataOpt.num_xF > 0:
+            self.adjW_Phi_buff = np.empty((num_buffs, FreeDyn.nDof, dataOpt.num_xF))
+            self.adjP_Phi_buff = np.empty((num_buffs, FreeDyn.nDof, dataOpt.num_xF))
+            self.BDF_Phi_buff_M_times_P = np.zeros((num_buffs, FreeDyn.nDof, dataOpt.num_xF))
+            self.BDF_solVec_Phi = np.zeros((nBDFsys, dataOpt.num_xF))
         
-        BDF_intOrderOne.__init__(self)
-        BDF_intOrderTwo.__init__(self)
+        
+        BDF_intOrderOne.__init__(self, FreeDyn.MBS_modeMAT_sparse)
+        BDF_intOrderTwo.__init__(self, FreeDyn.MBS_modeMAT_sparse)
            
         print('class BDF initialized')
         
@@ -42,20 +43,20 @@ class BDF(BDF_intOrderOne, BDF_intOrderTwo):
 # Update of relevant system matrices in the BDF routine
 # =============================================================================
 
-    def update_MBS_SysMat_dll_nonzeros(self):
-        self.FreeDyn.slot_MBS_M.update_from_dll()
-        self.FreeDyn.slot_MBS_Cq.update_from_dll()
-        self.FreeDyn.slot_MBS_CqvDq.update_from_dll()
-        self.FreeDyn.slot_MBS_fv.update_from_dll()
-        self.FreeDyn.slot_MBS_G_tr.update_from_dll()      
+    def update_MBS_SysMat_dll_nonzeros(self, FreeDyn):
+        FreeDyn.slot_MBS_M.update_from_dll()
+        FreeDyn.slot_MBS_Cq.update_from_dll()
+        FreeDyn.slot_MBS_CqvDq.update_from_dll()
+        FreeDyn.slot_MBS_fv.update_from_dll()
+        FreeDyn.slot_MBS_G_tr.update_from_dll()      
 
-    def update_MBS_SysMat(self):
-        self.update_MBS_SysMat_dll_nonzeros()
-        self.FreeDyn.slot_MBS_M.apply_to_cached_matrix()
-        self.FreeDyn.slot_MBS_Cq.apply_to_cached_matrix()
-        self.FreeDyn.slot_MBS_CqvDq.apply_to_cached_matrix()
-        self.FreeDyn.slot_MBS_fv.apply_to_cached_matrix()
-        self.FreeDyn.slot_MBS_G_tr.apply_to_cached_matrix()
+    def update_MBS_SysMat(self, FreeDyn):
+        self.update_MBS_SysMat_dll_nonzeros(FreeDyn)
+        FreeDyn.slot_MBS_M.apply_to_cached_matrix()
+        FreeDyn.slot_MBS_Cq.apply_to_cached_matrix()
+        FreeDyn.slot_MBS_CqvDq.apply_to_cached_matrix()
+        FreeDyn.slot_MBS_fv.apply_to_cached_matrix()
+        FreeDyn.slot_MBS_G_tr.apply_to_cached_matrix()
         
 # =============================================================================
 # Return values of adjVar p at BDF time idx s_n from the buffer

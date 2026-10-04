@@ -2,28 +2,29 @@ import numpy as np
 
 class Control:
     
-    def __init__(self, 
-                 num_ctrls, num_ctrl_gridNodes):
+    def __init__(self, nCtrls, nGridNodes):
         
-        if num_ctrls > 0:
-            self.num_ctrls = num_ctrls
-            self.num_ctrl_gridNodes = num_ctrl_gridNodes
-            self.ctrl_gridNodes_tau = np.linspace(0, 1, num_ctrl_gridNodes)
+        self.num_ctrls = nCtrls
+        
+        
+        if nCtrls > 0:
+            self.num_grid_nodes = nGridNodes
+            
+            self.grid_nodes = None
+            
+            self.grid_tau = np.linspace(0, 1, nGridNodes)
             self.spline_time_invariant()
             print('class Control initialized')
-            
-        else:
-            print('class Control not initialized - no control defined!')
 
 # -----------------------------------------------------------------------------
 
     def spline_time_invariant(self):
         
-        s = self.num_ctrl_gridNodes - 1   # number of Splines
+        s = self.num_grid_nodes - 1   # number of Splines
         dim_coeffSPL = 3*s
     
         matA = np.zeros((dim_coeffSPL, dim_coeffSPL))
-        matK = np.zeros((dim_coeffSPL, self.num_ctrl_gridNodes))
+        matK = np.zeros((dim_coeffSPL, self.num_grid_nodes))
         
         """ vecs with idx from 0 to s-1 | s-2 """
         vec_dim_s = np.arange(s)
@@ -35,7 +36,7 @@ class Control:
         rows_III = 3 + 3 * vec_dim_s1
         
         """ precompute time diffs """
-        h = np.diff(self.ctrl_gridNodes_tau)
+        h = np.diff(self.grid_tau)
         h_pow_2 = h * h
         h_pow_3 = h * h_pow_2
                  
@@ -73,10 +74,10 @@ class Control:
         self.ctrl_invA_times_K = - np.linalg.solve(matA,matK)  
 # -----------------------------------------------------------------------------
 
-    def vec_c_dtF_invariant_OptIt(self):
+    def vec_c_dtF_invariant_OptIt(self, tF):
         
-        inv_tF_squared = 1 / (self.tF * self.tF)
-        self.vecC_dtF_invariant = self.ctrl_invA_times_K @ self.ctrl_gridNodes
+        inv_tF_squared = 1 / (tF * tF)
+        self.vecC_dtF_invariant = self.ctrl_invA_times_K @ self.grid_nodes
         self.vecC_dtF_invariant *= inv_tF_squared
         
         self.vecC_dtF_invariant[1::3] *= 2
@@ -85,8 +86,8 @@ class Control:
 
     def find_SPL_by_t(self, t):
         
-        idx = np.searchsorted(self.ctrl_gridNodes_tau, t)
-        ctrl_intSPL_pos = min(max(0, idx - 1), self.num_ctrl_gridNodes-2)
+        idx = np.searchsorted(self.grid_tau, t)
+        ctrl_intSPL_pos = min(max(0, idx - 1), self.num_grid_nodes-2)
 
         return ctrl_intSPL_pos
 
@@ -98,7 +99,7 @@ class Control:
         idxMAT = 3 * ctrl_intSPL_pos
         
         # Vector tau entries
-        t = timePoint - self.ctrl_gridNodes_tau[ctrl_intSPL_pos]
+        t = timePoint - self.grid_tau[ctrl_intSPL_pos]
         
         
         # Note: ctrl_invA_times_K includes already the minus  
@@ -117,7 +118,7 @@ class Control:
         idxMAT = 3 * ctrl_intSPL_pos
         
         # Vector tau entries
-        t = timePoint - self.ctrl_gridNodes_tau[ctrl_intSPL_pos]
+        t = timePoint - self.grid_tau[ctrl_intSPL_pos]
         
         # Note: SPL_coeffs_bcd includes already the minus  
         vec_C_dtF =  (self.ctrl_invA_times_K[idxMAT, :] 
@@ -134,7 +135,7 @@ class Control:
         idxMAT = 3 * ctrl_intSPL_pos
         
         # Vector tau entries
-        t = timePoint - self.ctrl_gridNodes_tau[ctrl_intSPL_pos]
+        t = timePoint - self.grid_tau[ctrl_intSPL_pos]
         
         # Note: ctrl_invA_times_K and SPL_coeffs_bcd include already the minus   
 
@@ -156,10 +157,10 @@ class Control:
     def get_C(self, timePoint):
         
         vec_C = self.get_vec_c(timePoint)
-        matC = np.zeros([self.num_ctrls,self.num_ctrls*self.num_ctrl_gridNodes])
+        matC = np.zeros([self.num_ctrls,self.num_ctrls*self.num_grid_nodes])
         
         for i in range(0, self.num_ctrls):
-             matC[i,i*self.num_ctrl_gridNodes:(i+1)*self.num_ctrl_gridNodes] = vec_C
+             matC[i,i*self.num_grid_nodes:(i+1)*self.num_grid_nodes] = vec_C
           
         return matC
 # -----------------------------------------------------------------------------
@@ -173,10 +174,10 @@ class Control:
         
         else:
             
-            matC_dtF = np.zeros([self.num_ctrls,self.num_ctrls*self.num_ctrl_gridNodes])
+            matC_dtF = np.zeros([self.num_ctrls,self.num_ctrls*self.num_grid_nodes])
             
             for i in range(0, self.num_ctrls):
-                matC_dtF[i,i*self.num_ctrl_gridNodes:(i+1)*self.num_ctrl_gridNodes] = vec_C_dtF
+                matC_dtF[i,i*self.num_grid_nodes:(i+1)*self.num_grid_nodes] = vec_C_dtF
               
             return matC_dtF
 # -----------------------------------------------------------------------------
@@ -185,7 +186,7 @@ class Control:
         
         vec_C = self.get_vec_c(timePoint)
         
-        return np.dot(vec_C, self.ctrl_gridNodes)
+        return np.dot(vec_C, self.grid_nodes)
 # -----------------------------------------------------------------------------
      
     def get_u_for_GridNodes(self, timePoint, ctrl_gridNodes):

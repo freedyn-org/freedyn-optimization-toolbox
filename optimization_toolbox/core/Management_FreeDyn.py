@@ -47,7 +47,7 @@ class FreeDyn():
         print('class FreeDyn initialized')
 # -----------------------------------------------------------------------------        
         
-    def __del__(self):
+    def delete_model(self):
         
         self.API.__del__()
         print('Model deleted')   
@@ -128,18 +128,18 @@ class FreeDyn():
 # Commands concerning splines
 # =============================================================================
     
-    def update_ctrl_gridNodes(self, tF, ctrl_gridNodes_tau, ctrl_gridNodes):
+    def update_ctrl_gridNodes(self, dataOpt, Ctrl):
         
-        realT = tF * ctrl_gridNodes_tau
+        realT = dataOpt.final_time * Ctrl.grid_tau
         
         for i, SPL in enumerate(self.name_ctrlSPL):
-            self.API.set_spline(SPL, realT, ctrl_gridNodes[:,i])
+            self.API.set_spline(SPL, realT, Ctrl.grid_nodes[:,i])
 # -----------------------------------------------------------------------------              
             
-    def write_ctrl_dataSPL(self):
+    def write_ctrl_dataSPL(self, Ctrl):
         
-        realT = self.tF * self.ctrl_gridNodes_tau
-        data = np.column_stack((realT, self.ctrl_gridNodes))
+        realT = Ctrl.final_time * Ctrl.grid_tau
+        data = np.column_stack((realT, Ctrl.grid_nodes))
         np.savetxt(f'{self.fds_path}\\dataSPL.txt', data, fmt='%.10f')   
 
 # =============================================================================
