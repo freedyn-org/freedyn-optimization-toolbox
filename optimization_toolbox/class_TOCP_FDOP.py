@@ -2,8 +2,6 @@ import numpy as np
 
 from core.control_cubSPL_zeroClamped import Control
 from core.Management_FreeDyn import FreeDyn
-from core.consistent_boundary_conditions import BC_FDOP
-from core.BDF_physicalTime import BDF
 from core.adjGrad_wrt_u_and_tF_FDOP import adjGrads
 from user_fcts import fcts_User
 
