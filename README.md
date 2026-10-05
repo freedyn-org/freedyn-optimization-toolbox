@@ -1,9 +1,9 @@
 # FreeDyn Optimization Toolbox
 **Adjoint-based optimization toolbox for multibody systems using the FreeDyn API**
 
-## Optimal Control Problems in Multibody Dynamics
+## Optimization Tasks in Multibody Dynamics
 
-The objective is to identify the control $\mathbf{u}(t)$ that minimizes the cost functional
+The objective is to identify the optimization vriables $\mathbf{z}$ that minimizes the cost functional
 
 $$
 \begin{aligned}
@@ -20,6 +20,14 @@ $$
 $$
 
 have to be satisfied.
+
+$$
+\begin{aligned}
+\mathbf{q}(t) \dots \text{Vector of redundant generalized coordinates}\\
+\mathbf{v}(t) \dots \text{Vector of redundant generalized velocities}\\
+\mathbf{u}(t) \dots \text{Vector of controls (forces, torques, etc.)}
+\end{aligned}
+$$
 
 ## Features
 - **Optimal Control Problems with fixed final time** `class_OCP_FDOP.py`
