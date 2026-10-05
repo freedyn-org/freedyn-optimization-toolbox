@@ -1,9 +1,9 @@
 # FreeDyn Optimization Toolbox
 **Adjoint-based optimization toolbox for multibody systems using the FreeDyn API**
 
-## Optimal Control Problems in Multibody Dynamics
+## Optimization Tasks in Multibody Dynamics
 
-The objective is to identify the control $\mathbf{u}(t)$ that minimizes the cost functional
+The objective is to identify the optimization vriables $\mathbf{z}$ that minimizes the cost functional
 
 $$
 \begin{aligned}
