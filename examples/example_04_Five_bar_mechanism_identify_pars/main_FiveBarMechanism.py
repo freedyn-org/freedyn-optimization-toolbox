@@ -43,15 +43,11 @@ name_fds = 'five_bar_planar_mechanism'
 # Define FreeDyn data object spline of the controls
 name_ctrlSPL = []
 
-# Define FreeDyn parameter for fdu
-# name_fDu_par = ["fdu"]
-
-# Define FreeDyn parameter for Parameters
-name_fDpar = ["springOneLengthNature","springTwoLengthNature"]
-
-
 # Define FreeDyn measures
 name_fDmeas = ["dispX_P2","dispY_P2"]
+
+# Define FreeDyn parameter for Parameters
+name_dForce_dparam = ["springOneLengthNature","springTwoLengthNature"]
 #
 # -----------------------------------------------------------------------------
 #
@@ -70,42 +66,44 @@ xF = np.array([])   # final constraints,
 #
 # -----------------------------------------------------------------------------
 #
-""" Define initial values for optimization variables zInit"""
+""" Define FD parameters - if required"""
 l_spring_1 = np.sqrt(5)
 l_spring_2 = np.sqrt(4.25)
-pars = np.array([l_spring_1, l_spring_2])
-
-zInit = pars
-num_optVars = len(zInit)
+FD_pars = np.array([l_spring_1, l_spring_2])
+num_FD_pars = len(FD_pars)
 #
 # -----------------------------------------------------------------------------
 #
-"""  Choose Optimal Control Problem (OCP) with/without final constraints Phi """
-# Commenting in and out – according to the optimization problem
-
-#  from class_OCP_FDOP import Optimization   # OCP with fixed final time 
-#  from class_TOCP_FDOP import Optimization  # OCP with free final time 
-from class_Identify_Pars import Optimization
-
-optim = Optimization(num_optVars, num_ctrls, num_ctrl_gridNodes,
+""" Define initial values for optimization variables zInit"""
+zInit = FD_pars
+num_optVars = num_FD_pars
+#
+# -----------------------------------------------------------------------------
+#
+"""  Choose Optimization with/without final constraints Phi """
+from class_optimization_toolbox import Toolbox
+# Use "OCP" for Optimal Control Problems with fixed final time
+# Use "TOCP" for Optimal Control Problems with free final time
+# Use "Parameter" for Parameter-Identification with fixed final time
+#
+opt_TB = Toolbox("Parameter", num_optVars, num_ctrls, num_ctrl_gridNodes, num_FD_pars,
                      tF, xF,
                      path_fds, name_fds,
-                     name_ctrlSPL, name_fDpar,
-                     name_fDmeas,
+                     name_ctrlSPL, name_fDmeas, name_dForce_dparam,
                      path_FDdll)
 #
 # -----------------------------------------------------------------------------
 #
 """  Set up of the optimization-toolbox """
 # Add or comment out – according to the optimization problem
-res = sp.optimize.minimize(fun         = optim.costFct_J,                # cost function
+res = sp.optimize.minimize(fun         = opt_TB.costFct_J,                # cost function
                            x0          = zInit,                             # initial values
                            method      = 'SLSQP',                        # optimization method
-                           jac         = optim.grad_costFct_J,               # gradient of cost function
+                           jac         = opt_TB.grad_costFct_J,               # gradient of cost function
                            # bounds      = sp.optimize.Bounds(lb, ub),     # lower and upper bounds
                            # constraints = {'type':'eq', 
-                           #                'fun':optim.finalConstr_Phi, 
-                           #                'jac':optim.grad_finalConstr_Phi},     # non-linear constraints
+                           #                'fun':opt_TB.finalConstr_Phi, 
+                           #                'jac':opt_TB.grad_finalConstr_Phi},     # non-linear constraints
                            options     = {'disp': True, 
                                           'iprint': 2, 
                                           'ftol': 1e-8, 
@@ -116,32 +114,32 @@ res = sp.optimize.minimize(fun         = optim.costFct_J,                # cost 
 # -----------------------------------------------------------------------------
 #
 """ Update optimization variables in class and rerun simulation """
-optim.update_vars_if_changed(res.x)
+opt_TB.optim_vars.update_optim_vars.check_if_changed(opt_TB.opt_task, opt_TB.FreeDyn, opt_TB.ctrl, res.x)
 
 for i in range(0,num_optVars):
-    print(f'{name_fDpar[i]} = {res.x[i]}')
+    print(f'{name_dForce_dparam[i]} = {res.x[i]}')
 #
 # -----------------------------------------------------------------------------
 #
 """ Get data for plots """
-t = np.zeros(optim.FreeDyn.num_time_steps)                    # physical time t
-tau = np.zeros(optim.FreeDyn.num_time_steps)                  # normalized time scale [0;1]
-rx_P2 =  np.zeros(optim.FreeDyn.num_time_steps)           # 
-ry_P2 =  np.zeros(optim.FreeDyn.num_time_steps)            # 
-vx_P2 =  np.zeros(optim.FreeDyn.num_time_steps)            # 
-vy_P2 =  np.zeros(optim.FreeDyn.num_time_steps)            # 
+t = np.zeros(opt_TB.FreeDyn.num_time_steps)                    # physical time t
+tau = np.zeros(opt_TB.FreeDyn.num_time_steps)                  # normalized time scale [0;1]
+rx_P2 =  np.zeros(opt_TB.FreeDyn.num_time_steps)           # 
+ry_P2 =  np.zeros(opt_TB.FreeDyn.num_time_steps)            # 
+vx_P2 =  np.zeros(opt_TB.FreeDyn.num_time_steps)            # 
+vy_P2 =  np.zeros(opt_TB.FreeDyn.num_time_steps)            # 
 
-for i in range(optim.FreeDyn.num_time_steps-1, -1, -1): 
-   optim.FreeDyn.API.fetch_states_at_index(i)
-   optim.FreeDyn.API.update_state_at_index(i)   # necessary, if measures are used in get_Lagrangian()
-   t[i] = optim.FreeDyn.API.t
-   tau[i] = t[i]/optim.data_opt.final_time
-   q = optim.FreeDyn.API.Q[:, 0]
+for i in range(opt_TB.FreeDyn.num_time_steps-1, -1, -1): 
+   opt_TB.FreeDyn.API.fetch_states_at_index(i)
+   opt_TB.FreeDyn.API.update_state_at_index(i)   # necessary, if measures are used in get_Lagrangian()
+   t[i] = opt_TB.FreeDyn.API.t
+   tau[i] = t[i]/opt_TB.opt_task.final_time
+   q = opt_TB.FreeDyn.API.Q[:, 0]
    
-   rx_P2[i] = optim.FreeDyn.API.get_measure_value("dispX_P2")
-   ry_P2[i] = optim.FreeDyn.API.get_measure_value("dispY_P2")
-   vx_P2[i] = optim.FreeDyn.API.get_measure_value("veloX_P2")
-   vy_P2[i] = optim.FreeDyn.API.get_measure_value("veloY_P2")
+   rx_P2[i] = opt_TB.FreeDyn.API.get_measure_value("dispX_P2")
+   ry_P2[i] = opt_TB.FreeDyn.API.get_measure_value("dispY_P2")
+   vx_P2[i] = opt_TB.FreeDyn.API.get_measure_value("veloX_P2")
+   vy_P2[i] = opt_TB.FreeDyn.API.get_measure_value("veloY_P2")
    
 #
 # -----------------------------------------------------------------------------
@@ -172,4 +170,4 @@ plt.show()
 #
 # -----------------------------------------------------------------------------
 #
-optim.FreeDyn.delete_model()
+opt_TB.FreeDyn.delete_model()

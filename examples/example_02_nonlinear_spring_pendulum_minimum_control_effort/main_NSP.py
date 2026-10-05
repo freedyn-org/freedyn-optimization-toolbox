@@ -43,8 +43,11 @@ name_fds = 'OptCtrl_NonlinearSpringPendulum'
 # Define FreeDyn data object spline of the controls
 name_ctrlSPL = ["uDach_x", "uDach_y", "uDach_z"]
 
+# Define FreeDyn measures
+name_fDmeas = []
+
 # Define FreeDyn parameter for fdu
-name_fDu_par = ["fdu_x","fdu_y","fdu_z"]
+name_dForce_dparam = ["fdu_x","fdu_y","fdu_z"]
 #
 # -----------------------------------------------------------------------------
 #
@@ -63,70 +66,76 @@ xF = np.array([2,-10,-4,0,0,0])   # final constraints,
 #
 # -----------------------------------------------------------------------------
 #
+""" Define FD parameters - if required"""
+FD_pars = np.array([])
+num_FD_pars = len(FD_pars)
+#
+# -----------------------------------------------------------------------------
+#
 """ Define initial values for optimization variables zInit"""
 zInit = uDachInit      
 num_optVars = len(zInit)
 #
 # -----------------------------------------------------------------------------
 #
-"""  Choose Optimal Control Problem (OCP) with/without final constraints Phi """
-# Commenting in and out – according to the optimization problem
-
-from class_OCP_FDOP import Optimization   # OCP with fixed final time 
-#  from class_TOCP_FDOP import Optimization  # OCP with free final time 
-
-optim = Optimization(num_optVars, num_ctrls, num_ctrl_gridNodes,
+"""  Choose Optimization with/without final constraints Phi """
+from class_optimization_toolbox import Toolbox
+# Use "OCP" for Optimal Control Problems with fixed final time
+# Use "TOCP" for Optimal Control Problems with free final time
+# Use "Parameter" for Parameter-Identification with fixed final time
+#
+opt_TB = Toolbox("OCP", num_optVars, num_ctrls, num_ctrl_gridNodes, num_FD_pars,
                      tF, xF,
                      path_fds, name_fds,
-                     name_ctrlSPL, name_fDu_par,
+                     name_ctrlSPL, name_fDmeas, name_dForce_dparam,
                      path_FDdll)
 #
 # -----------------------------------------------------------------------------
 #
 """  Set up of the optimization-toolbox """
 # Add or comment out – according to the optimization problem
-res = sp.optimize.minimize(fun         = optim.costFct_J,                # cost function
+res = sp.optimize.minimize(fun         = opt_TB.costFct_J,                # cost function
                            x0          = zInit,                             # initial values
                            method      = 'SLSQP',                        # optimization method
-                           jac         = optim.grad_costFct_J,               # gradient of cost function
+                           jac         = opt_TB.grad_costFct_J,               # gradient of cost function
                            # bounds      = sp.optimize.Bounds(lb, ub),     # lower and upper bounds
                            constraints = {'type':'eq', 
-                                          'fun':optim.finalConstr_Phi, 
-                                          'jac':optim.grad_finalConstr_Phi},     # non-linear constraints
+                                          'fun':opt_TB.finalConstr_Phi, 
+                                          'jac':opt_TB.grad_finalConstr_Phi},     # non-linear constraints
                            options     = {'disp': True, 
                                           'iprint': 2, 
                                           'ftol': 1e-8, 
                                           'eps':1e-8, 
-                                          'maxiter': 1}                 # optimization options
+                                          'maxiter': 50}                 # optimization options
                            )
 #
 # -----------------------------------------------------------------------------
 #
 """ Update optimization variables in class and rerun simulation """
-optim.update_vars_if_changed(res.x)
-# optim.write_ctrl_dataSPL()
+opt_TB.optim_vars.update_optim_vars.check_if_changed(opt_TB.opt_task, opt_TB.FreeDyn, opt_TB.ctrl, res.x)
+# opt_TB.FreeDyn.write_ctrl_dataSPL()
 #
 # -----------------------------------------------------------------------------
 #
 """ Get data for plots """
-t = np.zeros(optim.FreeDyn.num_time_steps)                    # physical time t
-tau = np.zeros(optim.FreeDyn.num_time_steps)                  # normalized time scale [0;1]
-uInit = np.zeros((num_ctrls, optim.FreeDyn.num_time_steps))   # initial control
-u = np.zeros((num_ctrls, optim.FreeDyn.num_time_steps))       # optimal control
-q = np.zeros((optim.FreeDyn.nDof, optim.FreeDyn.num_time_steps))      # gen. red. coordinates
-qD = np.zeros((optim.FreeDyn.nDof, optim.FreeDyn.num_time_steps))     # gen. red. velocities
-spring_l = np.zeros(optim.FreeDyn.num_time_steps)             # length of the spring
+t = np.zeros(opt_TB.FreeDyn.num_time_steps)                    # physical time t
+tau = np.zeros(opt_TB.FreeDyn.num_time_steps)                  # normalized time scale [0;1]
+uInit = np.zeros((num_ctrls, opt_TB.FreeDyn.num_time_steps))   # initial control
+u = np.zeros((num_ctrls, opt_TB.FreeDyn.num_time_steps))       # optimal control
+q = np.zeros((opt_TB.FreeDyn.nDof, opt_TB.FreeDyn.num_time_steps))      # gen. red. coordinates
+qD = np.zeros((opt_TB.FreeDyn.nDof, opt_TB.FreeDyn.num_time_steps))     # gen. red. velocities
+spring_l = np.zeros(opt_TB.FreeDyn.num_time_steps)             # length of the spring
 
-for i in range(optim.FreeDyn.num_time_steps-1, -1, -1): 
-   optim.FreeDyn.API.fetch_states_at_index(i)
-   optim.FreeDyn.API.update_state_at_index(i)
-   t[i] = optim.FreeDyn.API.t
-   tau[i] = t[i]/optim.data_opt.final_time
-   uInit[:,i] = optim.ctrl.get_u_for_GridNodes(tau[i], uDachInit)
-   u[:,i] = optim.ctrl.get_u(tau[i])  
-   q[:,i] = optim.FreeDyn.API.Q[:, 0]
-   qD[:,i] = optim.FreeDyn.API.Qd[:, 0]
-   spring_l[i] = optim.FreeDyn.API.get_measure_value("l") 
+for i in range(opt_TB.FreeDyn.num_time_steps-1, -1, -1): 
+   opt_TB.FreeDyn.API.fetch_states_at_index(i)
+   opt_TB.FreeDyn.API.update_state_at_index(i)
+   t[i] = opt_TB.FreeDyn.API.t
+   tau[i] = t[i]/opt_TB.opt_task.final_time
+   uInit[:,i] = opt_TB.ctrl.get_u_for_GridNodes(tau[i], uDachInit)
+   u[:,i] = opt_TB.ctrl.get_u(tau[i])  
+   q[:,i] = opt_TB.FreeDyn.API.Q[:, 0]
+   qD[:,i] = opt_TB.FreeDyn.API.Qd[:, 0]
+   spring_l[i] = opt_TB.FreeDyn.API.get_measure_value("l") 
 #
 # -----------------------------------------------------------------------------
 #
@@ -178,4 +187,4 @@ plt.show()
 #
 # -----------------------------------------------------------------------------
 #
-optim.FreeDyn.delete_model()
+opt_TB.FreeDyn.delete_model()

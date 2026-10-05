@@ -4,12 +4,11 @@ import math
 
 class fcts_User():
     
-    def __init__(self, nState, nXF, nCtrl, nPars):
+    def __init__(self, nState, nXF, nPars):
         
         # Allocate matrices for derivatives of Lagrangian: L_q , L_v , L_u
         self.dLdq = np.zeros(nState)                         # do not change 
         self.dLdv = np.zeros(nState)                         # do not change 
-        self.dLdu = np.zeros(nCtrl)                    # do not change
         self.dLdpars = np.zeros(nPars)                  # do not change
         
         # Allocate matrices for derivatives of final constraints: Phi_q , Phi_v
@@ -76,16 +75,6 @@ class fcts_User():
         # If you want to zero all entries, use self.dLdv.fill(0.0)
         # If you want to access an element, use self.dLdv[i] = ...
         # If dLdv = 0, then only use "return None"
-        
-        return None
-# -----------------------------------------------------------------------------
-
-    def get_Lagrangian_du(self, dataOpt, FreeDyn, Ctrl, z):
-        
-        # Allocate in __init__ as self.dLdu = np.zeros(FreeDyn.nDof)
-        # If you want to zero all entries, use self.dLdu.fill(0.0)
-        # If you want to access an element, use self.dLdu[i] = ...
-        # If dLdu = 0, then only use "return None"
         
         return None
 # -----------------------------------------------------------------------------
