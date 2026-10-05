@@ -90,7 +90,7 @@ for loop_Limit in range(0, num_ctrls):
 # -----------------------------------------------------------------------------
 #
 """  Choose Optimization with/without final constraints Phi """
-from class_optimization_toolbox import Toolbox
+from optimization_toolbox import Toolbox
 # Use "OCP" for Optimal Control Problems with fixed final time
 # Use "TOCP" for Optimal Control Problems with free final time
 # Use "Parameter" for Parameter-Identification with fixed final time
