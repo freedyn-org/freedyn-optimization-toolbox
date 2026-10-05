@@ -30,8 +30,10 @@ $$
 $$
 
 ## Features
-- **Optimal Control Problems with fixed final time** `class_OCP_FDOP.py`
-- **Optimal Control Problems with free final time** `class_TOCP_FDOP.py`
+Use `optimization_toolbox.py` for:
+- **Optimal Control Problems with fixed final time**
+- **Optimal Control Problems with free final time**
+- **Parameter-Identification with fixed final time**
 
 ## Examples
 [Short Overwiew of Examples](examples/GitHub_Examples_Description.pdf)
@@ -88,6 +90,21 @@ $$
 \begin{aligned}
 \phi_{1} \dots \phi_{r} \dots \text{Final constraints due to the selected control}~u(t)\\
 \phi_{1,\mathrm{f}} \dots \phi_{r,\mathrm{f}} \dots \text{Desired final constraints}\\
+\end{aligned}
+$$
+
+- [Parameter-Identification](examples/example_04_Five_bar_mechanism_identify_pars/)
+  
+$$
+\begin{aligned}
+J = \int_{t_0}^{t_\mathrm{f}} \frac{1}{2} \left( \mathbf{r}_p - \mathbf{r}_{\mathrm{p,init}} \right)^2  \mathrm{d}t
+\end{aligned}
+$$
+
+$$
+\begin{aligned}
+\mathbf{r}_p \dots \text{Position of observation at time}~t\\
+\mathbf{r}_{\mathrm{p,init}} \dots \text{Initial position of observation}\\
 \end{aligned}
 $$
 
