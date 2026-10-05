@@ -7,7 +7,8 @@ class FreeDyn():
     
     def __init__(self,
                  path_FDdll, path_fds, name_fds,
-                 name_ctrlSPL, name_dForce_dparam):
+                 name_ctrlSPL, name_fDmeas, name_dForce_dparam,
+                 num_FD_pars):
         
         # Initialize FreeDyn API
         fd.initialize(path_FDdll)
@@ -41,8 +42,12 @@ class FreeDyn():
         self.buffer_MBS_dForce_dFDparam = fd.ForceParameterDerivativeMatrixBuffer(name_dForce_dparam)
         self.dForce_dFDparam = self.buffer_MBS_dForce_dFDparam.data
         
-        # FreeDyn data object spline of the controls 
+        # FreeDyn data object control splines, measures, force wrt parameter
         self.name_ctrlSPL = name_ctrlSPL
+        self.name_meas = name_fDmeas
+        self.name_dForce_dparam = name_dForce_dparam
+        self.FD_pars = None
+        self.num_FD_pars = num_FD_pars
         
         print('class FreeDyn initialized')
 # -----------------------------------------------------------------------------        

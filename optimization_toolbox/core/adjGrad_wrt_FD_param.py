@@ -3,7 +3,7 @@ import numpy as np
 from core.consistent_boundary_conditions import BC_FDOP
 from core.BDF_physicalTime import BDF
 
-class adjGrads(BC_FDOP, BDF):
+class adjGrads_Param(BC_FDOP, BDF):
     
     def __init__(self, dataOpt, FreeDyn, nPars):
         
