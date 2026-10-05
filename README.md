@@ -103,8 +103,8 @@ $$
 
 $$
 \begin{aligned}
-y(t) \dots \text{Trajectory due to the selected control}~u(t)\\
-\bar{y}(t) \dots \text{Desired trajectory}\\
+\mathbf{r}_p \dots \text{Position of observation at time}~t\\
+\mathbf{r}_{\mathrm{p,init}} \dots \text{Initial position of observation}\\
 \end{aligned}
 $$
 
