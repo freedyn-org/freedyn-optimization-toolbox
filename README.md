@@ -97,7 +97,7 @@ $$
   
 $$
 \begin{aligned}
-J = \int_{t_0}^{t_\mathrm{f}} \frac{1}{2} \left( \mathbf{r}_p - \mathbf{r}_{\mathrm{p,init} \right)^2  \mathrm{d}t
+J = \int_{t_0}^{t_\mathrm{f}} \frac{1}{2} \left( \mathbf{r}_p - \mathbf{r}_{\mathrm{p,init}} \right)^2  \mathrm{d}t
 \end{aligned}
 $$
 
