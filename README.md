@@ -23,9 +23,9 @@ have to be satisfied.
 
 $$
 \begin{aligned}
-\mathbf{q} \dots Vector of redundant generalized coordinates\\
-\mathbf{v} \dots Vector of redundant generalized velocities\\
-\mathbf{u} \dots Vector of controls (forces, torques, etc.)
+\mathbf{q} \dots \text{Vector of redundant generalized coordinates}\\
+\mathbf{v} \dots \text{Vector of redundant generalized velocities}\\
+\mathbf{u} \dots \text{Vector of controls (forces, torques, etc.)}
 \end{aligned}
 $$
 
