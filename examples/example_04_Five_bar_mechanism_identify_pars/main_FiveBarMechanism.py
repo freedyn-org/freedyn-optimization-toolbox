@@ -97,19 +97,19 @@ opt_TB = Toolbox("Parameter",
 #
 """  Set up of the optimization-toolbox """
 # Add or comment out – according to the optimization problem
-res = sp.optimize.minimize(fun         = opt_TB.costFct_J,                # cost function
-                           x0          = zInit,                             # initial values
-                           method      = 'SLSQP',                        # optimization method
-                           jac         = opt_TB.grad_costFct_J,               # gradient of cost function
-                           # bounds      = sp.optimize.Bounds(lb, ub),     # lower and upper bounds
+res = sp.optimize.minimize(fun         = opt_TB.costFct_J,                     # cost function
+                           x0          = zInit,                                # initial values
+                           method      = 'SLSQP',                              # optimization method
+                           jac         = opt_TB.grad_costFct_J,                # gradient of cost function
+                           # bounds      = sp.optimize.Bounds(lb, ub),           # lower and upper bounds
                            # constraints = {'type':'eq', 
                            #                'fun':opt_TB.finalConstr_Phi, 
-                           #                'jac':opt_TB.grad_finalConstr_Phi},     # non-linear constraints
+                           #                'jac':opt_TB.grad_finalConstr_Phi},  # non-linear constraints
                            options     = {'disp': True, 
                                           'iprint': 2, 
                                           'ftol': 1e-8, 
                                           'eps':1e-8, 
-                                          'maxiter': 1}                # optimization options
+                                          'maxiter': 50}                       # optimization options
                            )
 #
 # -----------------------------------------------------------------------------
