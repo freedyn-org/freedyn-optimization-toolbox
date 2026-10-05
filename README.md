@@ -21,6 +21,14 @@ $$
 
 have to be satisfied.
 
+$$
+\begin{aligned}
+\mathbf{q} \dots Vector of redundant generalized coordinates\\
+\mathbf{v} \dots Vector of redundant generalized velocities\\
+\mathbf{u} \dots Vector of controls (forces, torques, etc.)
+\end{aligned}
+$$
+
 ## Features
 - **Optimal Control Problems with fixed final time** `class_OCP_FDOP.py`
 - **Optimal Control Problems with free final time** `class_TOCP_FDOP.py`
