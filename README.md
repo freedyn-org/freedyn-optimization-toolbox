@@ -93,6 +93,21 @@ $$
 \end{aligned}
 $$
 
+- [Parameter-Identification](examples/example_04_Five_bar_mechanism_identify_pars/)
+  
+$$
+\begin{aligned}
+J = \int_{t_0}^{t_\mathrm{f}} \frac{1}{2} \left( \mathbf{r}_p - \mathbf{r}_{\mathrm{p,init} \right)^2  \mathrm{d}t
+\end{aligned}
+$$
+
+$$
+\begin{aligned}
+y(t) \dots \text{Trajectory due to the selected control}~u(t)\\
+\bar{y}(t) \dots \text{Desired trajectory}\\
+\end{aligned}
+$$
+
 ## Quick Start
 1. Create a virtual environment in Python
 2. Install Python packages
