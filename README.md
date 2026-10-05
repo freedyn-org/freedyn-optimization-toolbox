@@ -30,8 +30,10 @@ $$
 $$
 
 ## Features
-- **Optimal Control Problems with fixed final time** `class_OCP_FDOP.py`
-- **Optimal Control Problems with free final time** `class_TOCP_FDOP.py`
+Use `optimization_toolbox.py` for:
+- **Optimal Control Problems with fixed final time**
+- **Optimal Control Problems with free final time**
+- **Parameter-Identification with fixed final time**
 
 ## Examples
 [Short Overwiew of Examples](examples/GitHub_Examples_Description.pdf)
