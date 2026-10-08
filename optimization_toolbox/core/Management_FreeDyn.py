@@ -1,6 +1,7 @@
 import numpy as np
 import freedyn as fd
 from ctypes import c_int
+from pathlib import Path
 
 
 class FreeDyn():
@@ -15,7 +16,8 @@ class FreeDyn():
 
         # Define path and name of *.fds
         self.fds_path = path_fds
-        self.fds_path_name = f'{path_fds}\\{name_fds}.fds'
+        self.fds_path_name = str(Path(path_fds) / f'{name_fds}.fds')
+       
         
         # Load and Read *.fds
         self.load_and_read_fds(self.fds_path_name)
@@ -30,13 +32,17 @@ class FreeDyn():
         self.num_time_steps = 0
         
         # System matrices and derivatives - Decision: dense or sparse layout
-        if self.nDof < (10 * 7 + 1):
-            self.MBS_modeMAT_sparse = False  
-        else:
+        lim_val = 10 * 7
+        if self.nDof > lim_val:
             self.MBS_modeMAT_sparse = True
+            print("Matrix layout: sparse")
+        else:
+            self.MBS_modeMAT_sparse = False  
+            print("Matrix layout: dense")
+            
             
         # System matrices and derivatives - Decision: dense or sparse layout
-        self.init_MBS_SysMat_slots()
+        self.init_MBS_sysMat_slots()
         
         # Derivative of sum of external forces w.r.t. parameter given as string
         self.buffer_MBS_dForce_dFDparam = fd.ForceParameterDerivativeMatrixBuffer(name_dForce_dparam)
@@ -55,11 +61,22 @@ class FreeDyn():
     def delete_model(self):
         
         self.API.__del__()
-        print('Model deleted')   
-        
-# -----------------------------------------------------------------------------
+        print('Model deleted')
 
-    def init_MBS_SysMat_slots(self):
+# =============================================================================
+# Commands concerning system state
+# =============================================================================        
+        
+    def fetch_and_update_states_at_index(self, idx):
+        self.API.fetch_states_at_index(idx)
+        self.API.update_state_at_index(idx) # necessary, if measures are used in get_lagrangian()
+# -----------------------------------------------------------------------------  
+        
+# =============================================================================
+# Commands concerning system matrices
+# =============================================================================
+
+    def init_MBS_sysMat_slots(self):
         
         # Row/Column position and scaling value of single matrix
         pos_mat = np.array([0], dtype=c_int)
@@ -98,7 +115,47 @@ class FreeDyn():
         scale_matG = np.array([1.0, -1.0, -1.0, -1.0])
         G_idx = fd.analysis.create_matrix(id_matG, pos_matG, pos_matG, scale_matG)
         self.slot_MBS_G_tr = fd.ModelRelatedMatrixBuffer(G_idx, self.MBS_modeMAT_sparse)
-        self.MBS_G_tr = getattr(self.slot_MBS_G_tr, attr_name) 
+        self.MBS_G_tr = getattr(self.slot_MBS_G_tr, attr_name)    
+# ----------------------------------------------------------------------------- 
+
+    def update_sys_mat_for_BDF(self):
+        self.API.update_jacobian()
+        self.slot_MBS_M.update_from_dll()
+        self.slot_MBS_M.apply_to_cached_matrix()
+        self.slot_MBS_Cq.update_from_dll()
+        self.slot_MBS_Cq.apply_to_cached_matrix()
+        self.slot_MBS_CqvDq.update_from_dll()
+        self.slot_MBS_CqvDq.apply_to_cached_matrix()
+        self.slot_MBS_fv.update_from_dll()
+        self.slot_MBS_fv.apply_to_cached_matrix()
+        self.slot_MBS_G_tr.update_from_dll()   
+        self.slot_MBS_G_tr.apply_to_cached_matrix()
+# ----------------------------------------------------------------------------- 
+
+    def update_nnz_dll_sys_mat_for_BDF(self):
+        self.API.update_jacobian()
+        self.slot_MBS_M.update_from_dll()
+        self.slot_MBS_Cq.update_from_dll()
+        self.slot_MBS_CqvDq.update_from_dll()
+        self.slot_MBS_fv.update_from_dll()
+        self.slot_MBS_G_tr.update_from_dll()   
+# -----------------------------------------------------------------------------
+    
+    def update_sys_mat_for_consistent_BC_J(self):
+        self.API.update_jacobian()
+        self.slot_MBS_M.update_from_dll()
+        self.slot_MBS_M.apply_to_cached_matrix()
+# -----------------------------------------------------------------------------
+
+    def update_sys_mat_for_consistent_BC_Phi(self):
+        self.API.update_jacobian()
+        self.slot_MBS_M.update_from_dll()
+        self.slot_MBS_M.apply_to_cached_matrix()
+        self.slot_MBS_Cq.update_from_dll()
+        self.slot_MBS_Cq.apply_to_cached_matrix()
+        self.slot_MBS_CqvDq.update_from_dll()
+        self.slot_MBS_CqvDq.apply_to_cached_matrix()
+# -----------------------------------------------------------------------------
 
 # =============================================================================
 # Commands concerning FD pars 
@@ -109,31 +166,11 @@ class FreeDyn():
         for name, val in zip(param_names, values): #, strict=True
             self.API.set_parameter(name, val)
  
- # -----------------------------------------------------------------------------              
-
-    # def overwrite_param_val_FDS(self):
-        
-    #     # Open FDS file and store data
-    #     with open(self.fds_path_name, 'r') as inp:
-    #        self.fds_data = inp.readlines()      
-        
-    #     tempVar = 0
-        
-    #     # Get idex of lines
-    #     for i, line in enumerate(self.fds_data):
-    #         if line.lstrip().startswith("InitialValue"):
-    #             self.fds_data[i] = f"	InitialValue = {self.opt_pars[tempVar]}\n"
-    #             tempVar = tempVar + 1
-    #             if tempVar == 2:
-    #                 break
-                    
-    #     self.write_fds(self.fds_path_name)
-        
 # =============================================================================
 # Commands concerning splines
 # =============================================================================
     
-    def update_ctrl_gridNodes(self, dataOpt, Ctrl):
+    def update_ctrl_spline(self, dataOpt, Ctrl):
         
         realT = dataOpt.final_time * Ctrl.grid_tau
         
@@ -192,4 +229,23 @@ class FreeDyn():
         self.fds_data[self.fds_idxLine["WriteMeasureResultFile"]] = "	WriteMeasureResultFile = no\n"
         
         self.write_fds(fds)
+# -----------------------------------------------------------------------------              
+
+    # def overwrite_param_val_FDS(self):
+        
+    #     # Open FDS file and store data
+    #     with open(self.fds_path_name, 'r') as inp:
+    #        self.fds_data = inp.readlines()      
+        
+    #     tempVar = 0
+        
+    #     # Get idex of lines
+    #     for i, line in enumerate(self.fds_data):
+    #         if line.lstrip().startswith("InitialValue"):
+    #             self.fds_data[i] = f"	InitialValue = {self.opt_pars[tempVar]}\n"
+    #             tempVar = tempVar + 1
+    #             if tempVar == 2:
+    #                 break
+                    
+    #     self.write_fds(self.fds_path_name)
 # ----------------------------------------------------------------------------- 
