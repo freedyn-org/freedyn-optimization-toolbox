@@ -1,14 +1,14 @@
 import numpy as np
 
-from core.consistent_boundary_conditions import BC_FDOP
-from core.BDF_physicalTime import BDF
+from core.adjoint_system_settings import set_up_consistent_BC_FDOP
+from core.adjoint_system_settings import set_up_BDF_layout_sys_mat
 
-class adjGrads_OCP(BC_FDOP, BDF):
+class adjGrads_OCP():
     
     def __init__(self, dataOpt, FreeDyn, Ctrl):
         
-        BC_FDOP.__init__(self, dataOpt, FreeDyn)
-        BDF.__init__(self, dataOpt, FreeDyn)
+        self.BC_FDOP = set_up_consistent_BC_FDOP(dataOpt, FreeDyn)
+        self.BDF = set_up_BDF_layout_sys_mat(dataOpt, FreeDyn)
 
         self.adjGrad_J_buff = np.zeros((2, Ctrl.num_ctrls, Ctrl.num_grid_nodes))
         self.adjGrad_J_buff_view0 = self.adjGrad_J_buff[0].reshape(-1)
@@ -19,39 +19,33 @@ class adjGrads_OCP(BC_FDOP, BDF):
             self.adjGrad_Phi_buff = np.zeros((2, dataOpt.num_xF, Ctrl.num_ctrls, Ctrl.num_grid_nodes))
             self.adjGrad_Phi_buff_view0 = self.adjGrad_Phi_buff[0].reshape(dataOpt.num_xF, ctrl_all)
             self.adjGrad_Phi_buff_view1 = self.adjGrad_Phi_buff[1].reshape(dataOpt.num_xF, ctrl_all)
-# -----------------------------------------------------------------------------
-    
-    def adjGrad_updates(self, FreeDyn, idx):
-        
-        FreeDyn.API.fetch_states_at_index(idx)
-        FreeDyn.API.update_state_at_index(idx)
-        FreeDyn.API.update_jacobian()
-        FreeDyn.buffer_MBS_dForce_dFDparam.update_from_dll()
-        
-        return FreeDyn.API.t
 # -----------------------------------------------------------------------------        
 
-    def adjGrad_J(self, dataOpt, user_Fcts, FreeDyn, Ctrl, z):
+    def adjGrad_J(self, dataOpt, UserFcts, FreeDyn, Ctrl, z):
         
         """ Gradient of the cost functioncal J w.r.t. uDach 
             Numerical integration by the trapezoidal rule: use t_i , t_i+1 """
         
         """ t = t_f / init BDF routine """
         idx_buff = 0
-        tRight = self.adjGrad_updates(FreeDyn,FreeDyn.num_time_steps-1)
-        self.get_consistent_BC_J(FreeDyn) 
-        user_Fcts.get_Lagrangian_du(dataOpt, FreeDyn, Ctrl, z)
-        dLdu_adjP_fdu = user_Fcts.dLdu + self.get_adjVar_p_J().T @ FreeDyn.dForce_dFDparam
+        FreeDyn.fetch_and_update_states_at_index(FreeDyn.num_time_steps-1)
+        tRight = FreeDyn.API.t
+        self.BC_FDOP.get_consistent_BC_J(self.BDF, FreeDyn) 
+        UserFcts.get_lagrangian_du(dataOpt, FreeDyn, Ctrl, z)
+        FreeDyn.buffer_MBS_dForce_dFDparam.update_from_dll()
+        dLdu_adjP_fdu = UserFcts.dLdu + self.BDF.get_adjVar_p_J().T @ FreeDyn.dForce_dFDparam
         vec_C = Ctrl.get_vec_c(tRight/dataOpt.final_time)
         np.outer(dLdu_adjP_fdu, vec_C, out = self.adjGrad_J_buff[idx_buff])
         
         """ BDF order 1 """
         idx_buff = 1 - idx_buff
-        tLeft = self.adjGrad_updates(FreeDyn,FreeDyn.num_time_steps-2)
+        FreeDyn.fetch_and_update_states_at_index(FreeDyn.num_time_steps-2)
+        tLeft = FreeDyn.API.t
         deltaT = tRight - tLeft
-        self.BDForder1_singleStep_J(user_Fcts, FreeDyn, z, deltaT)        
-        user_Fcts.get_Lagrangian_du(dataOpt, FreeDyn, Ctrl, z)
-        dLdu_adjP_fdu = user_Fcts.dLdu + self.get_adjVar_p_J().T @ FreeDyn.dForce_dFDparam
+        self.BDF.BDForder1_singleStep_J(UserFcts, FreeDyn, z, deltaT)        
+        UserFcts.get_lagrangian_du(dataOpt, FreeDyn, Ctrl, z)
+        FreeDyn.buffer_MBS_dForce_dFDparam.update_from_dll()
+        dLdu_adjP_fdu = UserFcts.dLdu + self.BDF.get_adjVar_p_J().T @ FreeDyn.dForce_dFDparam
         vec_C = Ctrl.get_vec_c(tLeft/dataOpt.final_time)
         np.outer(dLdu_adjP_fdu, vec_C, out = self.adjGrad_J_buff[idx_buff])
         dJdu = deltaT * (self.adjGrad_J_buff_view0 + self.adjGrad_J_buff_view1)
@@ -60,11 +54,13 @@ class adjGrads_OCP(BC_FDOP, BDF):
         for i in range(FreeDyn.num_time_steps-3, -1, -1):
             idx_buff = 1 - idx_buff
             tRight = tLeft
-            tLeft = self.adjGrad_updates(FreeDyn,i)
+            FreeDyn.fetch_and_update_states_at_index(i)
+            tLeft = FreeDyn.API.t
             deltaT = tRight - tLeft
-            self.BDForder2_singleStep_J(user_Fcts, FreeDyn, z, deltaT)
-            user_Fcts.get_Lagrangian_du(dataOpt, FreeDyn, Ctrl, z)
-            dLdu_adjP_fdu = user_Fcts.dLdu + self.get_adjVar_p_J().T @ FreeDyn.dForce_dFDparam
+            self.BDF.BDForder2_singleStep_J(UserFcts, FreeDyn, z, deltaT)
+            UserFcts.get_lagrangian_du(dataOpt, FreeDyn, Ctrl, z)
+            FreeDyn.buffer_MBS_dForce_dFDparam.update_from_dll()
+            dLdu_adjP_fdu = UserFcts.dLdu + self.BDF.get_adjVar_p_J().T @ FreeDyn.dForce_dFDparam
             vec_C = Ctrl.get_vec_c(tLeft/dataOpt.final_time)
             np.outer(dLdu_adjP_fdu, vec_C, out = self.adjGrad_J_buff[idx_buff])
             dJdu += deltaT * (self.adjGrad_J_buff_view0 + self.adjGrad_J_buff_view1)
@@ -74,26 +70,30 @@ class adjGrads_OCP(BC_FDOP, BDF):
         return dJdu
 # -----------------------------------------------------------------------------    
     
-    def adjGrad_Phi(self, dataOpt, user_Fcts, FreeDyn, Ctrl, z):
+    def adjGrad_Phi(self, dataOpt, UserFcts, FreeDyn, Ctrl, z):
         
         """ Gradient of the final constraints Phi w.r.t. uDach 
             Numerical integration by the trapezoidal rule: use t_i , t_i+1 """
         
         """ t = t_f / init BDF routine """
         idx_buff = 0
-        tRight = self.adjGrad_updates(FreeDyn,FreeDyn.num_time_steps-1)
-        self.get_consistent_BC_Phi(user_Fcts, FreeDyn) 
+        FreeDyn.fetch_and_update_states_at_index(FreeDyn.num_time_steps-1)
+        tRight = FreeDyn.API.t
+        self.BC_FDOP.get_consistent_BC_Phi(self.BDF, UserFcts, FreeDyn) 
         vec_C = Ctrl.get_vec_c(tRight/dataOpt.final_time)
-        adjP_fdu = self.get_adjVar_P_Phi().T @ FreeDyn.dForce_dFDparam
+        FreeDyn.buffer_MBS_dForce_dFDparam.update_from_dll()
+        adjP_fdu = self.BDF.get_adjVar_P_Phi().T @ FreeDyn.dForce_dFDparam
         np.multiply(adjP_fdu[:,:,np.newaxis], vec_C, out = self.adjGrad_Phi_buff[idx_buff])
         
         """ BDF order 1 """ 
         idx_buff = 1 - idx_buff
-        tLeft = self.adjGrad_updates(FreeDyn,FreeDyn.num_time_steps-2)
+        FreeDyn.fetch_and_update_states_at_index(FreeDyn.num_time_steps-2)
+        tLeft = FreeDyn.API.t
         deltaT = tRight - tLeft
-        self.BDForder1_singleStep_Phi(FreeDyn, deltaT)
+        self.BDF.BDForder1_singleStep_Phi(FreeDyn, deltaT)
         vec_C = Ctrl.get_vec_c(tLeft/dataOpt.final_time)
-        adjP_fdu = self.get_adjVar_P_Phi().T @ FreeDyn.dForce_dFDparam
+        FreeDyn.buffer_MBS_dForce_dFDparam.update_from_dll()
+        adjP_fdu = self.BDF.get_adjVar_P_Phi().T @ FreeDyn.dForce_dFDparam
         np.multiply(adjP_fdu[:,:,np.newaxis], vec_C, out = self.adjGrad_Phi_buff[idx_buff])
         dPhidu = deltaT * (self.adjGrad_Phi_buff_view0 + self.adjGrad_Phi_buff_view1)
         
@@ -101,11 +101,13 @@ class adjGrads_OCP(BC_FDOP, BDF):
         for i in range(FreeDyn.num_time_steps-3, -1, -1):
             idx_buff = 1 - idx_buff
             tRight = tLeft
-            tLeft = self.adjGrad_updates(FreeDyn,i)
+            FreeDyn.fetch_and_update_states_at_index(i)
+            tLeft = FreeDyn.API.t
             deltaT = tRight - tLeft
-            self.BDForder2_singleStep_Phi(FreeDyn, deltaT)
+            self.BDF.BDForder2_singleStep_Phi(FreeDyn, deltaT)
             vec_C = Ctrl.get_vec_c(tLeft/dataOpt.final_time)
-            adjP_fdu = self.get_adjVar_P_Phi().T @ FreeDyn.dForce_dFDparam
+            FreeDyn.buffer_MBS_dForce_dFDparam.update_from_dll()
+            adjP_fdu = self.BDF.get_adjVar_P_Phi().T @ FreeDyn.dForce_dFDparam
             np.multiply(adjP_fdu[:,:,np.newaxis], vec_C, out = self.adjGrad_Phi_buff[idx_buff])
             dPhidu += deltaT * (self.adjGrad_Phi_buff_view0 + self.adjGrad_Phi_buff_view1)
             
