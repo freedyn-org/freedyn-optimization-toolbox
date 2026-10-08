@@ -1,24 +1,31 @@
 import numpy as np
 
-class update_optVars():
     
-    def __init__(self, task):
-    
-        if task == "OCP":
-            self.update_optim_vars = update_OCP()
-        elif task == "TOCP":
-            self.update_optim_vars= update_TOCP()
-        elif task == "Parameter":
-            self.update_optim_vars = update_Param()
+def update_optim_vars(task):
+
+    if task == "OCP":
+        return UpdateOCP()
+    elif task == "TOCP":
+        return UpdateTOCP()
+    elif task == "Parameter":
+        return UpdateParam()
+    else:
+        raise ValueError(f"Optimization task {task} not defined!")
         
 # -----------------------------------------------------------------------------       
 
-class update_OCP():
+class UpdateBasic():
     
-    def __init__(self):
-        return None
+    def recompute_due_to_change(self, OptimTask, FreeDyn):
+        FreeDyn.API.reset_for_rerun()
+        FreeDyn.API.compute_initial_conditions()
+        FreeDyn.API.solve_until(OptimTask.final_time) 
+        FreeDyn.num_time_steps = FreeDyn.API.get_num_time_steps()  
+# -----------------------------------------------------------------------------      
+
+class UpdateOCP(UpdateBasic):
     
-    def check_if_changed(self, opt_task, FreeDyn, Ctrl, z):
+    def assign_if_changed(self, OptimTask, FreeDyn, Ctrl, z):
         
         """ Check if the solution is already computed for z, otherwise reset and recompute """
         
@@ -31,19 +38,14 @@ class update_OCP():
         # reuse or compute solution, only assign and compute if changed
         if u_changed:
             Ctrl.grid_nodes = mat_ctrl_gridNodes_new.copy()
-            FreeDyn.update_ctrl_gridNodes(opt_task, Ctrl)
-            FreeDyn.API.reset_for_rerun()
-            FreeDyn.API.compute_initial_conditions()
-            FreeDyn.API.solve_until(opt_task.final_time) 
-            FreeDyn.num_time_steps = FreeDyn.API.get_num_time_steps()  
+            FreeDyn.update_ctrl_spline(OptimTask, Ctrl)
+            self.recompute_due_to_change(OptimTask, FreeDyn)
+            
 # -----------------------------------------------------------------------------
     
-class update_TOCP():
+class UpdateTOCP(UpdateBasic):
     
-    def __init__(self):
-        return None
-    
-    def check_if_changed(self, opt_task, FreeDyn, Ctrl, z):
+    def assign_if_changed(self, OptimTask, FreeDyn, Ctrl, z):
         
         """ Check if the solution is already computed for z, otherwise reset and recompute """
         
@@ -52,27 +54,21 @@ class update_TOCP():
         mat_ctrl_gridNodes_new = z[1:].reshape((Ctrl.num_grid_nodes, Ctrl.num_ctrls),order='F')
         
         # compare of change
-        tf_changed = (new_tf != opt_task.final_time)
+        tf_changed = (new_tf != OptimTask.final_time)
         u_changed = not np.array_equal(Ctrl.grid_nodes, mat_ctrl_gridNodes_new)
         
         # reuse or compute solution, only assign and compute if changed
         if tf_changed or u_changed:
-            opt_task.final_time = new_tf
+            OptimTask.final_time = new_tf
             Ctrl.grid_nodes = mat_ctrl_gridNodes_new.copy()
-            FreeDyn.update_ctrl_gridNodes(opt_task, Ctrl)
-            FreeDyn.API.reset_for_rerun()
-            FreeDyn.API.compute_initial_conditions()
-            FreeDyn.API.solve_until(opt_task.final_time) 
-            FreeDyn.num_time_steps = FreeDyn.API.get_num_time_steps()
+            FreeDyn.update_ctrl_spline(OptimTask, Ctrl)
+            self.recompute_due_to_change(OptimTask, FreeDyn)
     
 # -----------------------------------------------------------------------------
     
-class update_Param():
+class UpdateParam(UpdateBasic):
     
-    def __init__(self):
-        return None
-    
-    def check_if_changed(self, opt_task, FreeDyn, Ctrl, z):
+    def assign_if_changed(self, OptimTask, FreeDyn, Ctrl, z):
         
         """ Check if the solution is already computed for z, otherwise reset and recompute """
         
@@ -86,8 +82,5 @@ class update_Param():
         if opt_pars_changed:
             FreeDyn.FD_pars = opt_pars_new.copy()
             FreeDyn.update_FD_pars(FreeDyn.name_dForce_dparam, FreeDyn.FD_pars)
-            FreeDyn.API.reset_for_rerun()
-            FreeDyn.API.compute_initial_conditions()
-            FreeDyn.API.solve_until(opt_task.final_time) 
-            FreeDyn.num_time_steps = FreeDyn.API.get_num_time_steps()  
+            self.recompute_due_to_change(OptimTask, FreeDyn) 
 # -----------------------------------------------------------------------------
