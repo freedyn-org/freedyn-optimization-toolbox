@@ -86,7 +86,7 @@ from optimization_toolbox import Toolbox
 # Use "TOCP" for Optimal Control Problems with free final time
 # Use "Parameter" for Parameter-Identification with fixed final time
 #
-opt_TB = Toolbox("Parameter",
+Opt_TB = Toolbox("Parameter",
                  num_optVars, num_ctrls, num_ctrl_gridNodes, num_FD_pars,
                  tF, xF,
                  path_fds, name_fds,
@@ -97,14 +97,14 @@ opt_TB = Toolbox("Parameter",
 #
 """  Set up of the optimization-toolbox """
 # Add or comment out – according to the optimization problem
-res = sp.optimize.minimize(fun         = opt_TB.costFct_J,                     # cost function
+res = sp.optimize.minimize(fun         = Opt_TB.cost_fct_J,                    # cost function
                            x0          = zInit,                                # initial values
                            method      = 'SLSQP',                              # optimization method
-                           jac         = opt_TB.grad_costFct_J,                # gradient of cost function
+                           jac         = Opt_TB.grad_cost_fct_J,               # gradient of cost function
                            # bounds      = sp.optimize.Bounds(lb, ub),           # lower and upper bounds
-                           # constraints = {'type':'eq', 
-                           #                'fun':opt_TB.finalConstr_Phi, 
-                           #                'jac':opt_TB.grad_finalConstr_Phi},  # non-linear constraints
+                           # constraints = {'type':'eq',                         # non-linear constraints
+                           #                'fun':Opt_TB.final_constr_eq_Phi, 
+                           #                'jac':Opt_TB.grad_final_constr_eq_Phi},
                            options     = {'disp': True, 
                                           'iprint': 2, 
                                           'ftol': 1e-8, 
@@ -114,8 +114,8 @@ res = sp.optimize.minimize(fun         = opt_TB.costFct_J,                     #
 #
 # -----------------------------------------------------------------------------
 #
-""" Update optimization variables in class and rerun simulation """
-opt_TB.optim_vars.update_optim_vars.check_if_changed(opt_TB.opt_task, opt_TB.FreeDyn, opt_TB.ctrl, res.x)
+# """ Update optimization variables in class and rerun simulation """
+Opt_TB.new_opt_vars(res.x)
 
 for i in range(0,num_optVars):
     print(f'{name_dForce_dparam[i]} = {res.x[i]}')
@@ -123,24 +123,23 @@ for i in range(0,num_optVars):
 # -----------------------------------------------------------------------------
 #
 """ Get data for plots """
-t = np.zeros(opt_TB.FreeDyn.num_time_steps)                    # physical time t
-tau = np.zeros(opt_TB.FreeDyn.num_time_steps)                  # normalized time scale [0;1]
-rx_P2 =  np.zeros(opt_TB.FreeDyn.num_time_steps)           # 
-ry_P2 =  np.zeros(opt_TB.FreeDyn.num_time_steps)            # 
-vx_P2 =  np.zeros(opt_TB.FreeDyn.num_time_steps)            # 
-vy_P2 =  np.zeros(opt_TB.FreeDyn.num_time_steps)            # 
+t = np.zeros(Opt_TB.FreeDyn.num_time_steps)                    # physical time t
+tau = np.zeros(Opt_TB.FreeDyn.num_time_steps)                  # normalized time scale [0;1]
+rx_P2 =  np.zeros(Opt_TB.FreeDyn.num_time_steps)           # 
+ry_P2 =  np.zeros(Opt_TB.FreeDyn.num_time_steps)            # 
+vx_P2 =  np.zeros(Opt_TB.FreeDyn.num_time_steps)            # 
+vy_P2 =  np.zeros(Opt_TB.FreeDyn.num_time_steps)            # 
 
-for i in range(opt_TB.FreeDyn.num_time_steps-1, -1, -1): 
-   opt_TB.FreeDyn.API.fetch_states_at_index(i)
-   opt_TB.FreeDyn.API.update_state_at_index(i)   # necessary, if measures are used in get_Lagrangian()
-   t[i] = opt_TB.FreeDyn.API.t
-   tau[i] = t[i]/opt_TB.opt_task.final_time
-   q = opt_TB.FreeDyn.API.Q[:, 0]
+for i in range(Opt_TB.FreeDyn.num_time_steps-1, -1, -1): 
+   Opt_TB.FreeDyn.fetch_and_update_states_at_index(i)
+   t[i] = Opt_TB.FreeDyn.API.t
+   tau[i] = t[i]/Opt_TB.OptimTask.final_time
+   q = Opt_TB.FreeDyn.API.Q[:, 0]
    
-   rx_P2[i] = opt_TB.FreeDyn.API.get_measure_value("dispX_P2")
-   ry_P2[i] = opt_TB.FreeDyn.API.get_measure_value("dispY_P2")
-   vx_P2[i] = opt_TB.FreeDyn.API.get_measure_value("veloX_P2")
-   vy_P2[i] = opt_TB.FreeDyn.API.get_measure_value("veloY_P2")
+   rx_P2[i] = Opt_TB.FreeDyn.API.get_measure_value("dispX_P2")
+   ry_P2[i] = Opt_TB.FreeDyn.API.get_measure_value("dispY_P2")
+   vx_P2[i] = Opt_TB.FreeDyn.API.get_measure_value("veloX_P2")
+   vy_P2[i] = Opt_TB.FreeDyn.API.get_measure_value("veloY_P2")
    
 #
 # -----------------------------------------------------------------------------
@@ -171,4 +170,4 @@ plt.show()
 #
 # -----------------------------------------------------------------------------
 #
-opt_TB.FreeDyn.delete_model()
+Opt_TB.FreeDyn.delete_model()
