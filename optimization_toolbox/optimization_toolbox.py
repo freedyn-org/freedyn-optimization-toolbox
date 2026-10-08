@@ -60,7 +60,7 @@ class Toolbox():
         """ Gradient of the cost functional J """
         
         # Verification of the adjoint gradient via numerical differentiation
-        error = numDiff.check_grad_J(self, z)
+        # error = numDiff.check_grad_J(self, z)
         
         # Compute or reuse solution for z
         self.new_opt_vars(z)
@@ -74,7 +74,7 @@ class Toolbox():
         """ Gradient of the final constraints Phi """
         
         # Verification of the adjoint gradient via numerical differentiation
-        error = numDiff.check_grad_Phi(self, z)
+        # error = numDiff.check_grad_Phi(self, z)
         
         # Compute or reuse solution for z
         self.new_opt_vars(z)
