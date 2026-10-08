@@ -74,6 +74,7 @@ num_FD_pars = len(FD_pars)
 #
 """ Define initial values for optimization variables zInit"""
 zInit = np.append(tF_init, uDachInit)    
+#zInit = np.load('zSave.npy')
 num_optVars = len(zInit)
 #
 # -----------------------------------------------------------------------------
@@ -95,7 +96,7 @@ from optimization_toolbox import Toolbox
 # Use "TOCP" for Optimal Control Problems with free final time
 # Use "Parameter" for Parameter-Identification with fixed final time
 #
-opt_TB = Toolbox("TOCP",
+Opt_TB = Toolbox("TOCP",
                  num_optVars, num_ctrls, num_ctrl_gridNodes, num_FD_pars,
                  tF_init, xF,
                  path_fds, name_fds,
@@ -106,45 +107,45 @@ opt_TB = Toolbox("TOCP",
 #
 """  Set up of the optimization-toolbox """
 # Add or comment out – according to the optimization problem
-res = sp.optimize.minimize(fun         = opt_TB.costFct_J,                     # cost function
+res = sp.optimize.minimize(fun         = Opt_TB.cost_fct_J,                    # cost function
                            x0          = zInit,                                # initial values
                            method      = 'SLSQP',                              # optimization method
-                           jac         = opt_TB.grad_costFct_J,                # gradient of cost function
+                           jac         = Opt_TB.grad_cost_fct_J,               # gradient of cost function
                            bounds      = sp.optimize.Bounds(lb, ub),           # lower and upper bounds
-                           constraints = {'type':'eq', 
-                                          'fun':opt_TB.finalConstr_Phi, 
-                                          'jac':opt_TB.grad_finalConstr_Phi},  # non-linear constraints
+                           constraints = {'type':'eq',                         # non-linear constraints
+                                          'fun':Opt_TB.final_constr_eq_Phi, 
+                                          'jac':Opt_TB.grad_final_constr_eq_Phi},
                            options     = {'disp': True, 
                                           'iprint': 2, 
                                           'ftol': 1e-8, 
                                           'eps':1e-8, 
-                                          'maxiter': 5}                        # optimization options
+                                          'maxiter': 500}                      # optimization options
                            ) 
 #
 # -----------------------------------------------------------------------------
 #
 """ Update optimization variables in class and rerun simulation """
-opt_TB.update_vars_if_changed(res.x)
-# opt_TB.FreeDyn.write_ctrl_dataSPL()
+Opt_TB.new_opt_vars(res.x)
+# Opt_TB.FreeDyn.write_ctrl_dataSPL()
 #
 # -----------------------------------------------------------------------------
 #
 """ Get data for plots """
-t = np.zeros(opt_TB.FreeDyn.num_time_steps)                    # physical time t
-tau = np.zeros(opt_TB.FreeDyn.num_time_steps)                  # normalized time scale [0;1]
-uInit = np.zeros((num_ctrls, opt_TB.FreeDyn.num_time_steps))   # initial control
-u = np.zeros((num_ctrls, opt_TB.FreeDyn.num_time_steps))       # optimal control
-q = np.zeros((opt_TB.FreeDyn.nDof, opt_TB.FreeDyn.num_time_steps))      # gen. red. coordinates
-qD = np.zeros((opt_TB.FreeDyn.nDof, opt_TB.FreeDyn.num_time_steps))     # gen. red. velocities
+t = np.zeros(Opt_TB.FreeDyn.num_time_steps)                    # physical time t
+tau = np.zeros(Opt_TB.FreeDyn.num_time_steps)                  # normalized time scale [0;1]
+uInit = np.zeros((num_ctrls, Opt_TB.FreeDyn.num_time_steps))   # initial control
+u = np.zeros((num_ctrls, Opt_TB.FreeDyn.num_time_steps))       # optimal control
+q = np.zeros((Opt_TB.FreeDyn.nDof, Opt_TB.FreeDyn.num_time_steps))      # gen. red. coordinates
+qD = np.zeros((Opt_TB.FreeDyn.nDof, Opt_TB.FreeDyn.num_time_steps))     # gen. red. velocities
     
-for i in range(opt_TB.FreeDyn.num_time_steps-1, -1, -1): 
-   opt_TB.FreeDyn.API.fetch_states_at_index(i)
-   t[i] = opt_TB.FreeDyn.API.t
-   tau[i] = t[i]/opt_TB.opt_task.final_time
-   uInit[:,i] = opt_TB.ctrl.get_u_for_GridNodes(tau[i], uDachInit)
-   u[:,i] = opt_TB.ctrl.get_u(tau[i])
-   q[:,i] = opt_TB.FreeDyn.API.Q[:, 0]
-   qD[:,i] = opt_TB.FreeDyn.API.Qd[:, 0]
+for i in range(Opt_TB.FreeDyn.num_time_steps-1, -1, -1): 
+   Opt_TB.FreeDyn.fetch_and_update_states_at_index(i)
+   t[i] = Opt_TB.FreeDyn.API.t
+   tau[i] = t[i]/Opt_TB.OptimTask.final_time
+   uInit[:,i] = Opt_TB.Ctrl.get_u_for_GridNodes(tau[i], uDachInit)
+   u[:,i] = Opt_TB.Ctrl.get_u(tau[i])
+   q[:,i] = Opt_TB.FreeDyn.API.Q[:, 0]
+   qD[:,i] = Opt_TB.FreeDyn.API.Qd[:, 0]
 
 x_TCP = q[14,:]
 y_TCP = q[15,:]
@@ -183,4 +184,4 @@ plt.show()
 #
 # -----------------------------------------------------------------------------
 #
-opt_TB.FreeDyn.delete_model()
+Opt_TB.FreeDyn.delete_model()
