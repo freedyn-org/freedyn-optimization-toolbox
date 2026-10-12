@@ -37,7 +37,7 @@ from optimization_toolbox import OptimCtrl, TimeOptimCtrl, ParamIdent
 - Use **TimeOptimCtrl** for optimal control problems with fixed final time
 - Use **ParamIdent** for parameter-identification with fixed final time
 
-[Parameters of FreeDyn Optimization Toolbox](docs/architecture.md#Required Parameters for the FreeDyn Optimization Toolbox)
+[Parameters of FreeDyn Optimization Toolbox](docs/architecture.md###Required Parameters for the FreeDyn Optimization Toolbox)
 
 ## Examples
 [Short Overwiew of Examples](examples/GitHub_Examples_Description.pdf)
