@@ -13,3 +13,9 @@
 | BDF_core.py                           | Backward Differentiation Formula - common functions and memory buffer |
 | BDF_dense_physical_time.py            | BDF order 1 and 2 for dense system matrices                           |
 | BDF_sparse_physical_time.py           | BDF order 1 and 2 for sparse system matrices                          |
+
+
+| Example-Dependent Files | Tasks                                                                           |
+|-------------------------|---------------------------------------------------------------------------------|
+| main_*.py               | Provides the FreeDyn Optimization Toolbox the necessary data                    |
+| user_fcts.py            | Definition of cost functional and final constraints including their derivatives |
