@@ -37,22 +37,6 @@ from optimization_toolbox import OptimCtrl, TimeOptimCtrl, ParamIdent
 - Use **TimeOptimCtrl** for optimal control problems with fixed final time
 - Use **ParamIdent** for parameter-identification with fixed final time
 
-```python
-fds_path: str,                           # Path of *.fds
-fds_name: str,                           # Name of *.fds (without file typ)
-fds_dForce_dparam_name: Sequence[str],   # FreeDyn param for df / dparam
-fds_meas_name: Sequence[str] | None,     # FreeDyn measures: required, if measures are used in user_fcts.py
-fds_ctrl_name: Sequence[str] | None,     # FreeDyn control splines: required for OptimCtrl or TimeOptimCtrl
-num_ctrls: int,                          # Number of controls
-num_ctrl_grid_nodes: int,                # Number of grid nodes per control
-num_FD_pars: int,                        # Number of FreeDyn parameters 
-final_time: float,                       # Final time
-final_state: Sequence[str] | None,       # Constraints at final time
-path_FDdll: None | str                   # Path to FreeDyn dll:
-                                         # x) Use NONE: pip install freedyn
-                                         # x) Use str: FreeDyn Python bindings are download from GitHub without installing
-```
-
 ## Examples
 [Short Overwiew of Examples](examples/GitHub_Examples_Description.pdf)
 
