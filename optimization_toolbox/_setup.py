@@ -24,7 +24,7 @@ def OptimCtrl(
     num_FD_pars: int, 
     final_time: float, 
     final_state: Sequence[str] | None,
-    path_FDdll) -> Toolbox:
+    path_FDdll: None | str) -> Toolbox:
     
     num_optVars = num_ctrls * num_ctrl_grid_nodes
 
@@ -51,7 +51,7 @@ def TimeOptimCtrl(
     num_FD_pars: int, 
     final_time: float, 
     final_state: Sequence[str] | None,
-    path_FDdll) -> Toolbox:
+    path_FDdll: None | str) -> Toolbox:
     
     num_optVars = 1 + num_ctrls * num_ctrl_grid_nodes
     
@@ -77,7 +77,7 @@ def ParamIdent(
     num_FD_pars: int, 
     final_time: float, 
     final_state: Sequence[str] | None,
-    path_FDdll) -> Toolbox:
+    path_FDdll: None | str) -> Toolbox:
     
     num_optVars = num_FD_pars
 
