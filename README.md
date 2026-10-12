@@ -35,7 +35,8 @@ $$
 - Use **TimeOptimCtrl** for optimal control problems with fixed final time
 - Use **ParamIdent** for parameter-identification with fixed final time
 
-'(fds_path: str, fds_name: str,
+```python
+(fds_path: str, fds_name: str,
   fds_dForce_dparam_name: Sequence[str],
   fds_meas_name: Sequence[str] | None,
   fds_ctrl_name: Sequence[str] | None,
@@ -44,7 +45,8 @@ $$
   num_FD_pars: int, 
   final_time: float, 
   final_state: Sequence[str] | None,
-  path_FDdll)'
+  path_FDdll)
+```
 
 ## Examples
 [Short Overwiew of Examples](examples/GitHub_Examples_Description.pdf)
