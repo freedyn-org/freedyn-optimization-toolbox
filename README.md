@@ -36,7 +36,17 @@ from optimization_toolbox import OptimCtrl, TimeOptimCtrl, ParamIdent
 [Parameters of FreeDyn Optimization Toolbox](docs/architecture.md#required-parameters-for-the-freedyn-optimization-toolbox)
 
 - Use **OptimCtrl** for optimal control problems with fixed final time
-  - [Example Two Mass Oscillator: Optimal Control for Trajectory Tracking](examples/example_01_two_mass_oscillator_trajectory_tracking/)
+  <table>
+    <tr>
+      <td align="center" style="vertical-align:middle; width: 220px;">
+      <img src="examples/example_01_two_mass_oscillator_trajectory_tracking/two_mass_oscillator.png" width="200">
+      </td>
+      <td>
+        <a href="examples/example_01_two_mass_oscillator_trajectory_tracking/">Example Two Mass Oscillator</a><br>
+        <a href="examples/example_01_two_mass_oscillator_trajectory_tracking/">Optimal Control for Trajectory Tracking</a>
+      </td>
+    </tr>
+  </table>
   - [Example Nonlinear Spring Pendulum: Minimum Control Effort](examples/example_02_nonlinear_spring_pendulum_minimum_control_effort/)
 - Use **TimeOptimCtrl** for optimal control problems with fixed final time
   - [Example SCARA: Time-Optimal Control for a Rest-To-Rest Maneuver](examples/example_03_SCARA_time_optimal_control/) 
