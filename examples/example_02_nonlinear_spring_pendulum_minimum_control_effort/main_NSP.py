@@ -30,39 +30,31 @@ if path_FDApi is not None:
 #
 """ Freedyn Optimization Toolbox """
 # Path to optimization_toolbox
-path_optToolbox = str(path_main.parent.parent / 'optimization_toolbox')
-sys.path.insert(0, path_optToolbox)
+path_folder_optim_toolbox = str(path_main.parent.parent)
+sys.path.insert(0, path_folder_optim_toolbox)
 #
 # -----------------------------------------------------------------------------
 #
-""" FDS File """
-# Define path and name of *.fds - without file typ!
-path_fds = path_main
-name_fds = 'OptCtrl_NonlinearSpringPendulum'
-
-# Define FreeDyn data object spline of the controls
-name_ctrlSPL = ["uDach_x", "uDach_y", "uDach_z"]
-
-# Define FreeDyn measures
-name_fDmeas = []
-
-# Define FreeDyn parameter for fdu
-name_dForce_dparam = ["fdu_x","fdu_y","fdu_z"]
+""" FDS - File """
+fds_path = path_main                                        # Path of *.fds
+fds_name = 'OptCtrl_NonlinearSpringPendulum'                # Name of *.fds (without file typ)
+fds_dForce_dparam_name = ["fdu_x", "fdu_y", "fdu_z"]        # FreeDyn param for df / dparam
+fds_meas_name = None                                        # FreeDyn measures
+fds_ctrl_name = ["uDach_x", "uDach_y", "uDach_z"]           # FreeDyn control splines
 #
 # -----------------------------------------------------------------------------
 #
 """ Define controls """
-num_ctrls = 3     # number of controls
-num_ctrl_gridNodes = 10   # number of grid nodes per control
+num_ctrls = 3              # number of controls
+num_ctrl_grid_nodes = 10   # number of grid nodes per control
 
-uDachInit = np.zeros(num_ctrl_gridNodes*num_ctrls)
+uDachInit = np.zeros(num_ctrls * num_ctrl_grid_nodes)
 #
 # -----------------------------------------------------------------------------
 #
 """ Define final state of the MBS system """
-tF = 5                            # final time
-xF = np.array([2,-10,-4,0,0,0])   # final constraints,
-                                  # if no xF are used, set: xF = np.array([])
+final_time = 5                             # final time
+final_state = np.array([2,-10,-4,0,0,0])   # final constraints | if no, set: np.array([])
 #
 # -----------------------------------------------------------------------------
 #
@@ -73,23 +65,21 @@ num_FD_pars = len(FD_pars)
 # -----------------------------------------------------------------------------
 #
 """ Define initial values for optimization variables zInit"""
-zInit = uDachInit      
-num_optVars = len(zInit)
+zInit = uDachInit
 #
 # -----------------------------------------------------------------------------
 #
 """  Choose Optimization with/without final constraints Phi """
-from optimization_toolbox import Toolbox
-# Use "OCP" for Optimal Control Problems with fixed final time
-# Use "TOCP" for Optimal Control Problems with free final time
-# Use "Parameter" for Parameter-Identification with fixed final time
+from optimization_toolbox import OptimCtrl, TimeOptimCtrl, ParamIdent
+# Use "OptimCtrl" for Optimal Control Problems with fixed final time
+# Use "TimeOptimCtrl" for Optimal Control Problems with free final time
+# Use "ParamIdent" for Parameter-Identification with fixed final time
 #
-Opt_TB = Toolbox("OCP",
-                 num_optVars, num_ctrls, num_ctrl_gridNodes, num_FD_pars,
-                 tF, xF,
-                 path_fds, name_fds,
-                 name_ctrlSPL, name_fDmeas, name_dForce_dparam,
-                 path_FDdll)
+Opt_TB = OptimCtrl(fds_path, fds_name,
+                   fds_dForce_dparam_name, fds_meas_name, fds_ctrl_name,
+                   num_ctrls, num_ctrl_grid_nodes, num_FD_pars,
+                   final_time, final_state,
+                   path_FDdll)
 #
 # -----------------------------------------------------------------------------
 #
@@ -148,7 +138,7 @@ ax1 = f.add_subplot(2,2,1)
 ax1.plot(t, q[0,:], c = 'blue', linewidth = 2, label = "x")
 ax1.plot(t, q[1,:], c = 'green', linewidth = 2, label = "y")
 ax1.plot(t, q[2,:], c = 'darkorange', linewidth = 2, label = "z")
-ax1.scatter(np.array([tF,tF,tF]), xF[0:3], c = 'r', marker = 'x', label = "xf")
+ax1.scatter(np.array([final_time,final_time,final_time]), final_state[0:3], c = 'r', marker = 'x', label = "xf")
 ax1.set_xlabel('Time in s')
 ax1.set_ylabel('Position in m')
 ax1.legend(loc='upper left',ncols = 2)
@@ -159,7 +149,7 @@ ax2 = f.add_subplot(2,2,2)
 ax2.plot(t, qD[0,:], c = 'blue', linewidth = 2, label = "vx")
 ax2.plot(t, qD[1,:], c = 'green', linewidth = 2, label = "vy")
 ax2.plot(t, qD[2,:], c = 'darkorange', linewidth = 2, label = "vz")
-ax2.scatter(np.array([tF,tF,tF]), xF[3:6], c = 'r', marker = 'x', label = "vf")
+ax2.scatter(np.array([final_time,final_time,final_time]), final_state[3:6], c = 'r', marker = 'x', label = "vf")
 ax2.set_xlabel('Time in s')
 ax2.set_ylabel('Velocity in m/s')
 ax2.legend(loc='lower left',ncols = 4)

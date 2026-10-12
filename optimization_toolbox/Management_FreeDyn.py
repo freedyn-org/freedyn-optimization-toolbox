@@ -7,16 +7,16 @@ from pathlib import Path
 class FreeDyn():
     
     def __init__(self,
-                 path_FDdll, path_fds, name_fds,
-                 name_ctrlSPL, name_fDmeas, name_dForce_dparam,
+                 path_FDdll, fds_path, fds_name,
+                 fds_ctrl_name, name_fDmeas, fds_dForce_dparam_name,
                  num_FD_pars):
         
         # Initialize FreeDyn API
         fd.initialize(path_FDdll)
 
         # Define path and name of *.fds
-        self.fds_path = path_fds
-        self.fds_path_name = str(Path(path_fds) / f'{name_fds}.fds')
+        self.fds_path = fds_path
+        self.fds_path_name = str(Path(fds_path) / f'{fds_name}.fds')
        
         
         # Load and Read *.fds
@@ -45,13 +45,13 @@ class FreeDyn():
         self.init_MBS_sysMat_slots()
         
         # Derivative of sum of external forces w.r.t. parameter given as string
-        self.buffer_MBS_dForce_dFDparam = fd.ForceParameterDerivativeMatrixBuffer(name_dForce_dparam)
+        self.buffer_MBS_dForce_dFDparam = fd.ForceParameterDerivativeMatrixBuffer(fds_dForce_dparam_name)
         self.dForce_dFDparam = self.buffer_MBS_dForce_dFDparam.data
         
         # FreeDyn data object control splines, measures, force wrt parameter
-        self.name_ctrlSPL = name_ctrlSPL
+        self.fds_ctrl_name = fds_ctrl_name
         self.name_meas = name_fDmeas
-        self.name_dForce_dparam = name_dForce_dparam
+        self.fds_dForce_dparam_name = fds_dForce_dparam_name
         self.FD_pars = None
         self.num_FD_pars = num_FD_pars
         
@@ -64,13 +64,19 @@ class FreeDyn():
         print('Model deleted')
 
 # =============================================================================
-# Commands concerning system state
+# Batch of commands
 # =============================================================================        
         
     def fetch_and_update_states_at_index(self, idx):
         self.API.fetch_states_at_index(idx)
         self.API.update_state_at_index(idx) # necessary, if measures are used in get_lagrangian()
-# -----------------------------------------------------------------------------  
+# -----------------------------------------------------------------------------
+
+    def compute_due_to_change(self, final_time):
+        self.API.reset_for_rerun()
+        self.API.compute_initial_conditions()
+        self.API.solve_until(final_time) 
+        self.num_time_steps = self.API.get_num_time_steps()
         
 # =============================================================================
 # Commands concerning system matrices
@@ -174,7 +180,7 @@ class FreeDyn():
         
         realT = dataOpt.final_time * Ctrl.grid_tau
         
-        for i, SPL in enumerate(self.name_ctrlSPL):
+        for i, SPL in enumerate(self.fds_ctrl_name):
             self.API.set_spline(SPL, realT, Ctrl.grid_nodes[:,i])
 # -----------------------------------------------------------------------------              
             
@@ -200,7 +206,7 @@ class FreeDyn():
                 "WriteMeasureResultFile"}
         self.fds_idxLine = dict.fromkeys(keys, None)
         
-        # Open FDS file and store data
+        # Open fds file and store data
         with open(fds, 'r') as inp:
            self.fds_data = inp.readlines()      
         
@@ -231,9 +237,9 @@ class FreeDyn():
         self.write_fds(fds)
 # -----------------------------------------------------------------------------              
 
-    # def overwrite_param_val_FDS(self):
+    # def overwrite_param_val_fds(self):
         
-    #     # Open FDS file and store data
+    #     # Open fds file and store data
     #     with open(self.fds_path_name, 'r') as inp:
     #        self.fds_data = inp.readlines()      
         
@@ -248,4 +254,4 @@ class FreeDyn():
     #                 break
                     
     #     self.write_fds(self.fds_path_name)
-# ----------------------------------------------------------------------------- 
+# ----------------------------------------------------------------------------- name

@@ -30,66 +30,56 @@ if path_FDApi is not None:
 #
 """ Freedyn Optimization Toolbox """
 # Path to optimization_toolbox
-path_optToolbox = str(path_main.parent.parent / 'optimization_toolbox')
-sys.path.insert(0, path_optToolbox)
+path_folder_optim_toolbox = str(path_main.parent.parent)
+sys.path.insert(0, path_folder_optim_toolbox)
 #
 # -----------------------------------------------------------------------------
 #
-""" FDS File """
-# Define path and name of *.fds - without file typ!
-path_fds = path_main
-name_fds = 'OptCtrl_TwoMass'
-
-# Define FreeDyn data object spline of the controls
-name_ctrlSPL = ["uDach"]
-
-# Define FreeDyn measures
-name_fDmeas = []
-
-# Define FreeDyn parameter for fdu
-name_dForce_dparam = ["fdu"]
+""" FDS - File """
+fds_path = path_main                                        # Path of *.fds
+fds_name = 'OptCtrl_TwoMass'                                # Name of *.fds (without file typ)
+fds_dForce_dparam_name = ["fdu"]                            # FreeDyn param for df / dparam
+fds_meas_name = None                                        # FreeDyn measures
+fds_ctrl_name = ["uDach"]                                   # FreeDyn control splines
 #
 # -----------------------------------------------------------------------------
 #
 """ Define controls """
-num_ctrls = 1     # number of controls
-num_ctrl_gridNodes = 22   # number of grid nodes per control
+num_ctrls = 1     
+num_ctrl_grid_nodes = 22   # number of grid nodes per control
 
-uDachInit = np.zeros(num_ctrl_gridNodes*num_ctrls)
+uDachInit = np.zeros(num_ctrl_grid_nodes*num_ctrls)
 #
 # -----------------------------------------------------------------------------
 #
 """ Define final state of the MBS system """
-tF = 10             # final time
-xF = np.array([])   # final constraints,
-                    # if no xF are used, set: xF = np.array([])
+final_time = 10                   # final time
+final_state = np.array([])        # final constraints | if no, set: np.array([])
 #
 # -----------------------------------------------------------------------------
 #
 """ Define FD parameters - if required"""
 FD_pars = np.array([])
-num_FD_pars = len(FD_pars)
+num_FD_pars =  len(FD_pars)
 #
 # -----------------------------------------------------------------------------
 #
 """ Define initial values for optimization variables zInit"""
-zInit = uDachInit      
-num_optVars = len(zInit)
+zInit = uDachInit
 #
 # -----------------------------------------------------------------------------
 #
 """  Choose Optimization with/without final constraints Phi """
-from optimization_toolbox import Toolbox
-# Use "OCP" for Optimal Control Problems with fixed final time
-# Use "TOCP" for Optimal Control Problems with free final time
-# Use "Parameter" for Parameter-Identification with fixed final time
+from optimization_toolbox import OptimCtrl, TimeOptimCtrl, ParamIdent
+# Use "OptimCtrl" for Optimal Control Problems with fixed final time
+# Use "TimeOptimCtrl" for Optimal Control Problems with free final time
+# Use "ParamIdent" for Parameter-Identification with fixed final time
 #
-Opt_TB = Toolbox("OCP", 
-                 num_optVars, num_ctrls, num_ctrl_gridNodes, num_FD_pars,
-                 tF, xF,
-                 path_fds, name_fds,
-                 name_ctrlSPL, name_fDmeas, name_dForce_dparam,
-                 path_FDdll)
+Opt_TB = OptimCtrl(fds_path, fds_name,
+                   fds_dForce_dparam_name, fds_meas_name, fds_ctrl_name,
+                   num_ctrls, num_ctrl_grid_nodes, num_FD_pars,
+                   final_time, final_state,
+                   path_FDdll)
 #
 # -----------------------------------------------------------------------------
 #

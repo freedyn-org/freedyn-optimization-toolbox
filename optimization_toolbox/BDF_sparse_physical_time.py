@@ -3,24 +3,16 @@ import scipy
 from scipy.sparse import bmat
 from scipy.sparse.linalg import factorized
 
-from core.BDF_core import CoreBDF
+from .BDF_core import CoreBDF
 
 
 class SparseBDF(CoreBDF):
-    
-    def __init__(self, dataOpt, FreeDyn):
-        nBDFsys = self.init_adj_sys_coeff_mat(FreeDyn, 'csc')
-        partition_solVec_1 = FreeDyn.nDof
-        partition_solVec_2 = 2*FreeDyn.nDof      
-        CoreBDF.__init__(self, dataOpt, FreeDyn, nBDFsys, partition_solVec_1, partition_solVec_2)
-        
-        return None
     
 # =============================================================================
 # BDF System - Matrix layout sparse
 # =============================================================================
 
-    def init_adj_sys_coeff_mat(self, FreeDyn, format_mat):
+    def init_coeff_mat_adj_sys(self, FreeDyn):
         
         """ Allocate the coefficient matrix and create maps of the individual blocks """
         nBDFsys = 2 * (FreeDyn.nDof + FreeDyn.nConstr)
@@ -52,7 +44,7 @@ class SparseBDF(CoreBDF):
                   [A41_idx, None, None, None]]
         
         # Bulid Coeff Mat as csc sparse matrix
-        self.coeff_mat = bmat(layout, format=format_mat).astype(np.float64)
+        self.coeff_mat = bmat(layout, format='csc').astype(np.float64)
         
         # Mapping
         self.coeff_mat_map = np.argsort(self.coeff_mat.data)
@@ -104,7 +96,7 @@ class SparseBDF(CoreBDF):
         return (block_idx_mat.data[sort_idx[matched_pos]] - 1).astype(np.int32)      
 # -----------------------------------------------------------------------------
 
-    def update_coeff_mat_AdjSys(self, FreeDyn, eta0):
+    def update_coeff_mat_adj_sys(self, FreeDyn, eta0):
         
         """ Update the entries of the coefficient matrix - use directly the non-zeros elements from the API """
         
@@ -234,7 +226,7 @@ class SparseBDF(CoreBDF):
         self.BDF_solVec_J_view_first[:] += UserFcts.dLdq.T
         self.BDF_solVec_J_view_second[:] += UserFcts.dLdv.T
         
-        self.update_coeff_mat_AdjSys(FreeDyn, eta0)
+        self.update_coeff_mat_adj_sys(FreeDyn, eta0)
         solve = factorized(self.coeff_mat)
         vec_W_P_Sig_MU =  solve(self.BDF_solVec_J)
 
@@ -248,7 +240,7 @@ class SparseBDF(CoreBDF):
 
     def BDF_singleStep_Phi_post_steps(self, FreeDyn, eta0, idx2):
         
-        self.update_coeff_mat_AdjSys(FreeDyn, eta0)
+        self.update_coeff_mat_adj_sys(FreeDyn, eta0)
         solve = factorized(self.coeff_mat)
         vec_W_P_Sig_MU = solve(self.BDF_solVec_Phi)
     

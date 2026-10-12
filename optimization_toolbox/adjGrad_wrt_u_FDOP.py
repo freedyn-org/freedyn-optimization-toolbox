@@ -1,14 +1,14 @@
 import numpy as np
 
-from core.adjoint_system_settings import set_up_consistent_BC_FDOP
-from core.adjoint_system_settings import set_up_BDF_layout_sys_mat
+from .consistent_boundary_conditions import CoreBC
+from .BDF_core import CoreBDF
 
 class adjGrads_OCP():
     
     def __init__(self, dataOpt, FreeDyn, Ctrl):
         
-        self.BC_FDOP = set_up_consistent_BC_FDOP(dataOpt, FreeDyn)
-        self.BDF = set_up_BDF_layout_sys_mat(dataOpt, FreeDyn)
+        self.BC_FDOP = CoreBC.create(dataOpt, FreeDyn)
+        self.BDF = CoreBDF.create(dataOpt, FreeDyn)
 
         self.adjGrad_J_buff = np.zeros((2, Ctrl.num_ctrls, Ctrl.num_grid_nodes))
         self.adjGrad_J_buff_view0 = self.adjGrad_J_buff[0].reshape(-1)

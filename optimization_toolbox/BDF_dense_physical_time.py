@@ -1,22 +1,14 @@
 import numpy as np
 
-from core.BDF_core import CoreBDF
+from .BDF_core import CoreBDF
 
 class DenseBDF(CoreBDF):
-    
-    def __init__(self, dataOpt, FreeDyn):
-        nBDFsys = self.init_coeffMat_AdjSys(FreeDyn)
-        partition_solVec_1 = FreeDyn.nDof
-        partition_solVec_2 = FreeDyn.nDofConstr
-        CoreBDF.__init__(self, dataOpt, FreeDyn, nBDFsys, partition_solVec_1, partition_solVec_2)
-        CoreBDF.allocate_buffs_BDF_add_dense(self, FreeDyn.nDof, dataOpt.num_xF)        
-        return None
     
 # =============================================================================
 # BDF System - Matrix layout dense
 # =============================================================================
 
-    def init_coeffMat_AdjSys(self, FreeDyn):
+    def init_coeff_mat_adj_sys(self, FreeDyn):
         
         """ Allocate the coefficient matrix and create views of the individual blocks """
         
@@ -38,7 +30,7 @@ class DenseBDF(CoreBDF):
         return nBDFsys
 # -----------------------------------------------------------------------------
 
-    def update_coeffMat_AdjSys(self, FreeDyn, eta0, eta0_inv):
+    def update_coeff_mat_adj_sys(self, FreeDyn, eta0, eta0_inv):
         
         """ Update the entries of the coefficient matrix - use the dense matricies """
         
@@ -159,7 +151,7 @@ class DenseBDF(CoreBDF):
         self.BDF_solVec_J_view_first[:] += UserFcts.dLdv.T + eta0_inv*(UserFcts.dLdq.T - self.BDF_J_eta_times_adjW)
         self.BDF_solVec_J_view_second[:] = FreeDyn.MBS_Cq @ (self.BDF_J_eta_times_adjW - UserFcts.dLdq.T)
         
-        self.update_coeffMat_AdjSys(FreeDyn, eta0, eta0_inv)
+        self.update_coeff_mat_adj_sys(FreeDyn, eta0, eta0_inv)
         vec_P_Sig_MU = np.linalg.solve(self.BDF_coeffMat, self.BDF_solVec_J)
     
         # idx shift - use memory of idx = 2 for idx = 0
@@ -183,7 +175,7 @@ class DenseBDF(CoreBDF):
         self.BDF_solVec_Phi_view_first[:] -= eta0_inv * self.BDF_Phi_eta_times_adjW
         self.BDF_solVec_Phi_view_second[:] = FreeDyn.MBS_Cq @ self.BDF_Phi_eta_times_adjW
         
-        self.update_coeffMat_AdjSys(FreeDyn, eta0, eta0_inv)
+        self.update_coeff_mat_adj_sys(FreeDyn, eta0, eta0_inv)
         vec_P_Sig_MU = np.linalg.solve(self.BDF_coeffMat, self.BDF_solVec_Phi) 
     
         # idx shift - use memory of idx = 2 for idx = 0

@@ -154,7 +154,7 @@ Force GenericForce
 	PointOfApplication_Body2 = 0.500000,0.000000,0.000000
 	ForceDirectionType = In-line-of-sight
 	ForceDirection = 0.894427,0.447214,0.000000
-	ForceExpression = PARVAL[c_Springs] * (MEAVAL[l_Spring1]-PARVAL[springOneLengthNature])
+	ForceExpression = PARVAL[c_Springs] * (MEAVAL[l_Spring1]-PARVAL[l0_spring1])
 EndForce
 %
 Force GenericForce
@@ -165,18 +165,18 @@ Force GenericForce
 	PointOfApplication_Body2 = 0.500000,0.000000,0.000000
 	ForceDirectionType = In-line-of-sight
 	ForceDirection = 0.242536,0.970142,0.000000
-	ForceExpression = PARVAL[c_Springs] * (MEAVAL[l_Spring2]-PARVAL[springTwoLengthNature])
+	ForceExpression = PARVAL[c_Springs] * (MEAVAL[l_Spring2]-PARVAL[l0_spring2])
 EndForce
 %
 DataObject Parameter
 	ID = unassignedParamOne
-	Name = springOneLengthNature
+	Name = l0_spring1
 	InitialValue = 2.236070
 EndDataObject
 %
 DataObject Parameter
 	ID = unassignedParamTwo
-	Name = springTwoLengthNature
+	Name = l0_spring2
 	InitialValue = 2.061550
 EndDataObject
 %

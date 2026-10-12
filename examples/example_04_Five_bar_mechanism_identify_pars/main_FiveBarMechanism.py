@@ -30,38 +30,31 @@ if path_FDApi is not None:
 #
 """ Freedyn Optimization Toolbox """
 # Path to optimization_toolbox
-path_optToolbox = str(path_main.parent.parent / 'optimization_toolbox')
-sys.path.insert(0, path_optToolbox)
+path_folder_optim_toolbox = str(path_main.parent.parent)
+sys.path.insert(0, path_folder_optim_toolbox)
 #
 # -----------------------------------------------------------------------------
 #
-""" FDS File """
-# Define path and name of *.fds - without file typ!
-path_fds = path_main
-name_fds = 'five_bar_planar_mechanism'
-
-# Define FreeDyn data object spline of the controls
-name_ctrlSPL = []
-
-# Define FreeDyn measures
-name_fDmeas = ["dispX_P2","dispY_P2"]
-
-# Define FreeDyn parameter for Parameters
-name_dForce_dparam = ["springOneLengthNature","springTwoLengthNature"]
+""" FDS - File """
+fds_path = path_main                                       # Path of *.fds
+fds_name = 'five_bar_planar_mechanism'                     # Name of *.fds (without file typ)
+fds_dForce_dparam_name = ["l0_spring1", "l0_spring2"]      # FreeDyn param for df / dparam
+fds_meas_name = ["dispX_P2", "dispY_P2"]                   # FreeDyn measures
+fds_ctrl_name = None,                                      # FreeDyn control splines
 #
 # -----------------------------------------------------------------------------
 #
 """ Define controls """
 num_ctrls = 0     # number of controls
-num_ctrl_gridNodes = 0   # number of grid nodes per control
+num_ctrl_grid_nodes = 0   # number of grid nodes per control
 
-uDachInit = np.zeros(num_ctrl_gridNodes*num_ctrls)
+uDachInit = np.zeros(num_ctrl_grid_nodes*num_ctrls)
 #
 # -----------------------------------------------------------------------------
 #
 """ Define final state of the MBS system """
-tF = 5             # final time
-xF = np.array([])   # final constraints,
+final_time = 5             # final time
+final_state = np.array([])   # final constraints,
                     # if no xF are used, set: xF = np.array([])
 #
 # -----------------------------------------------------------------------------
@@ -76,22 +69,20 @@ num_FD_pars = len(FD_pars)
 #
 """ Define initial values for optimization variables zInit"""
 zInit = FD_pars
-num_optVars = num_FD_pars
 #
 # -----------------------------------------------------------------------------
 #
 """  Choose Optimization with/without final constraints Phi """
-from optimization_toolbox import Toolbox
-# Use "OCP" for Optimal Control Problems with fixed final time
-# Use "TOCP" for Optimal Control Problems with free final time
-# Use "Parameter" for Parameter-Identification with fixed final time
+from optimization_toolbox import OptimCtrl, TimeOptimCtrl, ParamIdent
+# Use "OptimCtrl" for Optimal Control Problems with fixed final time
+# Use "TimeOptimCtrl" for Optimal Control Problems with free final time
+# Use "ParamIdent" for Parameter-Identification with fixed final time
 #
-Opt_TB = Toolbox("Parameter",
-                 num_optVars, num_ctrls, num_ctrl_gridNodes, num_FD_pars,
-                 tF, xF,
-                 path_fds, name_fds,
-                 name_ctrlSPL, name_fDmeas, name_dForce_dparam,
-                 path_FDdll)
+Opt_TB = ParamIdent(fds_path, fds_name,
+                    fds_dForce_dparam_name, fds_meas_name, fds_ctrl_name,
+                    num_ctrls, num_ctrl_grid_nodes, num_FD_pars,
+                    final_time, final_state,
+                    path_FDdll)
 #
 # -----------------------------------------------------------------------------
 #
@@ -117,8 +108,8 @@ res = sp.optimize.minimize(fun         = Opt_TB.cost_fct_J,                    #
 # """ Update optimization variables in class and rerun simulation """
 Opt_TB.new_opt_vars(res.x)
 
-for i in range(0,num_optVars):
-    print(f'{name_dForce_dparam[i]} = {res.x[i]}')
+for i in range(0,num_FD_pars):
+    print(f'{fds_dForce_dparam_name[i]} = {res.x[i]}')
 #
 # -----------------------------------------------------------------------------
 #

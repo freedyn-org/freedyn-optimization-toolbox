@@ -30,39 +30,31 @@ if path_FDApi is not None:
 #
 """ Freedyn Optimization Toolbox """
 # Path to optimization_toolbox
-path_optToolbox = str(path_main.parent.parent / 'optimization_toolbox')
-sys.path.insert(0, path_optToolbox)
+path_folder_optim_toolbox = str(path_main.parent.parent)
+sys.path.insert(0, path_folder_optim_toolbox)
 #
 # -----------------------------------------------------------------------------
 #
-""" FDS File """
-# Define path and name of *.fds - without file typ!
-path_fds = path_main
-name_fds = 'OptCtrl_SCARA'
-
-# Define FreeDyn data object spline of the controls
-name_ctrlSPL = ["u1Dach", "u2Dach"]
-
-# Define FreeDyn measures
-name_fDmeas = []
-
-# Define FreeDyn parameter for fdu
-name_dForce_dparam = ["u1par","u2par"]
+""" FDS - File """
+fds_path = path_main                                    # Path of *.fds
+fds_name = 'OptCtrl_SCARA'                              # Name of *.fds (without file typ)
+fds_dForce_dparam_name = ["u1par","u2par"]              # FreeDyn param for df / dparam
+fds_meas_name = None                                    # FreeDyn measures
+fds_ctrl_name = ["u1Dach", "u2Dach"]                    # FreeDyn control splines                                    # FreeDyn control splines
 #
 # -----------------------------------------------------------------------------
 #
 """ Define controls """
 num_ctrls = 2     # number of controls
-num_ctrl_gridNodes = 50   # number of grid nodes per control
+num_ctrl_grid_nodes = 50   # number of grid nodes per control
 
-uDachInit = np.zeros(num_ctrl_gridNodes*num_ctrls)
+uDachInit = np.zeros(num_ctrl_grid_nodes*num_ctrls)
 #
 # -----------------------------------------------------------------------------
 #
 """ Define final state of the MBS system """
-tF_init = 3             # final time
-xF = np.array([1.0, 1.0, 0, 0])   # final constraints,
-                                  # if no xF are used, set: xF = np.array([])
+final_time_init = 3                                # final time
+final_state = np.array([1.0, 1.0, 0, 0])           # final constraints | # if no, set: np.array([])
 #
 # -----------------------------------------------------------------------------
 #
@@ -73,9 +65,7 @@ num_FD_pars = len(FD_pars)
 # -----------------------------------------------------------------------------
 #
 """ Define initial values for optimization variables zInit"""
-zInit = np.append(tF_init, uDachInit)    
-#zInit = np.load('zSave.npy')
-num_optVars = len(zInit)
+zInit = np.append(final_time_init, uDachInit)
 #
 # -----------------------------------------------------------------------------
 #
@@ -85,23 +75,22 @@ lb = np.array(0.01)
 ub = np.array(np.inf) 
 
 for loop_Limit in range(0, num_ctrls):
-    lb = np.append(lb, -uLimit[loop_Limit]*np.ones(num_ctrl_gridNodes))
-    ub = np.append(ub, uLimit[loop_Limit]*np.ones(num_ctrl_gridNodes))
+    lb = np.append(lb, -uLimit[loop_Limit]*np.ones(num_ctrl_grid_nodes))
+    ub = np.append(ub, uLimit[loop_Limit]*np.ones(num_ctrl_grid_nodes))
 #
 # -----------------------------------------------------------------------------
 #
 """  Choose Optimization with/without final constraints Phi """
-from optimization_toolbox import Toolbox
-# Use "OCP" for Optimal Control Problems with fixed final time
-# Use "TOCP" for Optimal Control Problems with free final time
-# Use "Parameter" for Parameter-Identification with fixed final time
+from optimization_toolbox import OptimCtrl, TimeOptimCtrl, ParamIdent
+# Use "OptimCtrl" for Optimal Control Problems with fixed final time
+# Use "TimeOptimCtrl" for Optimal Control Problems with free final time
+# Use "ParamIdent" for Parameter-Identification with fixed final time
 #
-Opt_TB = Toolbox("TOCP",
-                 num_optVars, num_ctrls, num_ctrl_gridNodes, num_FD_pars,
-                 tF_init, xF,
-                 path_fds, name_fds,
-                 name_ctrlSPL, name_fDmeas, name_dForce_dparam,
-                 path_FDdll)
+Opt_TB = TimeOptimCtrl(fds_path, fds_name,
+                       fds_dForce_dparam_name, fds_meas_name, fds_ctrl_name,
+                       num_ctrls, num_ctrl_grid_nodes, num_FD_pars,
+                       final_time_init, final_state,
+                       path_FDdll)
 #
 # -----------------------------------------------------------------------------
 #
@@ -160,7 +149,7 @@ f = plt.figure(figsize=(12,4))
 ax1 = f.add_subplot(1, 2, 1)
 ax1.plot(x_TCP, y_TCP, linewidth = 1, label = "x_TCP")
 ax1.scatter(x_TCP[0], y_TCP[1], c = 'g', marker  = 'x', label = "x_TCP(t_0)")
-ax1.scatter(xF[0], xF[1], c = 'r', marker = 'x', label = "x_TCP(t_f)")
+ax1.scatter(final_state[0], final_state[1], c = 'r', marker = 'x', label = "x_TCP(t_f)")
 ax1.set_xlabel('x in m')
 ax1.set_ylabel('y in m')
 ax1.legend(loc='upper right',ncols = 1)
@@ -170,10 +159,10 @@ ax1.grid()
 ax2 = f.add_subplot(1, 2, 2)
 ax2.plot(tau, u[0,:].T, linewidth = 2, label = "u1")
 ax2.plot(tau, u[1,:].T, linewidth = 2, label = "u2")
-ax2.scatter(np.linspace(0, 1, num_ctrl_gridNodes),  uLimit[0]*np.ones(num_ctrl_gridNodes), c = 'b', marker = 'x')
-ax2.scatter(np.linspace(0, 1, num_ctrl_gridNodes), -uLimit[0]*np.ones(num_ctrl_gridNodes), c = 'b', marker = 'x')
-ax2.scatter(np.linspace(0, 1, num_ctrl_gridNodes),  uLimit[1]*np.ones(num_ctrl_gridNodes), c = 'orange', marker = 'x')
-ax2.scatter(np.linspace(0, 1, num_ctrl_gridNodes), -uLimit[1]*np.ones(num_ctrl_gridNodes), c = 'orange', marker = 'x')
+ax2.scatter(np.linspace(0, 1, num_ctrl_grid_nodes),  uLimit[0]*np.ones(num_ctrl_grid_nodes), c = 'b', marker = 'x')
+ax2.scatter(np.linspace(0, 1, num_ctrl_grid_nodes), -uLimit[0]*np.ones(num_ctrl_grid_nodes), c = 'b', marker = 'x')
+ax2.scatter(np.linspace(0, 1, num_ctrl_grid_nodes),  uLimit[1]*np.ones(num_ctrl_grid_nodes), c = 'orange', marker = 'x')
+ax2.scatter(np.linspace(0, 1, num_ctrl_grid_nodes), -uLimit[1]*np.ones(num_ctrl_grid_nodes), c = 'orange', marker = 'x')
 ax2.set_ylabel('control in Nm')
 ax2.set_xlabel('normalized time')
 ax2.grid()

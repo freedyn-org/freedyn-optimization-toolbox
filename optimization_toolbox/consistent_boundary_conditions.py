@@ -7,12 +7,21 @@ from scipy.sparse import bmat
 
 class CoreBC():
     
+    @classmethod
+    def create(cls, dataOpt, FreeDyn):
+        if FreeDyn.MBS_modeMAT_sparse:
+            return SparseBC(dataOpt, FreeDyn)
+        else:
+            return DenseBC(dataOpt, FreeDyn)
+
+
     def __init__(self, dataOpt, FreeDyn):
         
         """ BC for Phi - if necessary """
         if dataOpt.num_xF > 0:  
             self.BC_dq_tr = np.zeros((FreeDyn.nDofConstr, dataOpt.num_xF))   # (dPhi / dq)^T
             self.BC_dv_tr = np.zeros((FreeDyn.nDofConstr, dataOpt.num_xF))   # (dPhi / dv)^T
+        self.init_mat_BC(dataOpt, FreeDyn)
             
 # -----------------------------------------------------------------------------
     def get_consistent_BC_J(self, BDF, FreeDyn):
@@ -45,15 +54,12 @@ class CoreBC():
 
 class DenseBC(CoreBC):
     
-    def __init__(self, dataOpt, FreeDyn):
+    def init_mat_BC(self, dataOpt, FreeDyn):
         
         """ BC for Phi - if necessary """
         if dataOpt.num_xF > 0:  
             self.BC_eyeMat = np.eye(FreeDyn.nDof)
-            self.BC_zeroMat = np.zeros((FreeDyn.nConstr, FreeDyn.nConstr)) 
-            
-        CoreBC.__init__(self, dataOpt, FreeDyn)
-    
+            self.BC_zeroMat = np.zeros((FreeDyn.nConstr, FreeDyn.nConstr))
 # -----------------------------------------------------------------------------
         
     def compute_consistent_BC_J(self):
@@ -82,14 +88,12 @@ class DenseBC(CoreBC):
 
 class SparseBC(CoreBC): 
     
-    def __init__(self, dataOpt, FreeDyn):
+    def init_mat_BC(self, dataOpt, FreeDyn):
         
         """ BC for Phi - if necessary """
         if dataOpt.num_xF > 0:  
             eye_dense = np.eye(FreeDyn.nDof)
             self.BC_eyeMat = scipy.sparse.csr_matrix(eye_dense)
-        
-        CoreBC.__init__(self, dataOpt, FreeDyn)
 # -----------------------------------------------------------------------------
     
     def compute_consistent_BC_J(self):
