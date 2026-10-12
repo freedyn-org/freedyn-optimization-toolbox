@@ -48,8 +48,9 @@ num_ctrl_grid_nodes: int,                # Number of grid nodes per control
 num_FD_pars: int,                        # Number of FreeDyn parameters 
 final_time: float,                       # Final time
 final_state: Sequence[str] | None,       # Constraints at final time
-path_FDdll: None | str                   # Path to FreeDyn dll: Use NONE: pip install freedyn
-                                         # Path to FreeDyn dll: Use str: FreeDyn Python bindings are download from GitHub without installing
+path_FDdll: None | str                   # Path to FreeDyn dll:
+                                         # x) Use NONE: pip install freedyn
+                                         # x) Use str: FreeDyn Python bindings are download from GitHub without installing
 ```
 
 ## Examples
