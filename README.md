@@ -7,7 +7,7 @@ The objective is to identify the optimization vriables $\mathbf{z}$ that minimiz
 
 $$
 \begin{aligned}
-J = \int_{t_0}^{t_\mathrm{f}} \mathcal{L} (\mathbf{q}(t),\mathbf{v}(t),\mathbf{u}(t))  \mathrm{d}t
+J(\mathbf{z}) = \int_{t_0}^{t_\mathrm{f}} \mathcal{L} (\mathbf{q}(t),\mathbf{v}(t),\mathbf{u}(t))  \mathrm{d}t
 \end{aligned}
 $$
 
