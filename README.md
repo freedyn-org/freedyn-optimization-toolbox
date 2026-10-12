@@ -33,84 +33,15 @@ $$
 ```python
 from optimization_toolbox import OptimCtrl, TimeOptimCtrl, ParamIdent
 ```
-- Use **OptimCtrl** for optimal control problems with fixed final time
-- Use **TimeOptimCtrl** for optimal control problems with fixed final time
-- Use **ParamIdent** for parameter-identification with fixed final time
-
 [Parameters of FreeDyn Optimization Toolbox](docs/architecture.md#required-parameters-for-the-freedyn-optimization-toolbox)
 
-## Examples
-[Short Overwiew of Examples](examples/GitHub_Examples_Description.pdf)
-
-
-- [Trajectory Tracking](examples/example_01_two_mass_oscillator_trajectory_tracking/)
-  
-$$
-\begin{aligned}
-J = \int_{t_0}^{t_\mathrm{f}} \frac{1}{2} \left( y - \bar{y} \right)^2  \mathrm{d}t
-\end{aligned}
-$$
-
-$$
-\begin{aligned}
-y(t) \dots \text{Trajectory due to the selected control}~u(t)\\
-\bar{y}(t) \dots \text{Desired trajectory}\\
-\end{aligned}
-$$
-  
-- [Minimum Control Effort](examples/example_02_nonlinear_spring_pendulum_minimum_control_effort/)
-
-$$
-\begin{aligned}
-J = \int_{t_0}^{t_\mathrm{f}} \frac{1}{2} \mathbf{u}^\top \mathbf{u} \mathrm{d}t \qquad \boldsymbol{\phi} = \left. \begin{pmatrix}
-        \phi_1 - \phi_{1,\mathrm{f}} \\ 
-        \vdots \\
-        \phi_r  - \phi_{r,\mathrm{f}}
-    \end{pmatrix} \right|_{t_\mathrm{f}} = \mathbf{0}
-\end{aligned}
-$$
-
-$$
-\begin{aligned}
-\mathbf{u} \dots \text{Control vector}\\
-\phi_{1} \dots \phi_{r} \dots \text{Final constraints due to the selected control}~u(t)\\
-\phi_{1,\mathrm{f}} \dots \phi_{r,\mathrm{f}} \dots \text{Desired final constraints}\\
-\end{aligned}
-$$
-  
-- [Time Optimal Control](examples/example_03_SCARA_time_optimal_control/)
-
-$$
-\begin{aligned}
-J = \int_{t_0}^{t_\mathrm{f}} 1 \mathrm{d}t \qquad \boldsymbol{\phi} = \left. \begin{pmatrix}
-        \phi_1 - \phi_{1,\mathrm{f}} \\ 
-        \vdots \\
-        \phi_r  - \phi_{r,\mathrm{f}}
-    \end{pmatrix} \right|_{t_\mathrm{f}} = \mathbf{0}
-\end{aligned}
-$$
-
-$$
-\begin{aligned}
-\phi_{1} \dots \phi_{r} \dots \text{Final constraints due to the selected control}~u(t)\\
-\phi_{1,\mathrm{f}} \dots \phi_{r,\mathrm{f}} \dots \text{Desired final constraints}\\
-\end{aligned}
-$$
-
-- [Parameter-Identification](examples/example_04_Five_bar_mechanism_identify_pars/)
-  
-$$
-\begin{aligned}
-J = \int_{t_0}^{t_\mathrm{f}} \frac{1}{2} \left( \mathbf{r}_p - \mathbf{r}_{\mathrm{p,init}} \right)^2  \mathrm{d}t
-\end{aligned}
-$$
-
-$$
-\begin{aligned}
-\mathbf{r}_p \dots \text{Position of observation at time}~t\\
-\mathbf{r}_{\mathrm{p,init}} \dots \text{Initial position of observation}\\
-\end{aligned}
-$$
+- Use **OptimCtrl** for optimal control problems with fixed final time
+  - [Example Two Mass Oscillator: Optimal Control for Trajectory Tracking](examples/example_01_two_mass_oscillator_trajectory_tracking/)
+  - [Example Nonlinear Spring Pendulum: Minimum Control Effort](examples/example_02_nonlinear_spring_pendulum_minimum_control_effort/)
+- Use **TimeOptimCtrl** for optimal control problems with fixed final time
+  - [Example SCARA: Time-Optimal Control for a Rest-To-Rest Maneuver](examples/example_03_SCARA_time_optimal_control/) 
+- Use **ParamIdent** for parameter-identification with fixed final time  
+  - [Example Five Bar Mechanism: Parameter-Identification](examples/example_04_Five_bar_mechanism_identify_pars/)
 
 ## Quick Start
 1. Create a virtual environment in Python
