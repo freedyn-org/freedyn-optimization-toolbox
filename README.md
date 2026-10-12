@@ -43,11 +43,11 @@ fds_meas_name: Sequence[str] | None,     # FreeDyn measures: required, if measur
 fds_ctrl_name: Sequence[str] | None,     # FreeDyn control splines: required for OptimCtrl or TimeOptimCtrl
 num_ctrls: int,                          # Number of controls
 num_ctrl_grid_nodes: int,                # Number of grid nodes per control
-num_FD_pars: int,                        # Path of *.fds
+num_FD_pars: int,                        # Number of FreeDyn parameters 
 final_time: float,                       # Final time
 final_state: Sequence[str] | None,       # Constraints at final time
-path_FDdll: None | str                   # Path to FreeDyn dll: Use NONE for: pip install freedyn
-                                         # Path to FreeDyn dll: Use str for: Python bindings are download from GitHub without installing
+path_FDdll: None | str                   # Path to FreeDyn dll: Use NONE: pip install freedyn
+                                         # Path to FreeDyn dll: Use str: FreeDyn Python bindings are download from GitHub without installing
 ```
 
 ## Examples
