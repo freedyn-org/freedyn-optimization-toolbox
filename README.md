@@ -38,7 +38,7 @@ from optimization_toolbox import OptimCtrl, TimeOptimCtrl, ParamIdent
 - Use **OptimCtrl** for optimal control problems with fixed final time
   <table>
     <tr>
-      <td align="center" style="vertical-align:middle; width: 220px;">
+      <td align="center" style="vertical-align:middle;">
       <img src="examples/example_01_two_mass_oscillator_trajectory_tracking/two_mass_oscillator.png" width="200">
       </td>
       <td>
@@ -46,12 +46,40 @@ from optimization_toolbox import OptimCtrl, TimeOptimCtrl, ParamIdent
         <a href="examples/example_01_two_mass_oscillator_trajectory_tracking/">Optimal Control for Trajectory Tracking</a>
       </td>
     </tr>
+    <tr>
+      <td align="center" style="vertical-align:middle;">
+      <img src="examples/example_02_nonlinear_spring_pendulum_minimum_control_effort/nonlinear_spring_pendulum.png" width="125">
+      </td>
+      <td>
+        <a href="examples/example_02_nonlinear_spring_pendulum_minimum_control_effort/">Example Nonlinear Spring Pendulum</a><br>
+        <a href="examples/example_02_nonlinear_spring_pendulum_minimum_control_effort/">Minimum Control Effort</a>
+      </td>
+    </tr>
   </table>
-  - [Example Nonlinear Spring Pendulum: Minimum Control Effort](examples/example_02_nonlinear_spring_pendulum_minimum_control_effort/)
 - Use **TimeOptimCtrl** for optimal control problems with fixed final time
-  - [Example SCARA: Time-Optimal Control for a Rest-To-Rest Maneuver](examples/example_03_SCARA_time_optimal_control/) 
-- Use **ParamIdent** for parameter-identification with fixed final time  
-  - [Example Five Bar Mechanism: Parameter-Identification](examples/example_04_Five_bar_mechanism_identify_pars/)
+  <table>
+    <tr>
+      <td align="center" style="vertical-align:middle;">
+      <img src="examples/example_03_SCARA_time_optimal_control/SCARA.png" width="200">
+      </td>
+      <td>
+        <a href="examples/example_03_SCARA_time_optimal_control/">Example Two-Axis SCARA</a><br>
+        <a href="examples/example_03_SCARA_time_optimal_control/">Time-Optimal Control for a Rest-To-Rest Maneuver</a>
+      </td>
+    </tr>
+  </table>
+- Use **ParamIdent** for parameter-identification with fixed final time
+  <table>
+    <tr>
+      <td align="center" style="vertical-align:middle;">
+      <img src="examples/example_04_Five_bar_mechanism_identify_pars/five_bar_planar_mechanism.png" width="200">
+      </td>
+      <td>
+        <a href="examples/example_04_Five_bar_mechanism_identify_pars/">Example Five Bar Mechanism</a><br>
+        <a href="examples/example_04_Five_bar_mechanism_identify_pars/">Parameter-Identification</a>
+      </td>
+    </tr>
+  </table>
 
 ## Quick Start
 1. Create a virtual environment in Python
