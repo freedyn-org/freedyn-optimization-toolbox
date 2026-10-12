@@ -41,7 +41,7 @@ from optimization_toolbox import OptimCtrl, TimeOptimCtrl, ParamIdent
       <td align="center" style="vertical-align:middle;">
       <img src="examples/example_01_two_mass_oscillator_trajectory_tracking/two_mass_oscillator.png" width="250">
       </td>
-      <td>
+      <td width="400">
         <a href="examples/example_01_two_mass_oscillator_trajectory_tracking/">Example Two Mass Oscillator</a><br>
         <a href="examples/example_01_two_mass_oscillator_trajectory_tracking/">Optimal Control for Trajectory Tracking</a>
       </td>
@@ -50,7 +50,7 @@ from optimization_toolbox import OptimCtrl, TimeOptimCtrl, ParamIdent
       <td align="center" style="vertical-align:middle;">
       <img src="examples/example_02_nonlinear_spring_pendulum_minimum_control_effort/nonlinear_spring_pendulum.png" width="125">
       </td>
-      <td>
+      <td width="400">
         <a href="examples/example_02_nonlinear_spring_pendulum_minimum_control_effort/">Example Nonlinear Spring Pendulum</a><br>
         <a href="examples/example_02_nonlinear_spring_pendulum_minimum_control_effort/">Minimum Control Effort</a>
       </td>
@@ -62,7 +62,7 @@ from optimization_toolbox import OptimCtrl, TimeOptimCtrl, ParamIdent
       <td align="center" style="vertical-align:middle;">
       <img src="examples/example_03_SCARA_time_optimal_control/SCARA.png" width="250">
       </td>
-      <td>
+      <td width="400">
         <a href="examples/example_03_SCARA_time_optimal_control/">Example Two-Axis SCARA</a><br>
         <a href="examples/example_03_SCARA_time_optimal_control/">Time-Optimal Control for a Rest-To-Rest Maneuver</a>
       </td>
@@ -74,7 +74,7 @@ from optimization_toolbox import OptimCtrl, TimeOptimCtrl, ParamIdent
       <td align="center" style="vertical-align:middle;">
       <img src="examples/example_04_Five_bar_mechanism_identify_pars/five_bar_planar_mechanism.png" width="250">
       </td>
-      <td>
+      <td width="400">
         <a href="examples/example_04_Five_bar_mechanism_identify_pars/">Example Five Bar Mechanism</a><br>
         <a href="examples/example_04_Five_bar_mechanism_identify_pars/">Parameter-Identification</a>
       </td>
