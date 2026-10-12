@@ -3,7 +3,7 @@
 
 ## Optimization Tasks in Multibody Dynamics
 
-The objective is to identify the optimization vriables $\mathbf{z}$ that minimizes the cost functional
+The objective is to identify the optimization variables $\mathbf{z}$ that minimizes the cost functional
 
 $$
 \begin{aligned}
