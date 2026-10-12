@@ -36,17 +36,17 @@ $$
 - Use **ParamIdent** for parameter-identification with fixed final time
 
 ```python
-fds_path: str,
-fds_name: str,
-fds_dForce_dparam_name: Sequence[str],
-fds_meas_name: Sequence[str] | None,
-fds_ctrl_name: Sequence[str] | None,
-num_ctrls: int, 
-num_ctrl_grid_nodes: int, 
-num_FD_pars: int, 
-final_time: float, 
-final_state: Sequence[str] | None,
-path_FDdll
+fds_path: str,                           # Path of *.fds
+fds_name: str,                           # Name of *.fds (without file typ)
+fds_dForce_dparam_name: Sequence[str],   # FreeDyn param for df / dparam
+fds_meas_name: Sequence[str] | None,     # FreeDyn measures - required, if measures are used in 'user_fcts.py'
+fds_ctrl_name: Sequence[str] | None,     # Path of *.fds
+num_ctrls: int,                          # Path of *.fds
+num_ctrl_grid_nodes: int,                # Path of *.fds
+num_FD_pars: int,                        # Path of *.fds
+final_time: float,                       # Path of *.fds
+final_state: Sequence[str] | None,       # Path of *.fds
+path_FDdll                               # Path of *.fds
 ```
 
 ## Examples
