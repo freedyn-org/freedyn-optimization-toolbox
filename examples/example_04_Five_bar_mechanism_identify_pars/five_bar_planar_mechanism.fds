@@ -171,13 +171,13 @@ EndForce
 DataObject Parameter
 	ID = unassignedParamOne
 	Name = l0_spring1
-	InitialValue = 2.236070
+	InitialValue = 2.431869
 EndDataObject
 %
 DataObject Parameter
 	ID = unassignedParamTwo
 	Name = l0_spring2
-	InitialValue = 2.061550
+	InitialValue = 1.844766
 EndDataObject
 %
 DataObject Parameter
