@@ -31,9 +31,9 @@ $$
 
 ## Features
 `from optimization_toolbox import OptimCtrl, TimeOptimCtrl, ParamIdent`
-- **Optimal Control Problems with fixed final time**
-- **Optimal Control Problems with free final time**
-- **Parameter-Identification with fixed final time**
+- Use **OptimCtrl** for optimal control problems with fixed final time
+- Use **TimeOptimCtrl** for optimal control problems with fixed final time
+- Use **ParamIdent** for Parameter-Identification with fixed final time
 
 ## Examples
 [Short Overwiew of Examples](examples/GitHub_Examples_Description.pdf)
