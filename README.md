@@ -36,17 +36,17 @@ $$
 - Use **ParamIdent** for parameter-identification with fixed final time
 
 ```python
-(fds_path: str,
- fds_name: str,
- fds_dForce_dparam_name: Sequence[str],
- fds_meas_name: Sequence[str] | None,
- fds_ctrl_name: Sequence[str] | None,
- num_ctrls: int, 
- num_ctrl_grid_nodes: int, 
- num_FD_pars: int, 
- final_time: float, 
- final_state: Sequence[str] | None,
- path_FDdll)
+fds_path: str,
+fds_name: str,
+fds_dForce_dparam_name: Sequence[str],
+fds_meas_name: Sequence[str] | None,
+fds_ctrl_name: Sequence[str] | None,
+num_ctrls: int, 
+num_ctrl_grid_nodes: int, 
+num_FD_pars: int, 
+final_time: float, 
+final_state: Sequence[str] | None,
+path_FDdll
 ```
 
 ## Examples
