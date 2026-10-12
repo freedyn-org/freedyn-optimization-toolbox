@@ -14,7 +14,7 @@ Body Rigid_EulerParameter_PAI
 	Geometry = Box 1.414214 0.250000 0.100000
 	Geometry Position = -1.000000,-0.500000,0.000000
 	Geometry Orientation = 0.707107,0.707107,0.000000,-0.707107,0.707107,0.000000,0.000000,-0.000000,1.000000
-	Geometry Color = 200,200,200,200
+	Geometry Color = 29,137,221,255
 	Geometry Transparency = 50
 EndBody
 %
@@ -31,7 +31,7 @@ Body Rigid_EulerParameter_PAI
 	Geometry = Box 1.802776 0.250000 0.100000
 	Geometry Position = -0.750000,-1.500000,0.000000
 	Geometry Orientation = 0.832050,-0.554700,0.000000,0.554700,0.832050,0.000000,-0.000000,0.000000,1.000000
-	Geometry Color = 200,200,200,200
+	Geometry Color = 186,214,0,255
 	Geometry Transparency = 50
 EndBody
 %
@@ -48,7 +48,7 @@ Body Rigid_EulerParameter_PAI
 	Geometry = Box 1.802776 0.250000 0.100000
 	Geometry Position = 0.750000,-1.500000,0.000000
 	Geometry Orientation = 0.832050,0.554700,0.000000,-0.554700,0.832050,0.000000,0.000000,-0.000000,1.000000
-	Geometry Color = 200,200,200,200
+	Geometry Color = 29,137,221,255
 	Geometry Transparency = 50
 EndBody
 %
@@ -65,7 +65,7 @@ Body Rigid_EulerParameter_PAI
 	Geometry = Box 1.414214 0.250000 0.100000
 	Geometry Position = 1.000000,-0.500000,0.000000
 	Geometry Orientation = 0.707107,-0.707107,0.000000,0.707107,0.707107,0.000000,-0.000000,0.000000,1.000000
-	Geometry Color = 200,200,200,200
+	Geometry Color = 186,214,0,255
 	Geometry Transparency = 50
 EndBody
 %
