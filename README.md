@@ -39,7 +39,7 @@ $$
 fds_path: str,                           # Path of *.fds
 fds_name: str,                           # Name of *.fds (without file typ)
 fds_dForce_dparam_name: Sequence[str],   # FreeDyn param for df / dparam
-fds_meas_name: Sequence[str] | None,     # FreeDyn measures - required, if measures are used in \`user_fcts.py\`
+fds_meas_name: Sequence[str] | None,     # FreeDyn measures - required, if measures are used in `user_fcts.py`
 fds_ctrl_name: Sequence[str] | None,     # Path of *.fds
 num_ctrls: int,                          # Path of *.fds
 num_ctrl_grid_nodes: int,                # Path of *.fds
