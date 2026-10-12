@@ -39,7 +39,7 @@ from optimization_toolbox import OptimCtrl, TimeOptimCtrl, ParamIdent
   <table>
     <tr>
       <td align="center" style="vertical-align:middle;">
-      <img src="examples/example_01_two_mass_oscillator_trajectory_tracking/two_mass_oscillator.png" width="200">
+      <img src="examples/example_01_two_mass_oscillator_trajectory_tracking/two_mass_oscillator.png" width="250">
       </td>
       <td>
         <a href="examples/example_01_two_mass_oscillator_trajectory_tracking/">Example Two Mass Oscillator</a><br>
@@ -60,7 +60,7 @@ from optimization_toolbox import OptimCtrl, TimeOptimCtrl, ParamIdent
   <table>
     <tr>
       <td align="center" style="vertical-align:middle;">
-      <img src="examples/example_03_SCARA_time_optimal_control/SCARA.png" width="200">
+      <img src="examples/example_03_SCARA_time_optimal_control/SCARA.png" width="250">
       </td>
       <td>
         <a href="examples/example_03_SCARA_time_optimal_control/">Example Two-Axis SCARA</a><br>
@@ -72,7 +72,7 @@ from optimization_toolbox import OptimCtrl, TimeOptimCtrl, ParamIdent
   <table>
     <tr>
       <td align="center" style="vertical-align:middle;">
-      <img src="examples/example_04_Five_bar_mechanism_identify_pars/five_bar_planar_mechanism.png" width="200">
+      <img src="examples/example_04_Five_bar_mechanism_identify_pars/five_bar_planar_mechanism.png" width="250">
       </td>
       <td>
         <a href="examples/example_04_Five_bar_mechanism_identify_pars/">Example Five Bar Mechanism</a><br>
