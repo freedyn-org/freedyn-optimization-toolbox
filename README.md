@@ -1,5 +1,5 @@
 # FreeDyn Optimization Toolbox
-**Adjoint-based optimization toolbox for multibody systems using the FreeDyn API**
+Adjoint-based optimization toolbox for multibody systems using the FreeDyn API
 
 ## Optimization Tasks in Multibody Dynamics
 
