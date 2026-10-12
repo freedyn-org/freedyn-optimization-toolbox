@@ -30,7 +30,9 @@ $$
 $$
 
 ## Features
-`from optimization_toolbox import OptimCtrl, TimeOptimCtrl, ParamIdent`
+```python
+`from optimization_toolbox import OptimCtrl, TimeOptimCtrl, ParamIdent
+```
 - Use **OptimCtrl** for optimal control problems with fixed final time
 - Use **TimeOptimCtrl** for optimal control problems with fixed final time
 - Use **ParamIdent** for parameter-identification with fixed final time
