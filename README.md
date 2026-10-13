@@ -38,7 +38,7 @@ from optimization_toolbox import OptimCtrl, TimeOptimCtrl, ParamIdent
 - Use **OptimCtrl** for optimal control problems with fixed final time
   <table>
     <tr>
-      <td align="center" style="vertical-align:middle;">
+      <td width="250" align="center" style="vertical-align:middle;">
       <img src="examples/example_01_two_mass_oscillator_trajectory_tracking/two_mass_oscillator.png" width="250">
       </td>
       <td width="400">
@@ -47,7 +47,7 @@ from optimization_toolbox import OptimCtrl, TimeOptimCtrl, ParamIdent
       </td>
     </tr>
     <tr>
-      <td align="center" style="vertical-align:middle;">
+      <td width="250" align="center" style="vertical-align:middle;">
       <img src="examples/example_02_nonlinear_spring_pendulum_minimum_control_effort/nonlinear_spring_pendulum.png" width="125">
       </td>
       <td width="400">
@@ -59,7 +59,7 @@ from optimization_toolbox import OptimCtrl, TimeOptimCtrl, ParamIdent
 - Use **TimeOptimCtrl** for optimal control problems with fixed final time
   <table>
     <tr>
-      <td align="center" style="vertical-align:middle;">
+      <td width="250" align="center" style="vertical-align:middle;">
       <img src="examples/example_03_SCARA_time_optimal_control/SCARA.png" width="250">
       </td>
       <td width="400">
@@ -71,7 +71,7 @@ from optimization_toolbox import OptimCtrl, TimeOptimCtrl, ParamIdent
 - Use **ParamIdent** for parameter-identification with fixed final time
   <table>
     <tr>
-      <td align="center" style="vertical-align:middle;">
+      <td width="250" align="center" style="vertical-align:middle;">
       <img src="examples/example_04_Five_bar_mechanism_identify_pars/five_bar_planar_mechanism.png" width="250">
       </td>
       <td width="400">
