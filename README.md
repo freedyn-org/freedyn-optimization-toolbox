@@ -35,7 +35,7 @@ Opt_TB = <ClassName>(fds_path, fds_name,
       </td>
     </tr>
   </table>
-- Use **TimeOptimCtrl** for optimal control problems with fixed final time
+- Use **TimeOptimCtrl** for time-optimal control problems with free final time
   <table>
     <tr>
       <td width="250" align="center" style="vertical-align:middle;">
