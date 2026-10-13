@@ -36,60 +36,81 @@
   <tbody>
     <tr>
       <td>fds_path</td>
-      <td>str</td>
+      <td><code>str</code></td>
       <td>Path of *.fds</td>
     </tr>
     <tr>
       <td>fds_name</td>
-      <td>str</td>
+      <td><code>str</code></td>
       <td>Name of *.fds (without file typ)</td>
     </tr>
     <tr>
       <td>fds_dForce_dparam_name</td>
-      <td>Sequence[str]</td>
+      <td><code>Sequence[str]</code></td>
       <td>FreeDyn param for df / dparam</td>
     </tr>
     <tr>
       <td>fds_meas_name</td>
-      <td>Sequence[str] | None</td>
-      <td>FreeDyn measures: required, if measures are used in user_fcts.py</td>
+      <td valign="top"><br>
+                       <code>None</code><br> 
+                       <code>Sequence[str]</code>
+      </td>
+      <td>FreeDyn measures<br>
+          x) <code>None</code> : No measures are used in user_fcts.py<br>
+          x) <code>Sequence[str]</code> : Measures are used in user_fcts.py
+      </td>
     </tr>
     <tr>
       <td>fds_ctrl_name</td>
-      <td>Sequence[str] | None</td>
-      <td>FreeDyn control splines: required for OptimCtrl or TimeOptimCtrl</td>
+      <td valign="top"><br>
+                       <code>None</code><br> 
+                       <code>Sequence[str]</code>
+      </td>
+      <td>FreeDyn control splines<br>
+          x) <code>None</code> : &lt;ClassName&gt; = ParamIdent<br>
+          x) <code>Sequence[str]</code> : &lt;ClassName&gt; = OptimCtrl or TimeOptimCtrl
+      </td>
     </tr>
     <tr>
       <td>num_ctrls</td>
-      <td>int</td>
+      <td><code>int</code></td>
       <td>Number of controls</td>
     </tr>
     <tr>
       <td>num_ctrl_grid_nodes</td>
-      <td>int</td>
+      <td><code>int</code></td>
       <td>Number of grid nodes per control</td>
     </tr>
     <tr>
       <td>num_FD_pars</td>
-      <td>int</td>
+      <td><code>int</code></td>
       <td>Number of FreeDyn parameters</td>
     </tr>
     <tr>
       <td>final_time</td>
-      <td>float</td>
+      <td><code>float</code></td>
       <td>Final time of the optimization problem</td>
     </tr>
     <tr>
       <td>final_state</td>
-      <td>Sequence[str] | None</td>
-      <td>Possible constraints at final time </td>
+      <td valign="top"><br>
+                       <code>None</code><br> 
+                       <code>numpy.ndarray</code>
+      </td>
+      <td>Possible constraints at final time $\boldsymbol{\phi}$<br>
+          x) <code>None</code> : No $\boldsymbol{\phi}$ nor target final_state<br>
+          x) <code>numpy.ndarray</code> : Assign target final_state for each $\boldsymbol{\phi}$ in user_fcts.py
+      </td>
     </tr>
     <tr>
       <td>path_FDdll</td>
-      <td>None | str</td>
+      <td valign="top"><br> 
+          <code>None</code><br> 
+          <code>str</code>
+      </td>
       <td>Path to freedyn.dll <br>
-          x) USE None, if: pip install freedyn<br>
-          x) USE str, if: FreeDyn Python bindings are download from GitHub without installing
+          x) <code>None</code> : pip install freedyn<br>
+          x) <code>str</code> : FreeDyn Python bindings are download without installing
       </td>
     </tr>
   </tbody>
