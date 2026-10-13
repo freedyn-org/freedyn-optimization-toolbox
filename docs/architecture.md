@@ -51,9 +51,9 @@
     </tr>
     <tr>
       <td>fds_meas_name</td>
-      <td valign="top"><br>
-                       <code>None</code><br> 
-                       <code>Sequence[str]</code>
+      <td><br>
+           <code>None</code><br> 
+           <code>Sequence[str]</code>
       </td>
       <td>FreeDyn measures<br>
           x) <code>None</code> : No measures are used in user_fcts.py<br>
@@ -62,9 +62,9 @@
     </tr>
     <tr>
       <td>fds_ctrl_name</td>
-      <td valign="top"><br>
-                       <code>None</code><br> 
-                       <code>Sequence[str]</code>
+      <td><br>
+           <code>None</code><br> 
+           <code>Sequence[str]</code>
       </td>
       <td>FreeDyn control splines<br>
           x) <code>None</code> : &lt;ClassName&gt; = ParamIdent<br>
@@ -93,9 +93,9 @@
     </tr>
     <tr>
       <td>final_state</td>
-      <td valign="top"><br>
-                       <code>None</code><br> 
-                       <code>numpy.ndarray</code>
+      <td><br>
+           <code>None</code><br> 
+           <code>numpy.ndarray</code>
       </td>
       <td>Possible constraints at final time $\boldsymbol{\phi}$<br>
           x) <code>None</code> : No $\boldsymbol{\phi}$ nor target final_state<br>
@@ -104,7 +104,7 @@
     </tr>
     <tr>
       <td>path_FDdll</td>
-      <td valign="top"><br> 
+      <td><br> 
           <code>None</code><br> 
           <code>str</code>
       </td>
