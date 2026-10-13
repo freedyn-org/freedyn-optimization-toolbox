@@ -54,7 +54,7 @@ uDachInit = np.zeros(num_ctrls * num_ctrl_grid_nodes)
 #
 """ Define final state of the MBS system """
 final_time = 5                             # final time
-final_state = np.array([2,-10,-4,0,0,0])   # final constraints | if no, set: np.array([])
+final_state = np.array([2,-10,-4,0,0,0])   # final constraints | if no, set: None
 #
 # -----------------------------------------------------------------------------
 #

@@ -1,4 +1,6 @@
-from typing import Sequence
+from __future__ import annotations
+from typing import Sequence, Union
+import numpy as np
 
 from .toolbox import Toolbox
 
@@ -23,7 +25,7 @@ def OptimCtrl(
     num_ctrl_grid_nodes: int, 
     num_FD_pars: int, 
     final_time: float, 
-    final_state: Sequence[str] | None,
+    final_state: Union[np.ndarray, None],
     path_FDdll: None | str) -> Toolbox:
     
     num_optVars = num_ctrls * num_ctrl_grid_nodes
@@ -50,7 +52,7 @@ def TimeOptimCtrl(
     num_ctrl_grid_nodes: int, 
     num_FD_pars: int, 
     final_time: float, 
-    final_state: Sequence[str] | None,
+    final_state: Union[np.ndarray, None],
     path_FDdll: None | str) -> Toolbox:
     
     num_optVars = 1 + num_ctrls * num_ctrl_grid_nodes
@@ -76,7 +78,7 @@ def ParamIdent(
     num_ctrl_grid_nodes: int, 
     num_FD_pars: int, 
     final_time: float, 
-    final_state: Sequence[str] | None,
+    final_state: Union[np.ndarray, None],
     path_FDdll: None | str) -> Toolbox:
     
     num_optVars = num_FD_pars

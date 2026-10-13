@@ -40,7 +40,7 @@ fds_path = path_main                                    # Path of *.fds
 fds_name = 'OptCtrl_SCARA'                              # Name of *.fds (without file typ)
 fds_dForce_dparam_name = ["u1par","u2par"]              # FreeDyn param for df / dparam
 fds_meas_name = None                                    # FreeDyn measures
-fds_ctrl_name = ["u1Dach", "u2Dach"]                    # FreeDyn control splines                                    # FreeDyn control splines
+fds_ctrl_name = ["u1Dach", "u2Dach"]                    # FreeDyn control splines
 #
 # -----------------------------------------------------------------------------
 #
@@ -54,7 +54,7 @@ uDachInit = np.zeros(num_ctrl_grid_nodes*num_ctrls)
 #
 """ Define final state of the MBS system """
 final_time_init = 3                                # final time
-final_state = np.array([1.0, 1.0, 0, 0])           # final constraints | # if no, set: np.array([])
+final_state = np.array([1.0, 1.0, 0, 0])           # final constraints | # if no, set: None
 #
 # -----------------------------------------------------------------------------
 #

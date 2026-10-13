@@ -9,7 +9,12 @@ class OptimTask():
                  tF, xF):
         
         self.num_opt_vars = nOptVars
-        self.num_xF = len(xF)
+        
+        if xF is None:
+            self.num_xF = 0
+        else:
+            self.num_xF = len(xF)
+
         self.final_time = tF
         self.xF = xF
         
