@@ -77,5 +77,51 @@ The only quantities, which have to be implemented by the user, are~$\OptTarget$ 
 By defining measures in FreeDyn, arbitrary displacements, velocities, angles, etc. can be determined. These can be used in FreeDyn, but are also accessible via the API.
 
 ## Setup Optimization
+1) Add path
+2) Define the Parameters of FreeDyn Optimization Toolbox: [`Parameters of FreeDyn Optimization Toolbox`](docs/architecture.md#required-parameters-for-the-freedyn-optimization-toolbox)
+3) Init
+```python
+from optimization_toolbox import OptimCtrl, TimeOptimCtrl, ParamIdent
 
-To work with the FreeDyn~API in Python, the basic commands are required. Besides the path to the solver input file, the path to the FreeDyn API needs to be specified.
+Opt_TB = <ClassName>(fds_path, fds_name,
+                     fds_dForce_dparam_name, fds_meas_name, fds_ctrl_name,
+                     num_ctrls, num_ctrl_grid_nodes, num_FD_pars,
+                     final_time, final_state,
+                     path_FDdll)
+```
+4) Carry out optimization with third-party optimization toolbox, e.g., SciPy
+```python
+import scipy as sp
+
+res = sp.optimize.minimize(fun         = Opt_TB.cost_fct_J,                    # cost function
+                           x0          = zInit,                                # initial values
+                           method      = 'SLSQP',                              # optimization method
+                           jac         = Opt_TB.grad_cost_fct_J,               # gradient of cost function
+                           bounds      = sp.optimize.Bounds(lb, ub),           # lower and upper bounds
+                           constraints = {'type':'eq',                         # non-linear constraints
+                                          'fun':Opt_TB.final_constr_eq_Phi, 
+                                          'jac':Opt_TB.grad_final_constr_eq_Phi},
+                           options     = {'disp': True, 
+                                          'iprint': 2, 
+                                          'ftol': 1e-8, 
+                                          'eps':1e-8, 
+                                          'maxiter': 500}                      # optimization options
+                           )
+```
+4) Post-processing of the optimization result
+```python 
+Opt_TB.new_opt_vars(res.x)                              # Update optimization variables, rerun simulation
+num_steps = Opt_TB.FreeDyn.num_time_steps
+final_time = Opt_TB.OptimTask.final_time
+time = np.zeros(num_steps)                              
+u = np.zeros((num_ctrls, num_steps))                    # optimal control
+q = np.zeros((Opt_TB.FreeDyn.nDof, num_steps))          # redundant generalized coordinates
+qD = np.zeros((Opt_TB.FreeDyn.nDof, num_steps))         # redundant generalized velocities
+    
+for i in range(num_steps-1, -1, -1): 
+   Opt_TB.FreeDyn.fetch_and_update_states_at_index(i)
+   time[i] = Opt_TB.FreeDyn.API.t
+   u[:,i] = Opt_TB.Ctrl.get_u(tau[i]/final_time)
+   q[:,i] = Opt_TB.FreeDyn.API.Q[:, 0]
+   qD[:,i] = Opt_TB.FreeDyn.API.Qd[:, 0]
+```
