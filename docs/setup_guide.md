@@ -12,7 +12,7 @@ The objective is to identify the optimization variables $\mathbf{z}$ that minimi
 
 $$
 \begin{aligned}
-J(\mathbf{z}) = \int_{t_0}^{t_\mathrm{f}} \mathcal{L} (\mathbf{q},\mathbf{v},\mathbf{u})  \mathrm{d}t
+J(\mathbf{z}) = \int_{t_0}^{t_\mathrm{f}} \mathcal{L} (\mathbf{q}(t),\mathbf{v}(t),\mathbf{u}(t))  \mathrm{d}t
 \end{aligned}
 $$
 
@@ -20,7 +20,7 @@ in which $\mathcal{L} (\mathbf{q}(t),\mathbf{v}(t),\mathbf{u}(t))$ is the Lagran
 
 $$
 \begin{aligned}
-\boldsymbol{\phi}(\mathbf{q}, \mathbf{v}) \bigg|_{t=t_{\mathrm{f}}} = \mathbf{0}
+\boldsymbol{\phi}(\mathbf{q}(t_\mathrm{f}), \mathbf{v}(t_\mathrm{f}), t_\mathrm{f}) = \mathbf{0}
 \end{aligned}
 $$
 
