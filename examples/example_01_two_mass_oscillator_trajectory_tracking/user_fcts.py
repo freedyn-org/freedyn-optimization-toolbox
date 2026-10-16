@@ -67,7 +67,7 @@ class UserFunctions():
         return None
 # -----------------------------------------------------------------------------
 
-    def eval_Phi(self, FreeDyn, xF):
+    def get_Phi(self, FreeDyn, xF):
         
         # Final constraints: Phi(t_f) = 0
         # If no final constraints are imposed, then only use "return None"
@@ -87,10 +87,10 @@ class UserFunctions():
 
     def get_Phi_dv(self, FreeDyn):
         
-        # Allocate in __init__ as self.dPhidq = np.zeros(FreeDyn.nDof)
-        # If you want to zero all entries, use self.dPhidq.fill(0.0)
-        # If you want to access an element, use self.dPhidq[i,j] = ...
-        # If dPhidq = 0, then only use "return None"
+        # Allocate in __init__ as self.dPhidv = np.zeros(FreeDyn.nDof)
+        # If you want to zero all entries, use self.dPhidv.fill(0.0)
+        # If you want to access an element, use self.dPhidv[i,j] = ...
+        # If dPhidv = 0, then only use "return None"
         
         return None
 # -----------------------------------------------------------------------------
