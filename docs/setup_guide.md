@@ -43,6 +43,7 @@ InterpolationType = zccspl
 Note: The identical control discretization must be used in the optimization and FreeDyn, otherwise errors in the gradient computation occur.
 Within the FreeDyn Optimization Toolbox, the spline type `zccspl` is used for computing the adjoint gradients.
 
+
 ## Optimization Task
 
 The objective is to identify the optimization variables $\mathbf{z}$ that minimizes the cost functional
@@ -75,6 +76,117 @@ The states of the multibody system, i.e., $\mathbf{q}$, $\dot{\mathbf{q}}$, $\dd
 
 The only quantities, which have to be implemented by the user, are~$\OptTarget$ and~$\BCend$, as well as their partial derivatives with respect to $\mathbf{q}$, $\mathbf{v}$ and $\mathbf{u}$.
 By defining measures in FreeDyn, arbitrary displacements, velocities, angles, etc. can be determined. These can be used in FreeDyn, but are also accessible via the API.
+
+<table>
+  <thead>
+    <tr>
+      <th>Derivative</th>
+      <th>Allocated Buffer</th>
+      <th>Function in user_fcts.py</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>$\mathcal{L}_{\mathbf{q}}$</td>
+      <td><code>self.dLdq</code></td>
+      <td>Path of <code>*.fds</code></td>
+    </tr>
+	  <tr>
+      <td>$\mathcal{L}_{\mathbf{v}}$</td>
+      <td><code>self.dLdv</code></td>
+      <td>Path of <code>*.fds</code></td>
+    </tr>
+	  <tr>
+      <td>$\mathcal{L}_{\mathbf{u}}$</td>
+      <td><code>self.dLdu</code></td>
+      <td>Path of <code>*.fds</code></td>
+    </tr>
+    <tr>
+      <td>$\boldsymbol{\phi}_{\mathbf{q}}$</td>
+      <td><code>self.dPhidq</code></td>
+      <td>Name of <code>*.fds</code> (without file type)</td>
+    </tr>
+    <tr>
+      <td>$\boldsymbol{\phi}_{\mathbf{v}}$</td>
+      <td><code>self.dPhidv</code></td>
+      <td>Final time of the optimization problem</td>
+    </tr>
+  </tbody>
+</table>
+
+```python
+        # Allocate matrices for derivatives of lagrangian: L_q , L_v , L_u
+        # Allocate matrices for derivatives of final constraints: Phi_q , Phi_v
+        
+        print("User functions loaded")
+# -----------------------------------------------------------------------------
+
+    def get_lagrangian(self, dataOpt, FreeDyn, Ctrl, z):
+        
+        # lagrangian of the optimization problem: J = \int_{t_0}^{t_f} L dt
+        
+        u = Ctrl.get_u(FreeDyn.API.t / dataOpt.final_time)
+
+        return None
+# -----------------------------------------------------------------------------
+
+    def get_lagrangian_dq(self, FreeDyn, z):
+        
+        # Allocate in __init__ as self.dLdq = np.zeros(FreeDyn.nDof)
+        # If you want to zero all entries, use self.dLdq.fill(0.0)
+        # If you want to access an element, use self.dLdq[i] = ...
+        # If dLdq = 0, then only use "return None"
+        
+        return None
+# -----------------------------------------------------------------------------
+
+    def get_lagrangian_dv(self, FreeDyn, z):
+        
+        # Allocate in __init__ as self.dLdv = np.zeros(FreeDyn.nDof)
+        # If you want to zero all entries, use self.dLdv.fill(0.0)
+        # If you want to access an element, use self.dLdv[i] = ...
+        # If dLdv = 0, then only use "return None"
+        
+        return None
+# -----------------------------------------------------------------------------
+
+    def get_lagrangian_du(self, dataOpt, FreeDyn, Ctrl, z):
+        
+        # Allocate in __init__ as self.dLdu = np.zeros(FreeDyn.nDof)
+        # If you want to zero all entries, use self.dLdu.fill(0.0)
+        # If you want to access an element, use self.dLdu[i] = ...
+        # If dLdu = 0, then only use "return None"
+        
+        return None
+# -----------------------------------------------------------------------------
+
+    def eval_Phi(self, dataOpt, FreeDyn):
+        
+        # Final constraints: Phi(t_f) = 0
+        # If no final constraints are imposed, then only use "return None"
+        return None
+# -----------------------------------------------------------------------------
+
+    def get_Phi_dq(self, FreeDyn):
+        
+        # Allocate in __init__ as self.dPhidq = np.zeros(FreeDyn.nDof)
+        # If you want to zero all entries, use self.dPhidq.fill(0.0)
+        # If you want to access an element, use self.dPhidq[i,j] = ...
+        # If dPhidq = 0, then only use "return None"
+        
+        return None
+# -----------------------------------------------------------------------------
+
+    def get_Phi_dv(self, FreeDyn):
+        
+        # Allocate in __init__ as self.dPhidq = np.zeros(FreeDyn.nDof)
+        # If you want to zero all entries, use self.dPhidq.fill(0.0)
+        # If you want to access an element, use self.dPhidq[i,j] = ...
+        # If dPhidq = 0, then only use "return None"
+        
+        return None
+# -----------------------------------------------------------------------------
+```
 
 ## Setup Optimization
 1) Add path of FreeDyn Optimization Toolbox
