@@ -77,9 +77,18 @@ The only quantities, which have to be implemented by the user, are~$\OptTarget$ 
 By defining measures in FreeDyn, arbitrary displacements, velocities, angles, etc. can be determined. These can be used in FreeDyn, but are also accessible via the API.
 
 ## Setup Optimization
-1) Add path
-2) Define the Parameters of FreeDyn Optimization Toolbox: [`Parameters of FreeDyn Optimization Toolbox`](docs/architecture.md#required-parameters-for-the-freedyn-optimization-toolbox)
-3) Init
+1) Add path of FreeDyn Optimization Toolbox
+```python
+path_main = Path(__file__).resolve().parent
+path_folder_optim_toolbox = str(path_main.parent.parent)
+sys.path.insert(0, path_folder_optim_toolbox)
+```
+
+2) Define the Parameters of FreeDyn Optimization Toolbox
+
+[`Parameters of FreeDyn Optimization Toolbox`](docs/architecture.md#required-parameters-for-the-freedyn-optimization-toolbox)
+
+3) Initialize FreeDyn Optimization Toolbox
 ```python
 from optimization_toolbox import OptimCtrl, TimeOptimCtrl, ParamIdent
 
@@ -89,6 +98,7 @@ Opt_TB = <ClassName>(fds_path, fds_name,
                      final_time, final_state,
                      path_FDdll)
 ```
+
 4) Carry out optimization with third-party optimization toolbox, e.g., SciPy
 ```python
 import scipy as sp
@@ -108,7 +118,8 @@ res = sp.optimize.minimize(fun         = Opt_TB.cost_fct_J,                    #
                                           'maxiter': 500}                      # optimization options
                            )
 ```
-4) Post-processing of the optimization result
+
+5) Post-processing of the optimization result
 ```python 
 Opt_TB.new_opt_vars(res.x)                              # Update optimization variables, rerun simulation
 num_steps = Opt_TB.FreeDyn.num_time_steps
