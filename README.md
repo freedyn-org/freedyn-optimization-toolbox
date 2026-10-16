@@ -109,7 +109,7 @@ If you use the FreeDyn Optimization Toolbox in your research, please cite:
 
 ```bibtex
 @software{freedynOptToolbox2026,
-  title = {FreeDyn: Optimization Toolbox},
+  title = {FreeDyn: A Multibody System Simulation Software},
   author = {FreeDyn Development Team},
   year = {2026},
   url = {https://github.com/freedyn-org/freedyn-optimization-toolbox}
