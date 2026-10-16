@@ -13,10 +13,12 @@ The dynamical model underlying the optimization is provided as FreeDyn multibody
 - Forces/Torques
 - Measures
 - Data Object
+	- Parameter
+	- Spline
+		- Interpolation type: `akima` [akima spline](https://en.wikipedia.org/wiki/Akima_spline)
+		- Interpolation type: `zccspl` [zero clamped cubic spline](https://doi.org/10.1007/s11044-023-09898-5)
 
-Masses and moments of inertia are assigned for each body. Joints can be assigned between bodies or with ground by locking the corresponding translational and rotational DOF. Forces or torques can be defined either directly in FreeDyn or by external subroutines in the form of dynamic link libraries~(DLL). Note that the identical discretization of the control has to be used in FreeDyn as well as in the optimization, otherwise errors in the gradient evaluation occur. FreeDyn provides different spline types for discretizing continuous variables, e.g., the control.
-
-In force or torque elements, the command~\texttt{SPL[query_point, data_object_spline]} returns the interpolated value at the query point based on the spline data object defined in FreeDyn. In the spline data object, either \texttt{AKISPL} or \texttt{ZCCSPL} can be chosen. The first is the spline type Akima~\cite{Akima1970} and the second is the spline type often used in optimal control problems as well, as e.g., in~\cite{Lichtenecker2023}. In the case of the FDOP, the latter spline type has to be used in FreeDyn in order to obtain the discretization of~$\mathbf{u}$ according to Eq.~(\ref{eq_ctrl_Daniel}). \par
+In force or torque elements, the command~\texttt{SPL[query_point, data_object_spline]} returns the interpolated value at the query point based on the spline data object defined in FreeDyn. In the spline data object, either \texttt{AKISPL} or \texttt{} can be chosen. The first is the spline type Akima~\cite{Akima1970} and the second is the spline type often used in optimal control problems as well, as e.g., in~\cite{Lichtenecker2023}.
 
 ### Additional Requirements for Optimal Control Problems: `<OptimCtrl> or <TimeOptimCtrl>`
 To compute the adjoint gradient with respect to a control, the partial derivative of the force vector with respect to the control is required. 
@@ -40,6 +42,8 @@ PARVAL[u_par] + SPL[SIMTIME[], u_Dach]
 ```text
 InterpolationType = zccspl
 ```
+Note that the identical discretization of the control has to be used in FreeDyn as well as in the optimization, otherwise errors in the gradient evaluation occur. FreeDyn provides different spline types for discretizing continuous variables, e.g., the control.
+In the case of the FDOP, the latter spline type has to be used in FreeDyn in order to obtain the discretization of~$\mathbf{u}$ according to Eq.~(\ref{eq_ctrl_Daniel}). \par
 
 ## Optimization Task
 
