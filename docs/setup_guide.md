@@ -1,8 +1,8 @@
 # Setup Custom Optimization 
 
 - `model.fds`
-- `main.py`
 - `user_fcts.py`
+- `main.py`
 
 ## Model
 
