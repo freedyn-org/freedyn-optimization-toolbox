@@ -49,6 +49,7 @@ Opt_TB = <ClassName>(fds_path, fds_name,
       </td>
     </tr>
   </table>
+- Use **ParamIdent** for parameter-identification with fixed final time
 
 ## Optimization Tasks in Multibody Dynamics
 
