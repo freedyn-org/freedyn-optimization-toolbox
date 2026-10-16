@@ -126,7 +126,7 @@ sys.path.insert(0, path_folder_optim_toolbox)
 
 3) Initialize FreeDyn Optimization Toolbox
 ```python
-from optimization_toolbox import OptimCtrl, TimeOptimCtrl, ParamIdent
+from optimization_toolbox import OptimCtrl, TimeOptimCtrl
 
 Opt_TB = <ClassName>(fds_path, fds_name,
                      fds_dForce_dparam_name, fds_meas_name, fds_ctrl_name,
