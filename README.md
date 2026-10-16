@@ -100,6 +100,8 @@ pip install freedyn
 3. Download Freedyn-optimization-toolbox
 4. Run `main_*.py`
 
+[`How to Create Your Own Optimization Task`](docs/setup_guide.md)
+
 ## Requirements
 - Python 3.8+ (Recommendation: Python 3.13)
 - numpy, scipy
