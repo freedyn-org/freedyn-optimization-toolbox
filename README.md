@@ -1,17 +1,66 @@
 # FreeDyn Optimization Toolbox
-**Adjoint-based optimization toolbox for multibody systems using the FreeDyn API**
+Adjoint-based optimization toolbox for multibody systems using the FreeDyn API
 
-## Optimal Control Problems in Multibody Dynamics
+```python
+from optimization_toolbox import OptimCtrl, TimeOptimCtrl
 
-The objective is to identify the control $\mathbf{u}(t)$ that minimizes the cost functional
+Opt_TB = <ClassName>(fds_path, fds_name,
+                     fds_dForce_dparam_name, fds_meas_name, fds_ctrl_name,
+                     num_ctrls, num_ctrl_grid_nodes, num_FD_pars,
+                     final_time, final_state,
+                     path_FDdll)
+```
+[`Parameters of FreeDyn Optimization Toolbox`](docs/architecture.md#required-parameters-for-the-freedyn-optimization-toolbox)
+
+## Features
+
+[Short Overwiew Demo Examples](examples/GitHub_Examples_Description.pdf)
+
+- Use **OptimCtrl** for optimal control problems with fixed final time
+  <table>
+    <tr>
+      <td width="250" align="center" style="vertical-align:middle;">
+      <img src="examples/example_01_two_mass_oscillator_trajectory_tracking/two_mass_oscillator.png" width="250">
+      </td>
+      <td width="400">
+        <a href="examples/example_01_two_mass_oscillator_trajectory_tracking/">Example Two Mass Oscillator</a><br>
+        <a href="examples/example_01_two_mass_oscillator_trajectory_tracking/">Optimal Control for Trajectory Tracking</a>
+      </td>
+    </tr>
+    <tr>
+      <td width="250" align="center" style="vertical-align:middle;">
+      <img src="examples/example_02_nonlinear_spring_pendulum_minimum_control_effort/nonlinear_spring_pendulum.png" width="125">
+      </td>
+      <td width="400">
+        <a href="examples/example_02_nonlinear_spring_pendulum_minimum_control_effort/">Example Nonlinear Spring Pendulum</a><br>
+        <a href="examples/example_02_nonlinear_spring_pendulum_minimum_control_effort/">Minimum Control Effort</a>
+      </td>
+    </tr>
+  </table>
+- Use **TimeOptimCtrl** for time-optimal control problems with free final time
+  <table>
+    <tr>
+      <td width="250" align="center" style="vertical-align:middle;">
+      <img src="examples/example_03_SCARA_time_optimal_control/SCARA.png" width="250">
+      </td>
+      <td width="400">
+        <a href="examples/example_03_SCARA_time_optimal_control/">Example Two-Axis SCARA</a><br>
+        <a href="examples/example_03_SCARA_time_optimal_control/">Time-Optimal Control for a Rest-To-Rest Maneuver</a>
+      </td>
+    </tr>
+  </table>
+
+## Optimization Tasks in Multibody Dynamics
+
+The objective is to identify the optimization variables $\mathbf{z}$ that minimizes the cost functional
 
 $$
 \begin{aligned}
-J = \int_{t_0}^{t_\mathrm{f}} \mathcal{L} (\mathbf{q}(t),\mathbf{v}(t),\mathbf{u}(t))  \mathrm{d}t
+J(\mathbf{z}) = \int_{t_0}^{t_\mathrm{f}} \mathcal{L} (\mathbf{q}(t),\mathbf{v}(t),\mathbf{u}(t))  \mathrm{d}t
 \end{aligned}
 $$
 
-in which $\mathcal{L} (\mathbf{q}(t),\mathbf{v}(t),\mathbf{u}(t))$ is the Lagrangian of the optimal control problem, while at final time $t_\mathrm{f}$ possible constraints
+in which $\mathcal{L} (\mathbf{q}(t),\mathbf{v}(t),\mathbf{u}(t))$ is the Lagrangian of the optimization problem, while at final time $t_\mathrm{f}$ possible constraints
 
 $$
 \begin{aligned}
@@ -21,65 +70,11 @@ $$
 
 have to be satisfied.
 
-## Features
-- **Optimal Control Problems with fixed final time** `class_OCP_FDOP.py`
-- **Optimal Control Problems with free final time** `class_TOCP_FDOP.py`
-
-## Examples
-[Short Overwiew of Examples](examples/GitHub_Examples_Description.pdf)
-
-
-- [Trajectory Tracking](examples/example_01_two_mass_oscillator_trajectory_tracking/)
-  
 $$
 \begin{aligned}
-J = \int_{t_0}^{t_\mathrm{f}} \frac{1}{2} \left( y - \bar{y} \right)^2  \mathrm{d}t
-\end{aligned}
-$$
-
-$$
-\begin{aligned}
-y(t) \dots \text{Trajectory due to the selected control}~u(t)\\
-\bar{y}(t) \dots \text{Desired trajectory}\\
-\end{aligned}
-$$
-  
-- [Minimum Control Effort](examples/example_02_nonlinear_spring_pendulum_minimum_control_effort/)
-
-$$
-\begin{aligned}
-J = \int_{t_0}^{t_\mathrm{f}} \frac{1}{2} \mathbf{u}^\top \mathbf{u} \mathrm{d}t \qquad \boldsymbol{\phi} = \left. \begin{pmatrix}
-        \phi_1 - \phi_{1,\mathrm{f}} \\ 
-        \vdots \\
-        \phi_r  - \phi_{r,\mathrm{f}}
-    \end{pmatrix} \right|_{t_\mathrm{f}} = \mathbf{0}
-\end{aligned}
-$$
-
-$$
-\begin{aligned}
-\mathbf{u} \dots \text{Control vector}\\
-\phi_{1} \dots \phi_{r} \dots \text{Final constraints due to the selected control}~u(t)\\
-\phi_{1,\mathrm{f}} \dots \phi_{r,\mathrm{f}} \dots \text{Desired final constraints}\\
-\end{aligned}
-$$
-  
-- [Time Optimal Control](examples/example_03_SCARA_time_optimal_control/)
-
-$$
-\begin{aligned}
-J = \int_{t_0}^{t_\mathrm{f}} 1 \mathrm{d}t \qquad \boldsymbol{\phi} = \left. \begin{pmatrix}
-        \phi_1 - \phi_{1,\mathrm{f}} \\ 
-        \vdots \\
-        \phi_r  - \phi_{r,\mathrm{f}}
-    \end{pmatrix} \right|_{t_\mathrm{f}} = \mathbf{0}
-\end{aligned}
-$$
-
-$$
-\begin{aligned}
-\phi_{1} \dots \phi_{r} \dots \text{Final constraints due to the selected control}~u(t)\\
-\phi_{1,\mathrm{f}} \dots \phi_{r,\mathrm{f}} \dots \text{Desired final constraints}\\
+\mathbf{q}(t) \dots \text{Vector of redundant generalized coordinates}\\
+\mathbf{v}(t) \dots \text{Vector of redundant generalized velocities}\\
+\mathbf{u}(t) \dots \text{Vector of controls (forces, torques, etc.)}
 \end{aligned}
 $$
 
@@ -115,4 +110,4 @@ If you use the FreeDyn Optimization Toolbox in your research, please cite:
 Papers demonstrating the toolbox:
 
 P. Zallinger, L. Buchner, W. Steiner, K. Nachbagauer. A Low-Effort Approach to Adjoint Gradient Computation for Optimal Control Problems Using a Multibody Dynamics Simulation Interface. 
-Proceedings of the ASME 2026 International Design Engineering Technical Conferences and Computers and Information in Engineering Conference. 22nd International Conference on Multibody Systems, Nonlinear Dynamics, and Control (MSNDC). Houston, Texas, USA. 2026.
+*Proceedings of the ASME 2026 International Design Engineering Technical Conferences and Computers and Information in Engineering Conference. 22nd International Conference on Multibody Systems, Nonlinear Dynamics, and Control (MSNDC)*. Houston, Texas, USA. 2026.
