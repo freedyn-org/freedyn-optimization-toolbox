@@ -58,7 +58,7 @@ class UserFunctions():
         return None
 # -----------------------------------------------------------------------------
 
-    def eval_Phi(self, dataOpt, FreeDyn):
+    def get_Phi(self, dataOpt, FreeDyn):
         
         # Final constraints: \Phi(t_f) = 0
         # If no final constraints are imposed, then only use "return None"
