@@ -64,7 +64,6 @@
           <code>Sequence[str]</code>
       </td>
       <td>FreeDyn control splines<br>
-          x) <code>None</code> : &lt;ParamIdent&gt;<br>
           x) <code>Sequence[str]</code> : &lt;OptimCtrl&gt; or &lt;TimeOptimCtrl&gt;
       </td>
     </tr>
@@ -72,7 +71,6 @@
       <td>num_ctrls</td>
       <td><code>int</code></td>
       <td>Number of controls<br>
-          x) &lt;ParamIdent&gt; : num_ctrls $= 0$<br>
           x) &lt;OptimCtrl&gt; or &lt;TimeOptimCtrl&gt; : num_ctrls $> 0$
       </td>
     </tr>
