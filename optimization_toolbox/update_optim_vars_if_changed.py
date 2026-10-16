@@ -42,3 +42,23 @@ class UpdateTOCP():
             FreeDyn.compute_due_to_change(OptimTask.final_time)
     
 # -----------------------------------------------------------------------------
+
+class UpdateParamIdent():
+    
+    def compute_or_reuse(self, OptimTask, FreeDyn, Ctrl, z):
+        
+        """ Check if the solution is already computed for z, otherwise reset and recompute """
+        
+        # Get new values of z
+        new_pars = z
+
+        # compare of change
+        pars_changed = not np.array_equal(FreeDyn.FD_pars, new_pars)
+
+        # reuse or compute solution, only assign and compute if changed
+        if pars_changed:
+            FreeDyn.FD_pars = new_pars
+            FreeDyn.update_FD_pars(FreeDyn.fds_dForce_dparam_name, FreeDyn.FD_pars)
+            FreeDyn.compute_due_to_change(OptimTask.final_time)
+            
+# -----------------------------------------------------------------------------

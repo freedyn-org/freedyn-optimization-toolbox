@@ -2,7 +2,7 @@
 Adjoint-based optimization toolbox for multibody systems using the FreeDyn API
 
 ```python
-from optimization_toolbox import OptimCtrl, TimeOptimCtrl
+from optimization_toolbox import OptimCtrl, TimeOptimCtrl, ParamIdent
 
 Opt_TB = <ClassName>(fds_path, fds_name,
                      fds_dForce_dparam_name, fds_meas_name, fds_ctrl_name,
@@ -49,6 +49,7 @@ Opt_TB = <ClassName>(fds_path, fds_name,
       </td>
     </tr>
   </table>
+- Use **ParamIdent** for parameter-identification with fixed final time
 
 ## Optimization Tasks in Multibody Dynamics
 
