@@ -49,18 +49,6 @@ Opt_TB = <ClassName>(fds_path, fds_name,
       </td>
     </tr>
   </table>
-- Use **ParamIdent** for parameter-identification with fixed final time
-  <table>
-    <tr>
-      <td width="250" align="center" style="vertical-align:middle;">
-      <img src="examples/example_04_Five_bar_mechanism_identify_pars/five_bar_planar_mechanism.png" width="250">
-      </td>
-      <td width="400">
-        <a href="examples/example_04_Five_bar_mechanism_identify_pars/">Example Five Bar Mechanism</a><br>
-        <a href="examples/example_04_Five_bar_mechanism_identify_pars/">Parameter-Identification</a>
-      </td>
-    </tr>
-  </table>
 
 ## Optimization Tasks in Multibody Dynamics
 
