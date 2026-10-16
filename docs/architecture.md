@@ -17,7 +17,6 @@
 | update_optim_vars_if_changed.py   | Reuse or compute solution in FreeDyn                                  |
 | adjGrad_wrt_u_FDOP.py             | Computes adjoint gradients - Optimal Control Problem                  |
 | adjGrad_wrt_u_and_tF_FDOP.py      | Computes adjoint gradients - Time-Optimal Control Problem             |
-| adjGrad_wrt_FD_param.py           | Computes adjoint gradients - Parameter-Identification                 |
 | consistent_boundary_conditions.py | Provides consistent boundary conditions for the adjoint systems       |
 | BDF_core.py                       | Backward Differentiation Formula - common functions and memory buffer |
 | BDF_dense_physical_time.py        | BDF order 1 and 2 for dense system matrices                           |
@@ -65,7 +64,6 @@
           <code>Sequence[str]</code>
       </td>
       <td>FreeDyn control splines<br>
-          x) <code>None</code> : &lt;ParamIdent&gt;<br>
           x) <code>Sequence[str]</code> : &lt;OptimCtrl&gt; or &lt;TimeOptimCtrl&gt;
       </td>
     </tr>
@@ -73,7 +71,6 @@
       <td>num_ctrls</td>
       <td><code>int</code></td>
       <td>Number of controls<br>
-          x) &lt;ParamIdent&gt; : num_ctrls $= 0$<br>
           x) &lt;OptimCtrl&gt; or &lt;TimeOptimCtrl&gt; : num_ctrls $> 0$
       </td>
     </tr>
@@ -81,7 +78,6 @@
       <td>num_ctrl_grid_nodes</td>
       <td><code>int</code></td>
       <td>Number of grid nodes per control<br>
-          x) &lt;ParamIdent&gt; : num_ctrl_grid_nodes $= 0$<br>
           x) &lt;OptimCtrl&gt; or &lt;TimeOptimCtrl&gt; : num_ctrl_grid_nodes $> 0$ 
       </td>
     </tr>
@@ -89,7 +85,6 @@
       <td>num_FD_pars</td>
       <td><code>int</code></td>
       <td>Number of FreeDyn parameters<br>
-          x) &lt;ParamIdent&gt; : num_FD_pars $> 0$<br>
           x) &lt;OptimCtrl&gt; or &lt;TimeOptimCtrl&gt; : num_FD_pars $= 0$ 
       </td>
     </tr>
