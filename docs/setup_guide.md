@@ -1,8 +1,8 @@
 # Setup Custom Optimization 
 
 - `model.fds` → [Model](setup_guide.md#Model)
-- `user_fcts.py` → [Optimization Task](setup_guide.md#optimization_task)
-- `main.py` → [Setup Optimization](setup_guide.md#setup_optimization)
+- `user_fcts.py` → [Optimization Task](setup_guide.md#optimization-task)
+- `main.py` → [Setup Optimization](setup_guide.md#setup-optimization)
 
 ## Model
 
