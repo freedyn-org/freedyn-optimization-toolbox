@@ -111,7 +111,7 @@ class OptimTask():
         FreeDyn.fetch_and_update_states_at_index(FreeDyn.num_time_steps-1)
         
         # Phi is evaluted in UserFcts.py
-        return self.UserFcts.eval_Phi(self, FreeDyn)
+        return self.UserFcts.get_Phi(self, FreeDyn)
 
 # -----------------------------------------------------------------------------    
 
