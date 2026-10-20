@@ -96,7 +96,7 @@ class adjGrads_TOCP():
         FreeDyn.buffer_MBS_dForce_dFDparam.update_from_dll()
         adjP_fdu = self.BDF.get_adjVar_P_Phi().T @ FreeDyn.dForce_dFDparam
         vec_C, dCdtau_times_uDach = Ctrl.get_vec_c_AND_dCdtau_times_uDach(tRight/dataOpt.final_time)
-        np.multiply(adjP_fdu[:,:,np.newaxis], vec_C, out = self.adjGrad_Phi_uDach_buff[idx_buff])        
+        np.multiply.outer(adjP_fdu, vec_C, out = self.adjGrad_Phi_uDach_buff[idx_buff])        
         integrand_tF_Right = tRight * (adjP_fdu @ dCdtau_times_uDach)
         
         """ BDF order 1 """ 
@@ -108,7 +108,7 @@ class adjGrads_TOCP():
         FreeDyn.buffer_MBS_dForce_dFDparam.update_from_dll()
         adjP_fdu = self.BDF.get_adjVar_P_Phi().T @ FreeDyn.dForce_dFDparam
         vec_C, dCdtau_times_uDach = Ctrl.get_vec_c_AND_dCdtau_times_uDach(tLeft/dataOpt.final_time)
-        np.multiply(adjP_fdu[:,:,np.newaxis], vec_C, out = self.adjGrad_Phi_uDach_buff[idx_buff])
+        np.multiply.outer(adjP_fdu, vec_C, out = self.adjGrad_Phi_uDach_buff[idx_buff])
         integrand_tF_Left = tLeft * (adjP_fdu @ dCdtau_times_uDach)
         gradPhi[:,0] -= deltaT * (integrand_tF_Left + integrand_tF_Right)
         gradPhi[:,1:] += deltaT * (self.adjGrad_Phi_uDach_buff_view0 + self.adjGrad_Phi_uDach_buff_view1)   
@@ -125,7 +125,7 @@ class adjGrads_TOCP():
             FreeDyn.buffer_MBS_dForce_dFDparam.update_from_dll()
             adjP_fdu = self.BDF.get_adjVar_P_Phi().T @ FreeDyn.dForce_dFDparam
             vec_C, dCdtau_times_uDach = Ctrl.get_vec_c_AND_dCdtau_times_uDach(tLeft/dataOpt.final_time)
-            np.multiply(adjP_fdu[:,:,np.newaxis], vec_C, out = self.adjGrad_Phi_uDach_buff[idx_buff])
+            np.multiply.outer(adjP_fdu, vec_C, out = self.adjGrad_Phi_uDach_buff[idx_buff])
             integrand_tF_Left = tLeft * (adjP_fdu @ dCdtau_times_uDach)
             gradPhi[:,0] -= deltaT * (integrand_tF_Left + integrand_tF_Right)
             gradPhi[:,1:] += deltaT * (self.adjGrad_Phi_uDach_buff_view0 + self.adjGrad_Phi_uDach_buff_view1)
