@@ -9,11 +9,13 @@ class Control:
         
         if num_ctrls > 0:
             self.num_grid_nodes = num_grid_nodes
-            
             self.grid_nodes = None
             
             self.grid_tau = np.linspace(0, 1, num_grid_nodes)
             self.spline_time_invariant()
+            
+            self.buff_vecC = np.zeros(num_grid_nodes)
+            self.buff_dCdtau_uDach = np.zeros(num_ctrls)
             print('class Control initialized')
 
 # -----------------------------------------------------------------------------
@@ -93,7 +95,7 @@ class Control:
 
 # -----------------------------------------------------------------------------
 
-    def get_vec_c(self, time_point):
+    def update_vecC(self, time_point):
         
         ctrl_intSPL_pos = self.find_SPL_by_t(time_point)
         idx_mat = 3 * ctrl_intSPL_pos
@@ -101,15 +103,21 @@ class Control:
         # Vector tau entries
         t = time_point - self.grid_tau[ctrl_intSPL_pos]
         
+        # Note: ctrl_invA_times_K includes already the minus
+        self.core_vecC(ctrl_intSPL_pos, idx_mat, t)
+# -----------------------------------------------------------------------------
+
+    def core_vecC(self, ctrl_intSPL_pos, idx_mat, deltaT):        
         
-        # Note: ctrl_invA_times_K includes already the minus  
-        vec_C = t * ( self.ctrl_invA_times_K[idx_mat, :] 
-              + t * ( self.ctrl_invA_times_K[idx_mat + 1, :] 
-                + t * self.ctrl_invA_times_K[idx_mat + 2, :]))
+        # Note: ctrl_invA_times_K includes already the minus
+        self.buff_vecC[:] = self.ctrl_invA_times_K[idx_mat + 2, :]
+        self.buff_vecC *= deltaT
+        self.buff_vecC += self.ctrl_invA_times_K[idx_mat + 1, :]
+        self.buff_vecC *= deltaT
+        self.buff_vecC += self.ctrl_invA_times_K[idx_mat, :] 
+        self.buff_vecC *= deltaT
             
-        vec_C[ctrl_intSPL_pos] += 1.0
-            
-        return vec_C 
+        self.buff_vecC[ctrl_intSPL_pos] += 1.0
 # -----------------------------------------------------------------------------
 
     def get_vec_c_dtF(self, time_point):
@@ -120,7 +128,7 @@ class Control:
         # Vector tau entries
         t = time_point - self.grid_tau[ctrl_intSPL_pos]
         
-        # Note: SPL_coeffs_bcd includes already the minus  
+        # Note: SPL_coeffs_bcd includes already the minus
         vec_C_dtF =  (self.ctrl_invA_times_K[idx_mat, :] 
                   + t * ( 2 * self.ctrl_invA_times_K[idx_mat + 1, :] 
                   + t * 3 * self.ctrl_invA_times_K[idx_mat + 2, :]))
@@ -129,7 +137,7 @@ class Control:
         return vec_C_dtF 
 # -----------------------------------------------------------------------------
 
-    def get_vec_c_AND_dCdtau_times_uDach(self, time_point):
+    def update_vecC_AND_dCdtau_times_uDach(self, time_point):
         
         ctrl_intSPL_pos = self.find_SPL_by_t(time_point)
         idx_mat = 3 * ctrl_intSPL_pos
@@ -137,30 +145,24 @@ class Control:
         # Vector tau entries
         t = time_point - self.grid_tau[ctrl_intSPL_pos]
         
-        # Note: ctrl_invA_times_K and SPL_coeffs_bcd include already the minus   
-
-        vec_C = t * ( self.ctrl_invA_times_K[idx_mat, :] 
-              + t * ( self.ctrl_invA_times_K[idx_mat + 1, :] 
-                + t * self.ctrl_invA_times_K[idx_mat + 2, :]))
-            
-        vec_C[ctrl_intSPL_pos] += 1.0
+        self.core_vecC(ctrl_intSPL_pos, idx_mat, t)
             
           
-        # Note: SPL_coeffs_bcd includes already the minus  
-        dCdtau_times_uDach =  (self.vecC_dtF_invariant[idx_mat] 
-                      + t * ( self.vecC_dtF_invariant[idx_mat + 1] 
-                      +  t * self.vecC_dtF_invariant[idx_mat + 2]))
-            
-        return vec_C, dCdtau_times_uDach 
+        # Note: SPL_coeffs_bcd includes already the minus
+        self.buff_dCdtau_uDach[:] = self.vecC_dtF_invariant[idx_mat + 2]
+        self.buff_dCdtau_uDach *= t
+        self.buff_dCdtau_uDach += self.vecC_dtF_invariant[idx_mat + 1]
+        self.buff_dCdtau_uDach *= t
+        self.buff_dCdtau_uDach += self.vecC_dtF_invariant[idx_mat]        
 # -----------------------------------------------------------------------------
 
     def get_C(self, time_point):
         
-        vec_C = self.get_vec_c(time_point)
+        self.update_vecC(time_point)
         matC = np.zeros([self.num_ctrls,self.num_ctrls*self.num_grid_nodes])
         
         for i in range(0, self.num_ctrls):
-             matC[i,i*self.num_grid_nodes:(i+1)*self.num_grid_nodes] = vec_C
+             matC[i,i*self.num_grid_nodes:(i+1)*self.num_grid_nodes] = self.buff_vecC
           
         return matC
 # -----------------------------------------------------------------------------
@@ -183,10 +185,8 @@ class Control:
 # -----------------------------------------------------------------------------
      
     def get_u(self, time_point):
-        
-        vec_C = self.get_vec_c(time_point)
-        
-        return np.dot(vec_C, self.grid_nodes)
+        self.update_vecC(time_point)
+        return np.dot(self.buff_vecC, self.grid_nodes)
 # -----------------------------------------------------------------------------
      
     def get_u_for_GridNodes(self, time_point, user_grid_nodes):
@@ -196,8 +196,8 @@ class Control:
             u = matC @ user_grid_nodes
         
         else:
-            vec_C = self.get_vec_c(time_point)
-            u = np.dot(vec_C, user_grid_nodes)
+            self.update_vecC(time_point)
+            u = np.dot(self.buff_vecC, user_grid_nodes)
             
         return u
 # -----------------------------------------------------------------------------

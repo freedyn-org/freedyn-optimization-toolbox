@@ -1,15 +1,6 @@
-import numpy as np
-
-class CoreBDF():
+import numpy as np 
     
-    @classmethod
-    def create(cls, dataOpt, FreeDyn):
-        if FreeDyn.MBS_modeMAT_sparse:
-            from .BDF_sparse_physical_time import SparseBDF
-            return SparseBDF(dataOpt, FreeDyn)
-        else:
-            from .BDF_dense_physical_time import DenseBDF
-            return DenseBDF(dataOpt, FreeDyn)
+class CoreBDF():       
     
     def __init__(self, dataOpt, FreeDyn):
         

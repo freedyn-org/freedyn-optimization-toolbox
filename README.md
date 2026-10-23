@@ -106,7 +106,7 @@ pip install freedyn
 - Python 3.8+ (Recommendation: Python 3.13)
 - numpy, scipy
 - matplotlib (optional: for plotting results)
-- freedyn 1.0.6.post1 +
+- freedyn 1.1.0 +
  
 ## Citation
 If you use the FreeDyn Optimization Toolbox in your research, please cite:
@@ -121,7 +121,7 @@ If you use the FreeDyn Optimization Toolbox in your research, please cite:
 ```
 
 ## Related Papers
-Papers demonstrating the toolbox:
+Papers demonstrating the toolbox v1.0.0:
 
 P. Zallinger, L. Buchner, W. Steiner, K. Nachbagauer. A Low-Effort Approach to Adjoint Gradient Computation for Optimal Control Problems Using a Multibody Dynamics Simulation Interface. 
 *Proceedings of the ASME 2026 International Design Engineering Technical Conferences and Computers and Information in Engineering Conference. 22nd International Conference on Multibody Systems, Nonlinear Dynamics, and Control (MSNDC)*. Houston, Texas, USA. 2026.
