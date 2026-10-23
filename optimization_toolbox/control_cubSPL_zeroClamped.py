@@ -9,7 +9,6 @@ class Control:
         
         if num_ctrls > 0:
             self.num_grid_nodes = num_grid_nodes
-            
             self.grid_nodes = None
             
             self.grid_tau = np.linspace(0, 1, num_grid_nodes)
