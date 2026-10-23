@@ -136,7 +136,7 @@ class Control:
         return vec_C_dtF 
 # -----------------------------------------------------------------------------
 
-    def get_vec_c_AND_dCdtau_times_uDach(self, time_point):
+    def get_vecC_AND_dCdtau_times_uDach(self, time_point):
         
         ctrl_intSPL_pos = self.find_SPL_by_t(time_point)
         idx_mat = 3 * ctrl_intSPL_pos
@@ -144,13 +144,7 @@ class Control:
         # Vector tau entries
         t = time_point - self.grid_tau[ctrl_intSPL_pos]
         
-        # Note: ctrl_invA_times_K and SPL_coeffs_bcd include already the minus   
-
-        vec_C = t * ( self.ctrl_invA_times_K[idx_mat, :] 
-              + t * ( self.ctrl_invA_times_K[idx_mat + 1, :] 
-                + t * self.ctrl_invA_times_K[idx_mat + 2, :]))
-            
-        vec_C[ctrl_intSPL_pos] += 1.0
+        self.core_vecC(ctrl_intSPL_pos, idx_mat, t)
             
           
         # Note: SPL_coeffs_bcd includes already the minus  
@@ -158,7 +152,7 @@ class Control:
                       + t * ( self.vecC_dtF_invariant[idx_mat + 1] 
                       +  t * self.vecC_dtF_invariant[idx_mat + 2]))
             
-        return vec_C, dCdtau_times_uDach 
+        return dCdtau_times_uDach 
 # -----------------------------------------------------------------------------
 
     def get_C(self, time_point):
