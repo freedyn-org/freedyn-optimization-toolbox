@@ -14,6 +14,8 @@ class Control:
             
             self.grid_tau = np.linspace(0, 1, num_grid_nodes)
             self.spline_time_invariant()
+            
+            self.vecC_buff = np.zeros(num_grid_nodes)
             print('class Control initialized')
 
 # -----------------------------------------------------------------------------
@@ -93,7 +95,7 @@ class Control:
 
 # -----------------------------------------------------------------------------
 
-    def get_vec_c(self, time_point):
+    def update_vecC(self, time_point):
         
         ctrl_intSPL_pos = self.find_SPL_by_t(time_point)
         idx_mat = 3 * ctrl_intSPL_pos
@@ -101,15 +103,21 @@ class Control:
         # Vector tau entries
         t = time_point - self.grid_tau[ctrl_intSPL_pos]
         
+        # Note: ctrl_invA_times_K includes already the minus
+        self.core_vecC(ctrl_intSPL_pos, idx_mat, t)
+# -----------------------------------------------------------------------------
+
+    def core_vecC(self, ctrl_intSPL_pos, idx_mat, deltaT):        
         
-        # Note: ctrl_invA_times_K includes already the minus  
-        vec_C = t * ( self.ctrl_invA_times_K[idx_mat, :] 
-              + t * ( self.ctrl_invA_times_K[idx_mat + 1, :] 
-                + t * self.ctrl_invA_times_K[idx_mat + 2, :]))
+        # Note: ctrl_invA_times_K includes already the minus
+        self.vecC_buff[:] = self.ctrl_invA_times_K[idx_mat + 2, :]
+        self.vecC_buff *= deltaT
+        self.vecC_buff += self.ctrl_invA_times_K[idx_mat + 1, :]
+        self.vecC_buff *= deltaT
+        self.vecC_buff += self.ctrl_invA_times_K[idx_mat, :] 
+        self.vecC_buff *= deltaT
             
-        vec_C[ctrl_intSPL_pos] += 1.0
-            
-        return vec_C 
+        self.vecC_buff[ctrl_intSPL_pos] += 1.0
 # -----------------------------------------------------------------------------
 
     def get_vec_c_dtF(self, time_point):
