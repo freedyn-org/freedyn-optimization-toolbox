@@ -163,11 +163,11 @@ class Control:
 
     def get_C(self, time_point):
         
-        vec_C = self.get_vec_c(time_point)
+        self.update_vecC(time_point)
         matC = np.zeros([self.num_ctrls,self.num_ctrls*self.num_grid_nodes])
         
         for i in range(0, self.num_ctrls):
-             matC[i,i*self.num_grid_nodes:(i+1)*self.num_grid_nodes] = vec_C
+             matC[i,i*self.num_grid_nodes:(i+1)*self.num_grid_nodes] = self.vecC_buff
           
         return matC
 # -----------------------------------------------------------------------------
@@ -190,10 +190,8 @@ class Control:
 # -----------------------------------------------------------------------------
      
     def get_u(self, time_point):
-        
-        vec_C = self.get_vec_c(time_point)
-        
-        return np.dot(vec_C, self.grid_nodes)
+        self.update_vecC(time_point)
+        return np.dot(self.vecC_buff, self.grid_nodes)
 # -----------------------------------------------------------------------------
      
     def get_u_for_GridNodes(self, time_point, user_grid_nodes):
@@ -203,8 +201,8 @@ class Control:
             u = matC @ user_grid_nodes
         
         else:
-            vec_C = self.get_vec_c(time_point)
-            u = np.dot(vec_C, user_grid_nodes)
+            self.update_vecC(time_point)
+            u = np.dot(self.vecC_buff, user_grid_nodes)
             
         return u
 # -----------------------------------------------------------------------------
