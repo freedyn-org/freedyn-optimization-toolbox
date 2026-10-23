@@ -14,7 +14,8 @@ class Control:
             self.grid_tau = np.linspace(0, 1, num_grid_nodes)
             self.spline_time_invariant()
             
-            self.vecC_buff = np.zeros(num_grid_nodes)
+            self.buff_vecC = np.zeros(num_grid_nodes)
+            self.buff_dCdtau_uDach = np.zeros(num_ctrls)
             print('class Control initialized')
 
 # -----------------------------------------------------------------------------
@@ -109,14 +110,14 @@ class Control:
     def core_vecC(self, ctrl_intSPL_pos, idx_mat, deltaT):        
         
         # Note: ctrl_invA_times_K includes already the minus
-        self.vecC_buff[:] = self.ctrl_invA_times_K[idx_mat + 2, :]
-        self.vecC_buff *= deltaT
-        self.vecC_buff += self.ctrl_invA_times_K[idx_mat + 1, :]
-        self.vecC_buff *= deltaT
-        self.vecC_buff += self.ctrl_invA_times_K[idx_mat, :] 
-        self.vecC_buff *= deltaT
+        self.buff_vecC[:] = self.ctrl_invA_times_K[idx_mat + 2, :]
+        self.buff_vecC *= deltaT
+        self.buff_vecC += self.ctrl_invA_times_K[idx_mat + 1, :]
+        self.buff_vecC *= deltaT
+        self.buff_vecC += self.ctrl_invA_times_K[idx_mat, :] 
+        self.buff_vecC *= deltaT
             
-        self.vecC_buff[ctrl_intSPL_pos] += 1.0
+        self.buff_vecC[ctrl_intSPL_pos] += 1.0
 # -----------------------------------------------------------------------------
 
     def get_vec_c_dtF(self, time_point):
@@ -127,7 +128,7 @@ class Control:
         # Vector tau entries
         t = time_point - self.grid_tau[ctrl_intSPL_pos]
         
-        # Note: SPL_coeffs_bcd includes already the minus  
+        # Note: SPL_coeffs_bcd includes already the minus
         vec_C_dtF =  (self.ctrl_invA_times_K[idx_mat, :] 
                   + t * ( 2 * self.ctrl_invA_times_K[idx_mat + 1, :] 
                   + t * 3 * self.ctrl_invA_times_K[idx_mat + 2, :]))
@@ -136,7 +137,7 @@ class Control:
         return vec_C_dtF 
 # -----------------------------------------------------------------------------
 
-    def get_vecC_AND_dCdtau_times_uDach(self, time_point):
+    def update_vecC_AND_dCdtau_times_uDach(self, time_point):
         
         ctrl_intSPL_pos = self.find_SPL_by_t(time_point)
         idx_mat = 3 * ctrl_intSPL_pos
@@ -147,12 +148,12 @@ class Control:
         self.core_vecC(ctrl_intSPL_pos, idx_mat, t)
             
           
-        # Note: SPL_coeffs_bcd includes already the minus  
-        dCdtau_times_uDach =  (self.vecC_dtF_invariant[idx_mat] 
-                      + t * ( self.vecC_dtF_invariant[idx_mat + 1] 
-                      +  t * self.vecC_dtF_invariant[idx_mat + 2]))
-            
-        return dCdtau_times_uDach 
+        # Note: SPL_coeffs_bcd includes already the minus
+        self.buff_dCdtau_uDach[:] = self.vecC_dtF_invariant[idx_mat + 2]
+        self.buff_dCdtau_uDach *= t
+        self.buff_dCdtau_uDach += self.vecC_dtF_invariant[idx_mat + 1]
+        self.buff_dCdtau_uDach *= t
+        self.buff_dCdtau_uDach += self.vecC_dtF_invariant[idx_mat]        
 # -----------------------------------------------------------------------------
 
     def get_C(self, time_point):
@@ -161,7 +162,7 @@ class Control:
         matC = np.zeros([self.num_ctrls,self.num_ctrls*self.num_grid_nodes])
         
         for i in range(0, self.num_ctrls):
-             matC[i,i*self.num_grid_nodes:(i+1)*self.num_grid_nodes] = self.vecC_buff
+             matC[i,i*self.num_grid_nodes:(i+1)*self.num_grid_nodes] = self.buff_vecC
           
         return matC
 # -----------------------------------------------------------------------------
@@ -185,7 +186,7 @@ class Control:
      
     def get_u(self, time_point):
         self.update_vecC(time_point)
-        return np.dot(self.vecC_buff, self.grid_nodes)
+        return np.dot(self.buff_vecC, self.grid_nodes)
 # -----------------------------------------------------------------------------
      
     def get_u_for_GridNodes(self, time_point, user_grid_nodes):
@@ -196,7 +197,7 @@ class Control:
         
         else:
             self.update_vecC(time_point)
-            u = np.dot(self.vecC_buff, user_grid_nodes)
+            u = np.dot(self.buff_vecC, user_grid_nodes)
             
         return u
 # -----------------------------------------------------------------------------
