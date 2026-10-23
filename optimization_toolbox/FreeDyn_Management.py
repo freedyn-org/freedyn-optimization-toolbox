@@ -2,8 +2,10 @@ import numpy as np
 import freedyn as fd
 from pathlib import Path
 
+from .FreeDyn_optim_buffers import FreeDynBuffers
 
-class FreeDyn():
+
+class FreeDyn(FreeDynBuffers):
     
     def __init__(self,
                  path_FDdll, fds_path, fds_name,
@@ -38,14 +40,6 @@ class FreeDyn():
         else:
             self.MBS_modeMAT_sparse = False  
             print("Matrix layout: dense")
-            
-            
-        # System matrices and derivatives - Decision: dense or sparse layout
-        self.init_MBS_sysMat_slots()
-        
-        # Derivative of sum of external forces w.r.t. parameter given as string
-        self.buffer_MBS_dForce_dFDparam = fd.ForceParameterDerivativeMatrixBuffer(fds_dForce_dparam_name)
-        self.dForce_dFDparam = self.buffer_MBS_dForce_dFDparam.data
         
         # FreeDyn data object control splines, measures, force wrt parameter
         self.fds_ctrl_name = fds_ctrl_name
@@ -53,6 +47,9 @@ class FreeDyn():
         self.fds_dForce_dparam_name = fds_dForce_dparam_name
         self.FD_pars = None
         self.num_FD_pars = num_FD_pars
+        
+        # System matrices and derivatives - Decision: dense or sparse layout
+        FreeDynBuffers.__init__(self)
         
         print('class FreeDyn initialized')
 # -----------------------------------------------------------------------------        
