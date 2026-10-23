@@ -6,7 +6,7 @@ from .toolbox import Toolbox
 
 from .update_optim_vars_if_changed import UpdateOCP, UpdateTOCP, UpdateParamIdent
 from .optimization_task import OptimTask
-from .Management_FreeDyn import FreeDyn
+from .FreeDyn_management import FreeDyn
 from .control_cubSPL_zeroClamped import Control
 
 from .adjGrad_wrt_u_FDOP import adjGrads_OCP

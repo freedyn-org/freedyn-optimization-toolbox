@@ -68,17 +68,17 @@ class DenseBC(CoreBC):
     
     def compute_consistent_BC_Phi(self, FreeDyn):        
 
-        coeffMat_W = np.block([[self.BC_eyeMat, FreeDyn.MBS_Cq.T],
-                                   [FreeDyn.MBS_Cq, self.BC_zeroMat]])
+        coeffMat_W = np.block([[self.BC_eyeMat, FreeDyn.SysMat.Cq.T],
+                                   [FreeDyn.SysMat.Cq, self.BC_zeroMat]])
         
-        coeffMat_P = np.block([[FreeDyn.MBS_M, FreeDyn.MBS_Cq.T],
-                               [FreeDyn.MBS_Cq, self.BC_zeroMat]])
+        coeffMat_P = np.block([[FreeDyn.SysMat.M, FreeDyn.SysMat.Cq.T],
+                               [FreeDyn.SysMat.Cq, self.BC_zeroMat]])
 
         
         PU_tF = np.linalg.solve(coeffMat_P, self.BC_dv_tr)
         U_tF = PU_tF[FreeDyn.nDof:, :]
         
-        self.BC_dq_tr[:FreeDyn.nDof, :] -= (FreeDyn.MBS_CqvDq.T @ U_tF)
+        self.BC_dq_tr[:FreeDyn.nDof, :] -= (FreeDyn.SysMat.CqvDq.T @ U_tF)
          
         WL_tF = np.linalg.solve(coeffMat_W, self.BC_dq_tr)
 
@@ -103,11 +103,11 @@ class SparseBC(CoreBC):
     
     def compute_consistent_BC_Phi(self, FreeDyn):        
         
-        coeffMat_W_csc = bmat([[self.BC_eyeMat, FreeDyn.MBS_Cq.T],
-                               [FreeDyn.MBS_Cq, None]], format = 'csc')
+        coeffMat_W_csc = bmat([[self.BC_eyeMat, FreeDyn.SysMat.Cq.T],
+                               [FreeDyn.SysMat.Cq, None]], format = 'csc')
 
-        coeffMat_P_csc = bmat([[FreeDyn.MBS_M, FreeDyn.MBS_Cq.T],
-                               [FreeDyn.MBS_Cq, None]], format = 'csc')
+        coeffMat_P_csc = bmat([[FreeDyn.SysMat.M, FreeDyn.SysMat.Cq.T],
+                               [FreeDyn.SysMat.Cq, None]], format = 'csc')
         
         solve_W = factorized(coeffMat_W_csc)
         solve_P = factorized(coeffMat_P_csc)
@@ -115,7 +115,7 @@ class SparseBC(CoreBC):
         PU_tF = solve_P(self.BC_dv_tr)
         U_tF = PU_tF[FreeDyn.nDof:, :]
         
-        self.BC_dq_tr[:FreeDyn.nDof, :] -= (FreeDyn.MBS_CqvDq.T @ U_tF)
+        self.BC_dq_tr[:FreeDyn.nDof, :] -= (FreeDyn.SysMat.CqvDq.T @ U_tF)
          
         WL_tF = solve_W(self.BC_dq_tr)
 
