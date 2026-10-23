@@ -40,7 +40,7 @@ class adjGrads_OCP():
         FreeDyn.update_dForce_dFDparam()
         dLdu_adjP_fdu = UserFcts.dLdu + self.BDF.get_adjVar_p_J().T @ FreeDyn.SysMat.dForce_dFDparam
         Ctrl.update_vecC(tRight/dataOpt.final_time)
-        np.outer(dLdu_adjP_fdu, Ctrl.vecC_buff, out = self.adjGrad_J_buff[idx_buff])
+        np.outer(dLdu_adjP_fdu, Ctrl.buff_vecC, out = self.adjGrad_J_buff[idx_buff])
         
         """ BDF order 1 """
         idx_buff = 1 - idx_buff
@@ -52,7 +52,7 @@ class adjGrads_OCP():
         FreeDyn.update_dForce_dFDparam()
         dLdu_adjP_fdu = UserFcts.dLdu + self.BDF.get_adjVar_p_J().T @ FreeDyn.SysMat.dForce_dFDparam
         Ctrl.update_vecC(tLeft/dataOpt.final_time)
-        np.outer(dLdu_adjP_fdu, Ctrl.vecC_buff, out = self.adjGrad_J_buff[idx_buff])
+        np.outer(dLdu_adjP_fdu, Ctrl.buff_vecC, out = self.adjGrad_J_buff[idx_buff])
         dJdu = deltaT * (self.adjGrad_J_buff_view0 + self.adjGrad_J_buff_view1)
                 
         """ BDF order 2 """        
@@ -67,7 +67,7 @@ class adjGrads_OCP():
             FreeDyn.update_dForce_dFDparam()
             dLdu_adjP_fdu = UserFcts.dLdu + self.BDF.get_adjVar_p_J().T @ FreeDyn.SysMat.dForce_dFDparam
             Ctrl.update_vecC(tLeft/dataOpt.final_time)
-            np.outer(dLdu_adjP_fdu, Ctrl.vecC_buff, out = self.adjGrad_J_buff[idx_buff])
+            np.outer(dLdu_adjP_fdu, Ctrl.buff_vecC, out = self.adjGrad_J_buff[idx_buff])
             dJdu += deltaT * (self.adjGrad_J_buff_view0 + self.adjGrad_J_buff_view1)
             
         dJdu *= 0.5 
@@ -88,7 +88,7 @@ class adjGrads_OCP():
         Ctrl.update_vecC(tRight/dataOpt.final_time)
         FreeDyn.update_dForce_dFDparam()
         adjP_fdu = self.BDF.get_adjVar_P_Phi().T @ FreeDyn.SysMat.dForce_dFDparam
-        np.multiply.outer(adjP_fdu, Ctrl.vecC_buff, out = self.adjGrad_Phi_buff[idx_buff])
+        np.multiply.outer(adjP_fdu, Ctrl.buff_vecC, out = self.adjGrad_Phi_buff[idx_buff])
         
         """ BDF order 1 """ 
         idx_buff = 1 - idx_buff
@@ -99,7 +99,7 @@ class adjGrads_OCP():
         Ctrl.update_vecC(tLeft/dataOpt.final_time)
         FreeDyn.update_dForce_dFDparam()
         adjP_fdu = self.BDF.get_adjVar_P_Phi().T @ FreeDyn.SysMat.dForce_dFDparam
-        np.multiply.outer(adjP_fdu, Ctrl.vecC_buff, out = self.adjGrad_Phi_buff[idx_buff])
+        np.multiply.outer(adjP_fdu, Ctrl.buff_vecC, out = self.adjGrad_Phi_buff[idx_buff])
         dPhidu = deltaT * (self.adjGrad_Phi_buff_view0 + self.adjGrad_Phi_buff_view1)
         
         """ BDF order 2 """      
@@ -113,7 +113,7 @@ class adjGrads_OCP():
             Ctrl.update_vecC(tLeft/dataOpt.final_time)
             FreeDyn.update_dForce_dFDparam()
             adjP_fdu = self.BDF.get_adjVar_P_Phi().T @ FreeDyn.SysMat.dForce_dFDparam
-            np.multiply.outer(adjP_fdu, Ctrl.vecC_buff, out = self.adjGrad_Phi_buff[idx_buff])
+            np.multiply.outer(adjP_fdu, Ctrl.buff_vecC, out = self.adjGrad_Phi_buff[idx_buff])
             dPhidu += deltaT * (self.adjGrad_Phi_buff_view0 + self.adjGrad_Phi_buff_view1)
             
         dPhidu *= 0.5
