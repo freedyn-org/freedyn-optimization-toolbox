@@ -21,22 +21,22 @@ class SparseBDF(CoreBDF):
         FreeDyn.API.compute_initial_conditions()
         eye_dense = np.eye(FreeDyn.nDof)
         eyeMat_sp = scipy.sparse.csr_matrix(eye_dense)
-        dummy_M = FreeDyn.slot_MBS_M.sp_mat.copy()
-        dummy_fv = FreeDyn.slot_MBS_fv.sp_mat.copy()
+        dummy_M = FreeDyn.SysMat.slot_M.sp_mat.copy()
+        dummy_fv = FreeDyn.SysMat.slot_fv.sp_mat.copy()
         dummy_M.data.fill(1.0)
         dummy_fv.data.fill(1.0)        
         sumA22 = dummy_M + dummy_fv.T
     
         offset = 0
         offset, A11_idx = self.idx_temp_init_adj_sys_coeff_mat(offset, eyeMat_sp)  
-        offset, A12_idx = self.idx_temp_init_adj_sys_coeff_mat(offset, FreeDyn.MBS_G_tr, transpose=True) 
-        offset, A13_idx = self.idx_temp_init_adj_sys_coeff_mat(offset, FreeDyn.MBS_CqvDq, transpose=True)
-        offset, A14_idx = self.idx_temp_init_adj_sys_coeff_mat(offset, FreeDyn.MBS_Cq, transpose=True) 
+        offset, A12_idx = self.idx_temp_init_adj_sys_coeff_mat(offset, FreeDyn.SysMat.G_tr, transpose=True) 
+        offset, A13_idx = self.idx_temp_init_adj_sys_coeff_mat(offset, FreeDyn.SysMat.CqvDq, transpose=True)
+        offset, A14_idx = self.idx_temp_init_adj_sys_coeff_mat(offset, FreeDyn.SysMat.Cq, transpose=True) 
         offset, A21_idx = self.idx_temp_init_adj_sys_coeff_mat(offset, eyeMat_sp)
         offset, A22_idx = self.idx_temp_init_adj_sys_coeff_mat(offset, sumA22)        
-        offset, A23_idx = self.idx_temp_init_adj_sys_coeff_mat(offset, FreeDyn.MBS_Cq, transpose=True)
-        offset, A32_idx = self.idx_temp_init_adj_sys_coeff_mat(offset, FreeDyn.MBS_Cq)  
-        offset, A41_idx = self.idx_temp_init_adj_sys_coeff_mat(offset, FreeDyn.MBS_Cq)
+        offset, A23_idx = self.idx_temp_init_adj_sys_coeff_mat(offset, FreeDyn.SysMat.Cq, transpose=True)
+        offset, A32_idx = self.idx_temp_init_adj_sys_coeff_mat(offset, FreeDyn.SysMat.Cq)  
+        offset, A41_idx = self.idx_temp_init_adj_sys_coeff_mat(offset, FreeDyn.SysMat.Cq)
         
         layout = [[A11_idx, A12_idx, A13_idx, A14_idx],
                   [A21_idx, A22_idx, A23_idx, None],
@@ -50,16 +50,16 @@ class SparseBDF(CoreBDF):
         self.coeff_mat_map = np.argsort(self.coeff_mat.data)
     
         self.coeff_mat_map_A11 = self.coeff_mat_map[self.build_map_coeff_mat(eyeMat_sp, A11_idx)]
-        self.coeff_mat_map_A12 = self.coeff_mat_map[self.build_map_coeff_mat(FreeDyn.MBS_G_tr, A12_idx, transpose=True)]
-        self.coeff_mat_map_A13 = self.coeff_mat_map[self.build_map_coeff_mat(FreeDyn.MBS_CqvDq, A13_idx, transpose=True)]
-        self.coeff_mat_map_A14 = self.coeff_mat_map[self.build_map_coeff_mat(FreeDyn.MBS_Cq, A14_idx, transpose=True)]
+        self.coeff_mat_map_A12 = self.coeff_mat_map[self.build_map_coeff_mat(FreeDyn.SysMat.G_tr, A12_idx, transpose=True)]
+        self.coeff_mat_map_A13 = self.coeff_mat_map[self.build_map_coeff_mat(FreeDyn.SysMat.CqvDq, A13_idx, transpose=True)]
+        self.coeff_mat_map_A14 = self.coeff_mat_map[self.build_map_coeff_mat(FreeDyn.SysMat.Cq, A14_idx, transpose=True)]
         self.coeff_mat_map_A21 = self.coeff_mat_map[self.build_map_coeff_mat(eyeMat_sp, A21_idx)]
-        self.coeff_mat_map_M_A22 = self.coeff_mat_map[self.build_map_coeff_mat(FreeDyn.MBS_M, A22_idx)]
-        self.coeff_mat_map_fv_A22 = self.coeff_mat_map[self.build_map_coeff_mat(FreeDyn.MBS_fv, A22_idx, transpose=True)]
+        self.coeff_mat_map_M_A22 = self.coeff_mat_map[self.build_map_coeff_mat(FreeDyn.SysMat.M, A22_idx)]
+        self.coeff_mat_map_fv_A22 = self.coeff_mat_map[self.build_map_coeff_mat(FreeDyn.SysMat.fv, A22_idx, transpose=True)]
         self.coeff_mat_map_A22 = np.unique(np.concatenate([self.coeff_mat_map_M_A22,self.coeff_mat_map_fv_A22]))
-        self.coeff_mat_map_A23 = self.coeff_mat_map[self.build_map_coeff_mat(FreeDyn.MBS_Cq, A23_idx, transpose=True)]
-        self.coeff_mat_map_A32 = self.coeff_mat_map[self.build_map_coeff_mat(FreeDyn.MBS_Cq, A32_idx)]
-        self.coeff_mat_map_A41 = self.coeff_mat_map[self.build_map_coeff_mat(FreeDyn.MBS_Cq, A41_idx)]
+        self.coeff_mat_map_A23 = self.coeff_mat_map[self.build_map_coeff_mat(FreeDyn.SysMat.Cq, A23_idx, transpose=True)]
+        self.coeff_mat_map_A32 = self.coeff_mat_map[self.build_map_coeff_mat(FreeDyn.SysMat.Cq, A32_idx)]
+        self.coeff_mat_map_A41 = self.coeff_mat_map[self.build_map_coeff_mat(FreeDyn.SysMat.Cq, A41_idx)]
         
         # A21 is set here, as these are const. values
         self.coeff_mat.data[self.coeff_mat_map_A21] = -1.0
@@ -102,22 +102,22 @@ class SparseBDF(CoreBDF):
         
         # Row 1
         self.coeff_mat.data[self.coeff_mat_map_A11] = eta0 
-        self.coeff_mat.data[self.coeff_mat_map_A12] = -FreeDyn.slot_MBS_G_tr.dll_nonzeros
-        self.coeff_mat.data[self.coeff_mat_map_A13] = -FreeDyn.slot_MBS_CqvDq.dll_nonzeros
-        self.coeff_mat.data[self.coeff_mat_map_A14] = -FreeDyn.slot_MBS_Cq.dll_nonzeros
+        self.coeff_mat.data[self.coeff_mat_map_A12] = -FreeDyn.SysMat.slot_G_tr.dll_nonzeros
+        self.coeff_mat.data[self.coeff_mat_map_A13] = -FreeDyn.SysMat.slot_CqvDq.dll_nonzeros
+        self.coeff_mat.data[self.coeff_mat_map_A14] = -FreeDyn.SysMat.slot_Cq.dll_nonzeros
         
         # Row 2
         # A21 is already set in self.init_adj_sys_coeff_mat
         self.coeff_mat.data[self.coeff_mat_map_A22] = 0.0
-        self.coeff_mat.data[self.coeff_mat_map_M_A22] = eta0 * FreeDyn.slot_MBS_M.dll_nonzeros
-        self.coeff_mat.data[self.coeff_mat_map_fv_A22] -= FreeDyn.slot_MBS_fv.dll_nonzeros
-        self.coeff_mat.data[self.coeff_mat_map_A23] = -FreeDyn.slot_MBS_Cq.dll_nonzeros
+        self.coeff_mat.data[self.coeff_mat_map_M_A22] = eta0 * FreeDyn.SysMat.slot_M.dll_nonzeros
+        self.coeff_mat.data[self.coeff_mat_map_fv_A22] -= FreeDyn.SysMat.slot_fv.dll_nonzeros
+        self.coeff_mat.data[self.coeff_mat_map_A23] = -FreeDyn.SysMat.slot_Cq.dll_nonzeros
     
         # Row 3
-        self.coeff_mat.data[self.coeff_mat_map_A32] = FreeDyn.slot_MBS_Cq.dll_nonzeros 
+        self.coeff_mat.data[self.coeff_mat_map_A32] = FreeDyn.SysMat.slot_Cq.dll_nonzeros 
         
         # Row 4
-        self.coeff_mat.data[self.coeff_mat_map_A41] = FreeDyn.slot_MBS_Cq.dll_nonzeros 
+        self.coeff_mat.data[self.coeff_mat_map_A41] = FreeDyn.SysMat.slot_Cq.dll_nonzeros 
 # -----------------------------------------------------------------------------
     
 # =============================================================================
@@ -193,7 +193,7 @@ class SparseBDF(CoreBDF):
         idx2 = 1 - idx1
         
         # Compute M(s_n-1) * adjP(s_n-1) - must before update_MBS_SysMat, because s_n-1 is needed!
-        self.BDF_J_buff_M_times_p[idx1, :] = FreeDyn.MBS_M @ self.adjP_J_buff[idx1, :]
+        self.BDF_J_buff_M_times_p[idx1, :] = FreeDyn.SysMat.M @ self.adjP_J_buff[idx1, :]
         
         # Updates at BDF time step s_n
         FreeDyn.update_sys_mat_for_BDF()
@@ -209,7 +209,7 @@ class SparseBDF(CoreBDF):
         idx2 = 1 - idx1
         
         # Compute M(s_n-1) * adjP(s_n-1) - must before update_MBS_SysMat, because s_n-1 is needed!
-        self.BDF_Phi_buff_M_times_P[idx1, :, :] = FreeDyn.MBS_M @ self.adjP_Phi_buff[idx1, :, :]
+        self.BDF_Phi_buff_M_times_P[idx1, :, :] = FreeDyn.SysMat.M @ self.adjP_Phi_buff[idx1, :, :]
         
         # Updates at BDF time step s_n
         FreeDyn.update_sys_mat_for_BDF()

@@ -49,7 +49,7 @@ class FreeDyn(FreeDynBuffers):
         self.num_FD_pars = num_FD_pars
         
         # System matrices and derivatives - Decision: dense or sparse layout
-        FreeDynBuffers.__init__(self)
+        self.SysMat = FreeDynBuffers(self.MBS_modeMAT_sparse, fds_dForce_dparam_name)
         
         print('class FreeDyn initialized')
 # -----------------------------------------------------------------------------        
@@ -73,6 +73,25 @@ class FreeDyn(FreeDynBuffers):
         self.API.compute_initial_conditions()
         self.API.solve_until(final_time) 
         self.num_time_steps = self.API.get_num_time_steps()
+
+# =============================================================================
+# Commands concerning FreeDyn optim buffers
+# ============================================================================= 
+
+    def update_dForce_dFDparam(self):
+        self.SysMat.update_dForce_dFDparam()
+        
+    def update_sys_mat_for_BDF(self):
+        self.SysMat.update_sys_mat_for_BDF(self.API)
+
+    def update_nnz_dll_sys_mat_for_BDF(self):
+        self.SysMat.update_nnz_dll_sys_mat_for_BDF(self.API)
+    
+    def update_sys_mat_for_consistent_BC_J(self):
+        self.SysMat.update_sys_mat_for_consistent_BC_J(self.API)
+
+    def update_sys_mat_for_consistent_BC_Phi(self):
+        self.SysMat.update_sys_mat_for_consistent_BC_Phi(self.API)
 
 # =============================================================================
 # Commands concerning FD pars 

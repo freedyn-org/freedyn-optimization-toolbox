@@ -34,13 +34,13 @@ class DenseBDF(CoreBDF):
         
         """ Update the entries of the coefficient matrix - use the dense matricies """
         
-        self.BDF_coeffMat_view_11[:] = eta0 * FreeDyn.MBS_M - eta0_inv * FreeDyn.MBS_G_tr.T - FreeDyn.MBS_fv.T
-        self.BDF_coeffMat_view_12[:] = -eta0_inv * FreeDyn.MBS_CqvDq.T - FreeDyn.MBS_Cq.T
-        self.BDF_coeffMat_view_13[:] = -eta0_inv * FreeDyn.MBS_Cq.T
-        self.BDF_coeffMat_view_21[:] = FreeDyn.MBS_Cq @ FreeDyn.MBS_G_tr.T
-        self.BDF_coeffMat_view_22[:] = FreeDyn.MBS_Cq @ FreeDyn.MBS_CqvDq.T
-        self.BDF_coeffMat_view_23[:] = FreeDyn.MBS_Cq @ FreeDyn.MBS_Cq.T
-        self.BDF_coeffMat_view_31[:] = FreeDyn.MBS_Cq
+        self.BDF_coeffMat_view_11[:] = eta0 * FreeDyn.SysMat.M - eta0_inv * FreeDyn.SysMat.G_tr.T - FreeDyn.SysMat.fv.T
+        self.BDF_coeffMat_view_12[:] = -eta0_inv * FreeDyn.SysMat.CqvDq.T - FreeDyn.SysMat.Cq.T
+        self.BDF_coeffMat_view_13[:] = -eta0_inv * FreeDyn.SysMat.Cq.T
+        self.BDF_coeffMat_view_21[:] = FreeDyn.SysMat.Cq @ FreeDyn.SysMat.G_tr.T
+        self.BDF_coeffMat_view_22[:] = FreeDyn.SysMat.Cq @ FreeDyn.SysMat.CqvDq.T
+        self.BDF_coeffMat_view_23[:] = FreeDyn.SysMat.Cq @ FreeDyn.SysMat.Cq.T
+        self.BDF_coeffMat_view_31[:] = FreeDyn.SysMat.Cq
 # -----------------------------------------------------------------------------
 
 # =============================================================================
@@ -119,7 +119,7 @@ class DenseBDF(CoreBDF):
         idx2 = 1 - idx1
         
         # Compute M(s_n-1) * adjP(s_n-1) - must before update_MBS_SysMat, because s_n-1 is needed!
-        self.BDF_J_buff_M_times_p[idx1, :] = FreeDyn.MBS_M @ self.adjP_J_buff[idx1, :]
+        self.BDF_J_buff_M_times_p[idx1, :] = FreeDyn.SysMat.M @ self.adjP_J_buff[idx1, :]
 
         # Updates at BDF time step s_n
         FreeDyn.update_sys_mat_for_BDF()
@@ -135,7 +135,7 @@ class DenseBDF(CoreBDF):
         idx2 = 1 - idx1
         
         # Compute M(s_n-1) * adjP(s_n-1) - must before update_MBS_SysMat, because s_n-1 is needed!
-        self.BDF_Phi_buff_M_times_P[idx1, :, :] = FreeDyn.MBS_M @ self.adjP_Phi_buff[idx1, :, :]
+        self.BDF_Phi_buff_M_times_P[idx1, :, :] = FreeDyn.SysMat.M @ self.adjP_Phi_buff[idx1, :, :]
         
         # Updates at BDF time step s_n
         FreeDyn.update_sys_mat_for_BDF()
@@ -149,7 +149,7 @@ class DenseBDF(CoreBDF):
         
         # Bulid the solution vector of the Adjoint Sys
         self.BDF_solVec_J_view_first[:] += UserFcts.dLdv.T + eta0_inv*(UserFcts.dLdq.T - self.BDF_J_eta_times_adjW)
-        self.BDF_solVec_J_view_second[:] = FreeDyn.MBS_Cq @ (self.BDF_J_eta_times_adjW - UserFcts.dLdq.T)
+        self.BDF_solVec_J_view_second[:] = FreeDyn.SysMat.Cq @ (self.BDF_J_eta_times_adjW - UserFcts.dLdq.T)
         
         self.update_coeff_mat_adj_sys(FreeDyn, eta0, eta0_inv)
         vec_P_Sig_MU = np.linalg.solve(self.BDF_coeffMat, self.BDF_solVec_J)
@@ -161,9 +161,9 @@ class DenseBDF(CoreBDF):
         self.adjP_J_buff[self.BDF_idx_buff, :] = vec_P_Sig_MU[:FreeDyn.nDof]
         
         # Compute adj w at time idx = 0
-        self.adjW_J_buff[self.BDF_idx_buff, :] = FreeDyn.MBS_G_tr.T @ vec_P_Sig_MU[:FreeDyn.nDof]
-        self.adjW_J_buff[self.BDF_idx_buff, :] += FreeDyn.MBS_CqvDq.T @ vec_P_Sig_MU[FreeDyn.nDof:FreeDyn.nDofConstr] 
-        self.adjW_J_buff[self.BDF_idx_buff, :] += FreeDyn.MBS_Cq.T @ vec_P_Sig_MU[FreeDyn.nDofConstr:] 
+        self.adjW_J_buff[self.BDF_idx_buff, :] = FreeDyn.SysMat.G_tr.T @ vec_P_Sig_MU[:FreeDyn.nDof]
+        self.adjW_J_buff[self.BDF_idx_buff, :] += FreeDyn.SysMat.CqvDq.T @ vec_P_Sig_MU[FreeDyn.nDof:FreeDyn.nDofConstr] 
+        self.adjW_J_buff[self.BDF_idx_buff, :] += FreeDyn.SysMat.Cq.T @ vec_P_Sig_MU[FreeDyn.nDofConstr:] 
         self.adjW_J_buff[self.BDF_idx_buff, :] -= self.BDF_J_eta_times_adjW
         self.adjW_J_buff[self.BDF_idx_buff, :] += UserFcts.dLdq.T 
         self.adjW_J_buff[self.BDF_idx_buff, :] *= eta0_inv
@@ -173,7 +173,7 @@ class DenseBDF(CoreBDF):
         
         # Bulid the solution vector of the Adjoint Sys      
         self.BDF_solVec_Phi_view_first[:] -= eta0_inv * self.BDF_Phi_eta_times_adjW
-        self.BDF_solVec_Phi_view_second[:] = FreeDyn.MBS_Cq @ self.BDF_Phi_eta_times_adjW
+        self.BDF_solVec_Phi_view_second[:] = FreeDyn.SysMat.Cq @ self.BDF_Phi_eta_times_adjW
         
         self.update_coeff_mat_adj_sys(FreeDyn, eta0, eta0_inv)
         vec_P_Sig_MU = np.linalg.solve(self.BDF_coeffMat, self.BDF_solVec_Phi) 
@@ -185,9 +185,9 @@ class DenseBDF(CoreBDF):
         self.adjP_Phi_buff[self.BDF_idx_buff, :, :] = vec_P_Sig_MU[:FreeDyn.nDof]
         
         # Compute adj w at time idx = 0
-        self.adjW_Phi_buff[self.BDF_idx_buff, :, :] = FreeDyn.MBS_G_tr.T @ vec_P_Sig_MU[:FreeDyn.nDof]
-        self.adjW_Phi_buff[self.BDF_idx_buff, :, :] += FreeDyn.MBS_CqvDq.T @ vec_P_Sig_MU[FreeDyn.nDof:FreeDyn.nDofConstr] 
-        self.adjW_Phi_buff[self.BDF_idx_buff, :, :] += FreeDyn.MBS_Cq.T @ vec_P_Sig_MU[FreeDyn.nDofConstr:] 
+        self.adjW_Phi_buff[self.BDF_idx_buff, :, :] = FreeDyn.SysMat.G_tr.T @ vec_P_Sig_MU[:FreeDyn.nDof]
+        self.adjW_Phi_buff[self.BDF_idx_buff, :, :] += FreeDyn.SysMat.CqvDq.T @ vec_P_Sig_MU[FreeDyn.nDof:FreeDyn.nDofConstr] 
+        self.adjW_Phi_buff[self.BDF_idx_buff, :, :] += FreeDyn.SysMat.Cq.T @ vec_P_Sig_MU[FreeDyn.nDofConstr:] 
         self.adjW_Phi_buff[self.BDF_idx_buff, :, :] -= self.BDF_Phi_eta_times_adjW
         self.adjW_Phi_buff[self.BDF_idx_buff, :, :] *= eta0_inv
   
