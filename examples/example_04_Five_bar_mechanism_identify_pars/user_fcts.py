@@ -23,26 +23,14 @@ class UserFunctions():
         
         # lagrangian of the optimization problem: J = \int_{t_0}^{t_f} L dt
         
-        # r_P2 = np.zeros(2)
+        r_P2 = np.zeros(2)
         
-        # for i, par in enumerate(self.name_fDmeas):
-        #     r_P2[i] = self.API.get_measure_value(self.name_fDmeas[i])
-        
-        
-        # r_P2_init = np.array([0.0, -2.0])
-        # delta = r_P2 - r_P2_init
+        for i, meas in enumerate(FreeDyn.name_meas):
+            r_P2[i] = FreeDyn.API.get_measure_value(meas)
         
         
-        r_COM1 = np.zeros(2)
-        
-        r_COM1[0] = FreeDyn.API.Q[0,0]
-        r_COM1[1] = FreeDyn.API.Q[1,0] 
-        
-        
-        r_COM1_init = np.array([-1.0, -0.5])
-        delta = r_COM1 - r_COM1_init
-
-        
+        r_P2_init = np.array([0.0, -2.0])
+        delta = r_P2 - r_P2_init
         
         return 0.5 * np.dot(delta, delta)
 # -----------------------------------------------------------------------------
@@ -54,17 +42,15 @@ class UserFunctions():
         # If you want to access an element, use self.dLdq[i] = ...
         # If dLdq = 0, then only use "return None"
         
-        r_COM1 = np.zeros(2)
+        r_P2_init = np.array([0.0, -2.0])
         
-        r_COM1[0] = FreeDyn.API.Q[0,0]
-        r_COM1[1] = FreeDyn.API.Q[1,0] 
+        self.dLdq.fill(0.0)
         
+        for i, meas in enumerate(FreeDyn.name_meas):
+            delta_i = FreeDyn.API.get_measure_value(meas) - r_P2_init[i]
+            self.dLdq[:] += delta_i * FreeDyn.API.get_measure_derivative(meas, 'q')[0]
         
-        r_COM1_init = np.array([-1.0, -0.5])
-        delta = r_COM1 - r_COM1_init
-           
-        self.dLdq[0] = delta[0]
-        self.dLdq[1] = delta[1]
+
         
         return None
 # -----------------------------------------------------------------------------
