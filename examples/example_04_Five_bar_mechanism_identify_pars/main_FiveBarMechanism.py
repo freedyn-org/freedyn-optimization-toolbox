@@ -40,7 +40,7 @@ fds_path = path_main                                       # Path of *.fds
 fds_name = 'five_bar_planar_mechanism'                     # Name of *.fds (without file typ)
 fds_dForce_dparam_name = ["l0_spring1", "l0_spring2"]      # FreeDyn param for df / dparam
 fds_meas_name = ["dispX_P2", "dispY_P2"]                   # FreeDyn measures
-fds_ctrl_name = None,                                      # FreeDyn control splines
+fds_ctrl_name = None                                       # FreeDyn control splines
 #
 # -----------------------------------------------------------------------------
 #
