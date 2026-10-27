@@ -115,7 +115,6 @@ for i in range(0,num_FD_pars):
 #
 """ Get data for plots """
 t = np.zeros(Opt_TB.FreeDyn.num_time_steps)                    # physical time t
-tau = np.zeros(Opt_TB.FreeDyn.num_time_steps)                  # normalized time scale [0;1]
 rx_P2 =  np.zeros(Opt_TB.FreeDyn.num_time_steps)           # 
 ry_P2 =  np.zeros(Opt_TB.FreeDyn.num_time_steps)            # 
 vx_P2 =  np.zeros(Opt_TB.FreeDyn.num_time_steps)            # 
@@ -124,8 +123,6 @@ vy_P2 =  np.zeros(Opt_TB.FreeDyn.num_time_steps)            #
 for i in range(Opt_TB.FreeDyn.num_time_steps-1, -1, -1): 
    Opt_TB.FreeDyn.fetch_and_update_states_at_index(i)
    t[i] = Opt_TB.FreeDyn.API.t
-   tau[i] = t[i]/Opt_TB.OptimTask.final_time
-   q = Opt_TB.FreeDyn.API.Q[:, 0]
    
    rx_P2[i] = Opt_TB.FreeDyn.API.get_measure_value("dispX_P2")
    ry_P2[i] = Opt_TB.FreeDyn.API.get_measure_value("dispY_P2")
