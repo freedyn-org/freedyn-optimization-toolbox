@@ -136,7 +136,7 @@ Constraint Generic
 	ayFixed = no
 	azFixed = no
 	Location = 0.500000,0.000000,0.000000
-	    ConstraintOrientation = 1.000000,0.000000,0.000000,0.000000,1.000000,0.000000,0.000000,0.000000,1.000000
+	ConstraintOrientation = 1.000000,0.000000,0.000000,0.000000,1.000000,0.000000,0.000000,0.000000,1.000000
 EndConstraint
 %
 Force Gravity
