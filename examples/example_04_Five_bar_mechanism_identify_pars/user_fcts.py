@@ -48,7 +48,8 @@ class UserFunctions():
         
         for i, meas in enumerate(FreeDyn.name_meas):
             delta_i = FreeDyn.API.get_measure_value(meas) - r_P2_init[i]
-            self.dLdq[:] += delta_i * FreeDyn.API.get_measure_derivative(meas, 'q')[0]
+            meas_dq = FreeDyn.API.get_measure_derivative(meas, 'q')
+            self.dLdq[:] += delta_i * meas_dq[0]
         
 
         
