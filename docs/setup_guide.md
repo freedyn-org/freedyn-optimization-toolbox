@@ -168,7 +168,7 @@ qD = np.zeros((Opt_TB.FreeDyn.nDof, num_steps))         # redundant generalized 
 for i in range(num_steps-1, -1, -1): 
    Opt_TB.FreeDyn.fetch_and_update_states_at_index(i)
    time[i] = Opt_TB.FreeDyn.API.t
-   u[:,i] = Opt_TB.Ctrl.get_u(tau[i]/final_time)
+   u[:,i] = Opt_TB.Ctrl.get_u(time[i]/final_time)
    q[:,i] = Opt_TB.FreeDyn.API.Q[:, 0]
    qD[:,i] = Opt_TB.FreeDyn.API.Qd[:, 0]
 ```
