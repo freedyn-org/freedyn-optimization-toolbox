@@ -122,7 +122,7 @@ sys.path.insert(0, path_folder_optim_toolbox)
 
 2) Define the Parameters of FreeDyn Optimization Toolbox
 
-[`Parameters of FreeDyn Optimization Toolbox`](docs/architecture.md#required-parameters-for-the-freedyn-optimization-toolbox)
+[`Parameters of FreeDyn Optimization Toolbox`](docs/config.md#required-parameters-for-the-freedyn-optimization-toolbox)
 
 3) Initialize FreeDyn Optimization Toolbox
 ```python
