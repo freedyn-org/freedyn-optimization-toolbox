@@ -10,7 +10,7 @@ Opt_TB = <ClassName>(fds_path, fds_name,
                      final_time, final_state,
                      path_FDdll)
 ```
-[`Parameters of FreeDyn Optimization Toolbox`](docs/architecture.md#required-parameters-for-the-freedyn-optimization-toolbox)
+[`Parameters of FreeDyn Optimization Toolbox`](docs/config.md#required-parameters-for-the-freedyn-optimization-toolbox)
 
 ## Features
 
