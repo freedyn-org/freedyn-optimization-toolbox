@@ -10,11 +10,11 @@ Opt_TB = <ClassName>(fds_path, fds_name,
                      final_time, final_state,
                      path_FDdll)
 ```
-[`Parameters of FreeDyn Optimization Toolbox`](docs/config.md#required-parameters-for-the-freedyn-optimization-toolbox)
+→ [`Parameters of FreeDyn Optimization Toolbox`](docs/config.md#required-parameters-for-the-freedyn-optimization-toolbox)
 
 ## Features
 
-[Short Overwiew Demo Examples](examples/GitHub_Examples_Description.pdf)
+→ [Short Overwiew Demo Examples](examples/GitHub_Examples_Description.pdf)
 
 - Use **OptimCtrl** for optimal control problems with fixed final time
   <table>
@@ -89,7 +89,7 @@ pip install freedyn
 3. Download Freedyn-optimization-toolbox
 4. Run `main_*.py`
 
-[`How to Create Your Own Optimization Task`](docs/setup_guide.md)
+→ [`How to Create Your Own Optimization Task`](docs/setup_guide.md)
 
 ## Requirements
 - Python 3.8+ (Recommendation: Python 3.13)
