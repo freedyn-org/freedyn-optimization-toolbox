@@ -1,5 +1,15 @@
 ### Required Parameters for the FreeDyn Optimization Toolbox
 
+```python
+from optimization_toolbox import OptimCtrl, TimeOptimCtrl, ParamIdent
+
+Opt_TB = <ClassName>(fds_path, fds_name,
+                     fds_dForce_dparam_name, fds_meas_name, fds_ctrl_name,
+                     num_ctrls, num_ctrl_grid_nodes, num_FD_pars,
+                     final_time, final_state,
+                     path_FDdll)
+```
+
 <table>
   <thead>
     <tr>
