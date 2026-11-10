@@ -51,7 +51,7 @@ class FreeDyn(FreeDynBuffers):
         # System matrices and derivatives - Decision: dense or sparse layout
         self.SysMat = FreeDynBuffers(self.MBS_modeMAT_sparse, fds_dForce_dparam_name)
         
-        print('class FreeDyn initialized')
+        # print('class FreeDyn initialized')
 # -----------------------------------------------------------------------------        
         
     def delete_model(self):
