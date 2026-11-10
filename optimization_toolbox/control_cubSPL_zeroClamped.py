@@ -16,7 +16,8 @@ class Control:
             
             self.buff_vecC = np.zeros(num_grid_nodes)
             self.buff_dCdtau_uDach = np.zeros(num_ctrls)
-            print('class Control initialized')
+            
+        # print('class Control initialized')
 
 # -----------------------------------------------------------------------------
 
