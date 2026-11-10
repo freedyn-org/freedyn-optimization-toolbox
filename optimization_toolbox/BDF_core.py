@@ -24,7 +24,7 @@ class CoreBDF():
         self.init_order_one_BDF()
         self.init_order_two_BDF()
         
-        print('class BDF initialized')
+        # print('class BDF initialized')
         
 # =============================================================================
 # Return values of adjVar p at BDF time idx s_n from the buffer
