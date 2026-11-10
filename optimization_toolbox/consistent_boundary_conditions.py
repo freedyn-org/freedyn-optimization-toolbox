@@ -8,20 +8,20 @@ from scipy.sparse import bmat
 class CoreBC():
     
     @classmethod
-    def create(cls, dataOpt, FreeDyn):
+    def create(cls, FreeDyn, num_xF):
         if FreeDyn.MBS_modeMAT_sparse:
-            return SparseBC(dataOpt, FreeDyn)
+            return SparseBC(FreeDyn, num_xF)
         else:
-            return DenseBC(dataOpt, FreeDyn)
+            return DenseBC(FreeDyn, num_xF)
 
 
-    def __init__(self, dataOpt, FreeDyn):
+    def __init__(self, FreeDyn, num_xF):
         
         """ BC for Phi - if necessary """
-        if dataOpt.num_xF > 0:  
-            self.BC_dq_tr = np.zeros((FreeDyn.nDofConstr, dataOpt.num_xF))   # (dPhi / dq)^T
-            self.BC_dv_tr = np.zeros((FreeDyn.nDofConstr, dataOpt.num_xF))   # (dPhi / dv)^T
-        self.init_mat_BC(dataOpt, FreeDyn)
+        if num_xF > 0:  
+            self.BC_dq_tr = np.zeros((FreeDyn.nDofConstr, num_xF))   # (dPhi / dq)^T
+            self.BC_dv_tr = np.zeros((FreeDyn.nDofConstr, num_xF))   # (dPhi / dv)^T
+        self.init_mat_BC(FreeDyn, num_xF)
             
 # -----------------------------------------------------------------------------
     def get_consistent_BC_J(self, BDF, FreeDyn):
@@ -54,10 +54,10 @@ class CoreBC():
 
 class DenseBC(CoreBC):
     
-    def init_mat_BC(self, dataOpt, FreeDyn):
+    def init_mat_BC(self, FreeDyn, num_xF):
         
         """ BC for Phi - if necessary """
-        if dataOpt.num_xF > 0:  
+        if num_xF > 0:  
             self.BC_eyeMat = np.eye(FreeDyn.nDof)
             self.BC_zeroMat = np.zeros((FreeDyn.nConstr, FreeDyn.nConstr))
 # -----------------------------------------------------------------------------
@@ -88,10 +88,10 @@ class DenseBC(CoreBC):
 
 class SparseBC(CoreBC): 
     
-    def init_mat_BC(self, dataOpt, FreeDyn):
+    def init_mat_BC(self, FreeDyn, num_xF):
         
         """ BC for Phi - if necessary """
-        if dataOpt.num_xF > 0:  
+        if num_xF > 0:  
             eye_dense = np.eye(FreeDyn.nDof)
             self.BC_eyeMat = scipy.sparse.csr_matrix(eye_dense)
 # -----------------------------------------------------------------------------

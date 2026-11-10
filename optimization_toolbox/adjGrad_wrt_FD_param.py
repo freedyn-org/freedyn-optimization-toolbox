@@ -6,21 +6,21 @@ from .BDF_dense_physical_time import DenseBDF
 
 class adjGrads_Param():
     
-    def __init__(self, dataOpt, FreeDyn, Ctrl):
+    def __init__(self, FreeDyn, num_xF):
         
-        self.BC_FDOP = CoreBC.create(dataOpt, FreeDyn)
+        self.BC_FDOP = CoreBC.create(FreeDyn, num_xF)
         
         if FreeDyn.MBS_modeMAT_sparse:
-            self.BDF = SparseBDF(dataOpt, FreeDyn)
+            self.BDF = SparseBDF(FreeDyn, num_xF)
         else:
-            self.BDF =  DenseBDF(dataOpt, FreeDyn)
+            self.BDF =  DenseBDF(FreeDyn, num_xF)
 
         self.adjGrad_J_buff = np.zeros((2, FreeDyn.num_FD_pars))
         self.adjGrad_J_buff_view0 = self.adjGrad_J_buff[0]
         self.adjGrad_J_buff_view1 = self.adjGrad_J_buff[1]
         
-        if dataOpt.num_xF > 0:
-            self.adjGrad_Phi_buff = np.zeros((2, dataOpt.num_xF, FreeDyn.num_FD_pars))
+        if num_xF > 0:
+            self.adjGrad_Phi_buff = np.zeros((2, num_xF, FreeDyn.num_FD_pars))
             self.adjGrad_Phi_buff_view0 = self.adjGrad_Phi_buff[0]
             self.adjGrad_Phi_buff_view1 = self.adjGrad_Phi_buff[1]
 # -----------------------------------------------------------------------------        

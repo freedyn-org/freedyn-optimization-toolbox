@@ -1,26 +1,19 @@
 import numpy as np
 
-from user_fcts import UserFunctions
-
 class OptimTask():
     
-    def __init__(self, UpdateOptimVars, AdjGrad, FreeDyn, Ctrl,
-                 nOptVars, npars,
+    def __init__(self, UpdateOptimVars, UserFunctions, AdjGrad, FreeDyn, Ctrl,
+                 nOptVars, num_xF,
                  tF, xF):
         
         self.num_opt_vars = nOptVars
-        
-        if xF is None:
-            self.num_xF = 0
-        else:
-            self.num_xF = len(xF)
-
+        self.num_xF = num_xF
         self.final_time = tF
         self.xF = xF
         
         self.UpdateOptimVars = UpdateOptimVars()
-        self.adjGrads = AdjGrad(self, FreeDyn, Ctrl)
-        self.UserFcts = UserFunctions(FreeDyn.nDof, self.num_xF, npars)
+        self.adjGrads = AdjGrad
+        self.UserFcts = UserFunctions
 
 # =============================================================================
 #  Cost functional J
