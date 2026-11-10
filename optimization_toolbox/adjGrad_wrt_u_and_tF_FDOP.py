@@ -6,24 +6,24 @@ from .BDF_dense_physical_time import DenseBDF
 
 class adjGrads_TOCP():
     
-    def __init__(self, dataOpt, FreeDyn, Ctrl):
+    def __init__(self, FreeDyn, Ctrl, num_xF):
         
-        self.BC_FDOP = CoreBC.create(dataOpt, FreeDyn)
+        self.BC_FDOP = CoreBC.create(FreeDyn, num_xF)
         
         if FreeDyn.MBS_modeMAT_sparse:
-            self.BDF = SparseBDF(dataOpt, FreeDyn)
+            self.BDF = SparseBDF(FreeDyn, num_xF)
         else:
-            self.BDF =  DenseBDF(dataOpt, FreeDyn)
+            self.BDF =  DenseBDF(FreeDyn, num_xF)
         
         self.adjGrad_J_uDach_buff = np.zeros((2, Ctrl.num_ctrls, Ctrl.num_grid_nodes))
         self.adjGrad_J_uDach_buff_view0 = self.adjGrad_J_uDach_buff[0].reshape(-1)
         self.adjGrad_J_uDach_buff_view1 = self.adjGrad_J_uDach_buff[1].reshape(-1)
         
-        if dataOpt.num_xF > 0: 
+        if num_xF > 0: 
             ctrl_all = Ctrl.num_ctrls * Ctrl.num_grid_nodes
-            self.adjGrad_Phi_uDach_buff = np.zeros((2, dataOpt.num_xF, Ctrl.num_ctrls, Ctrl.num_grid_nodes))
-            self.adjGrad_Phi_uDach_buff_view0 = self.adjGrad_Phi_uDach_buff[0].reshape(dataOpt.num_xF, ctrl_all)
-            self.adjGrad_Phi_uDach_buff_view1 = self.adjGrad_Phi_uDach_buff[1].reshape(dataOpt.num_xF, ctrl_all)
+            self.adjGrad_Phi_uDach_buff = np.zeros((2, num_xF, Ctrl.num_ctrls, Ctrl.num_grid_nodes))
+            self.adjGrad_Phi_uDach_buff_view0 = self.adjGrad_Phi_uDach_buff[0].reshape(num_xF, ctrl_all)
+            self.adjGrad_Phi_uDach_buff_view1 = self.adjGrad_Phi_uDach_buff[1].reshape(num_xF, ctrl_all)
 # -----------------------------------------------------------------------------
     
     def adjGrad_J(self, dataOpt, UserFcts, FreeDyn, Ctrl, z):

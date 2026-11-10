@@ -2,6 +2,10 @@ from __future__ import annotations
 from typing import Sequence, Union
 import numpy as np
 
+
+from user_fcts import UserFunctions
+
+
 from .toolbox import Toolbox
 
 from .update_optim_vars_if_changed import UpdateOCP, UpdateTOCP, UpdateParamIdent
@@ -29,13 +33,20 @@ def OptimCtrl(
     path_FDdll: None | str) -> Toolbox:
     
     num_optVars = num_ctrls * num_ctrl_grid_nodes
+    
+    if final_state is None:
+        num_xF = 0
+    else:
+        num_xF = len(final_state)
 
     freedyn = FreeDyn(path_FDdll, fds_path, fds_name, 
                       fds_ctrl_name, fds_meas_name, fds_dForce_dparam_name,
                       num_FD_pars)
     ctrl = Control(num_ctrls, num_ctrl_grid_nodes)
-    optim_task = OptimTask(UpdateOCP, adjGrads_OCP, freedyn, ctrl, 
-                          num_optVars, num_ctrls, final_time, final_state)
+    userFcts = UserFunctions(freedyn.nDof, num_xF, num_ctrls)
+    adjGrads = adjGrads_OCP(freedyn, ctrl, num_xF)
+    optim_task = OptimTask(UpdateOCP, userFcts, adjGrads, freedyn, ctrl, 
+                          num_optVars, num_xF, final_time, final_state)
     
     
     return Toolbox(freedyn, ctrl, optim_task)
@@ -57,12 +68,19 @@ def TimeOptimCtrl(
     
     num_optVars = 1 + num_ctrls * num_ctrl_grid_nodes
     
+    if final_state is None:
+        num_xF = 0
+    else:
+        num_xF = len(final_state)
+    
     freedyn = FreeDyn(path_FDdll, fds_path, fds_name, 
                       fds_ctrl_name, fds_meas_name, fds_dForce_dparam_name,
                       num_FD_pars)
     ctrl = Control(num_ctrls, num_ctrl_grid_nodes)
-    optim_task = OptimTask(UpdateTOCP, adjGrads_TOCP, freedyn, ctrl, 
-                          num_optVars, num_ctrls, final_time, final_state)
+    userFcts = UserFunctions(freedyn.nDof, num_xF, num_ctrls)
+    adjGrads = adjGrads_TOCP(freedyn, ctrl, num_xF)
+    optim_task = OptimTask(UpdateTOCP, userFcts, adjGrads, freedyn, ctrl, 
+                          num_optVars, num_xF, final_time, final_state)
     
     return Toolbox(freedyn, ctrl, optim_task)
 
@@ -82,13 +100,20 @@ def ParamIdent(
     path_FDdll: None | str) -> Toolbox:
     
     num_optVars = num_FD_pars
+    
+    if final_state is None:
+        num_xF = 0
+    else:
+        num_xF = len(final_state)
 
     freedyn = FreeDyn(path_FDdll, fds_path, fds_name, 
                       fds_ctrl_name, fds_meas_name, fds_dForce_dparam_name,
                       num_FD_pars)
     ctrl = Control(num_ctrls, num_ctrl_grid_nodes)
-    optim_task = OptimTask(UpdateParamIdent, adjGrads_Param, freedyn, ctrl, 
-                          num_optVars, num_FD_pars, final_time, final_state)
+    userFcts = UserFunctions(freedyn.nDof, num_xF, num_FD_pars)
+    adjGrads = adjGrads_Param(freedyn, num_xF)
+    optim_task = OptimTask(UpdateParamIdent, userFcts, adjGrads, freedyn, ctrl, 
+                          num_optVars, num_xF, final_time, final_state)
     
     
     return Toolbox(freedyn, ctrl, optim_task)

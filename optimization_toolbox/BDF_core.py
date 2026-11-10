@@ -2,7 +2,7 @@ import numpy as np
     
 class CoreBDF():       
     
-    def __init__(self, dataOpt, FreeDyn):
+    def __init__(self, FreeDyn, num_xF):
         
         # Create buffers for fast access
         self.BDF_idx_buff = 0
@@ -17,9 +17,9 @@ class CoreBDF():
         else:
             partition_1 = FreeDyn.nDof
             partition_2 = FreeDyn.nDofConstr
-            self.allocate_buffs_BDF_add_dense(FreeDyn.nDof, dataOpt.num_xF)        
+            self.allocate_buffs_BDF_add_dense(FreeDyn.nDof, num_xF)        
         
-        self.allocate_buffs_BDF(num_buffs, FreeDyn.nDof, dataOpt.num_xF, nBDFsys, partition_1, partition_2)
+        self.allocate_buffs_BDF(num_buffs, FreeDyn.nDof, num_xF, nBDFsys, partition_1, partition_2)
         
         self.init_order_one_BDF()
         self.init_order_two_BDF()
