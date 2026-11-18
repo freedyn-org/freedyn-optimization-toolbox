@@ -260,7 +260,7 @@ Simulation Dynamic
 	InitialVelocityFromFile = 0
 	SimulationTimeEnd = 5.000000
 	OutputTimeBegin = 0.000000
-	OutputTimeStepSize = 5.000000e-03
+	OutputTimeStepSize = 1.000000e-03
 	isExactOutputTimeEnforced = yes
 	WriteConstraintForceResultFile = no
 	WriteForceResultFile = no
@@ -278,7 +278,7 @@ Solver HHT
 	MaxNumberOfInnerIterations = 5,5
 	GlobalErrorTolerance = 1.000000e-05
 	SolverMinTimeStep = 1.000000e-10
-	SolverMaxTimeStep = 5.000000e-03
+	SolverMaxTimeStep = 1.000000e-03
 	ModifyNewmark = no
 	MaxNumOfTimeStepsUsingSameFactorizedJacobian = 0
 	UsePardisoScalingAndMatching = no
