@@ -61,7 +61,20 @@ class FreeDynBuffers():
         scale_matG = np.array([1.0, -1.0, -1.0, -1.0])
         G_idx = fd.analysis.create_matrix(id_matG, pos_matG, pos_matG, scale_matG)
         self.slot_G_tr = fd.ModelRelatedMatrixBuffer(G_idx, memory_layout)
-        self.G_tr = getattr(self.slot_G_tr, attr_name)    
+        self.G_tr = getattr(self.slot_G_tr, attr_name)
+        
+        # Coeff matrices for adjoint variables - BC
+        scale_coeff_mat_BC_adj = np.array([1.0, 1.0, 1.0])
+        row_coeff_mat_BC_adj = np.array([0, 0, 1], dtype=c_int)
+        col_coeff_mat_BC_adj = np.array([0, 1, 0], dtype=c_int)
+        id_coeff_mat_BC_adjW = np.array([112, 201, 301], dtype=c_int)
+        id_coeff_mat_BC_adjP = np.array([101, 201, 301], dtype=c_int)
+        coeff_mat_BC_adjW_idx = fd.analysis.create_matrix(id_coeff_mat_BC_adjW, row_coeff_mat_BC_adj, col_coeff_mat_BC_adj, scale_coeff_mat_BC_adj)
+        coeff_mat_BC_adjP_idx = fd.analysis.create_matrix(id_coeff_mat_BC_adjP, row_coeff_mat_BC_adj, col_coeff_mat_BC_adj, scale_coeff_mat_BC_adj)
+        self.slot_coeff_mat_BC_adjW = fd.ModelRelatedMatrixBuffer(coeff_mat_BC_adjW_idx, memory_layout)
+        self.slot_coeff_mat_BC_adjP = fd.ModelRelatedMatrixBuffer(coeff_mat_BC_adjP_idx, memory_layout)
+        self.coeff_mat_BC_adjW = getattr(self.slot_coeff_mat_BC_adjW, attr_name) 
+        self.coeff_mat_BC_adjP = getattr(self.slot_coeff_mat_BC_adjP, attr_name) 
 # ----------------------------------------------------------------------------- 
 
     def update_sys_mat_for_BDF(self, API):
@@ -97,8 +110,11 @@ class FreeDynBuffers():
         API.update_jacobian()
         self.slot_M.update_from_dll()
         self.slot_M.apply_to_cached_matrix()
-        self.slot_Cq.update_from_dll()
-        self.slot_Cq.apply_to_cached_matrix()
         self.slot_CqvDq.update_from_dll()
         self.slot_CqvDq.apply_to_cached_matrix()
+        
+        self.slot_coeff_mat_BC_adjW.update_from_dll()
+        self.slot_coeff_mat_BC_adjW.apply_to_cached_matrix()
+        self.slot_coeff_mat_BC_adjP.update_from_dll()
+        self.slot_coeff_mat_BC_adjP.apply_to_cached_matrix()
 # -----------------------------------------------------------------------------
