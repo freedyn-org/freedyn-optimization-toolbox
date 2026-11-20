@@ -1,7 +1,5 @@
 import numpy as np
-import scipy
-from scipy.sparse.linalg import factorized
-from scipy.sparse import bmat
+from scipy.sparse.linalg import spsolve
 
 
 
@@ -21,7 +19,6 @@ class CoreBC():
         if num_xF > 0:  
             self.BC_dq_tr = np.zeros((FreeDyn.nDofConstr, num_xF))   # (dPhi / dq)^T
             self.BC_dv_tr = np.zeros((FreeDyn.nDofConstr, num_xF))   # (dPhi / dv)^T
-        self.init_mat_BC(FreeDyn, num_xF)
             
 # -----------------------------------------------------------------------------
     def get_consistent_BC_J(self, BDF, FreeDyn):
@@ -54,12 +51,6 @@ class CoreBC():
 
 class DenseBC(CoreBC):
     
-    def init_mat_BC(self, FreeDyn, num_xF):
-        
-        """ BC for Phi - if necessary """
-        if num_xF > 0:  
-            self.BC_eyeMat = np.eye(FreeDyn.nDof)
-            self.BC_zeroMat = np.zeros((FreeDyn.nConstr, FreeDyn.nConstr))
 # -----------------------------------------------------------------------------
         
     def compute_consistent_BC_J(self):
@@ -68,13 +59,9 @@ class DenseBC(CoreBC):
     
     def compute_consistent_BC_Phi(self, FreeDyn):        
 
-        coeffMat_W = np.block([[self.BC_eyeMat, FreeDyn.SysMat.Cq.T],
-                                   [FreeDyn.SysMat.Cq, self.BC_zeroMat]])
-        
-        coeffMat_P = np.block([[FreeDyn.SysMat.M, FreeDyn.SysMat.Cq.T],
-                               [FreeDyn.SysMat.Cq, self.BC_zeroMat]])
+        coeffMat_W = FreeDyn.SysMat.coeff_mat_BC_adjW
+        coeffMat_P = FreeDyn.SysMat.coeff_mat_BC_adjP
 
-        
         PU_tF = np.linalg.solve(coeffMat_P, self.BC_dv_tr)
         U_tF = PU_tF[FreeDyn.nDof:, :]
         
@@ -88,12 +75,6 @@ class DenseBC(CoreBC):
 
 class SparseBC(CoreBC): 
     
-    def init_mat_BC(self, FreeDyn, num_xF):
-        
-        """ BC for Phi - if necessary """
-        if num_xF > 0:  
-            eye_dense = np.eye(FreeDyn.nDof)
-            self.BC_eyeMat = scipy.sparse.csr_matrix(eye_dense)
 # -----------------------------------------------------------------------------
     
     def compute_consistent_BC_J(self):
@@ -103,21 +84,15 @@ class SparseBC(CoreBC):
     
     def compute_consistent_BC_Phi(self, FreeDyn):        
         
-        coeffMat_W_csc = bmat([[self.BC_eyeMat, FreeDyn.SysMat.Cq.T],
-                               [FreeDyn.SysMat.Cq, None]], format = 'csc')
-
-        coeffMat_P_csc = bmat([[FreeDyn.SysMat.M, FreeDyn.SysMat.Cq.T],
-                               [FreeDyn.SysMat.Cq, None]], format = 'csc')
+        coeffMat_W = FreeDyn.SysMat.coeff_mat_BC_adjW
+        coeffMat_P = FreeDyn.SysMat.coeff_mat_BC_adjP
         
-        solve_W = factorized(coeffMat_W_csc)
-        solve_P = factorized(coeffMat_P_csc)
-
-        PU_tF = solve_P(self.BC_dv_tr)
+        PU_tF = spsolve(coeffMat_P,self.BC_dv_tr)
+        
         U_tF = PU_tF[FreeDyn.nDof:, :]
-        
         self.BC_dq_tr[:FreeDyn.nDof, :] -= (FreeDyn.SysMat.CqvDq.T @ U_tF)
-         
-        WL_tF = solve_W(self.BC_dq_tr)
+        
+        WL_tF = spsolve(coeffMat_W,self.BC_dq_tr)
 
         return WL_tF, PU_tF
 # -----------------------------------------------------------------------------
