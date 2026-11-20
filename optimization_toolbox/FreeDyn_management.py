@@ -49,7 +49,7 @@ class FreeDyn(FreeDynBuffers):
         self.num_FD_pars = num_FD_pars
         
         # System matrices and derivatives - Decision: dense or sparse layout
-        self.SysMat = FreeDynBuffers(self.MBS_modeMAT_sparse, fds_dForce_dparam_name)
+        self.SysMat = FreeDynBuffers.create(self.MBS_modeMAT_sparse, fds_dForce_dparam_name)
         
         # print('class FreeDyn initialized')
 # -----------------------------------------------------------------------------        
