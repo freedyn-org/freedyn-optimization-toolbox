@@ -19,11 +19,6 @@ class SparseBDF(CoreBDF):
         
         #FreeDyn.update_sys_mat_for_BDF()
         FreeDyn.API.compute_initial_conditions()
-        dummy_M = FreeDyn.SysMat.slot_M.sp_mat.copy()
-        dummy_fv = FreeDyn.SysMat.slot_fv.sp_mat.copy()
-        dummy_M.data.fill(1.0)
-        dummy_fv.data.fill(1.0)        
-        sumA22 = dummy_M + dummy_fv.T
     
         offset = 0
         offset, A11_idx = self.idx_temp_init_adj_sys_coeff_mat(offset, FreeDyn.SysMat.I)  
@@ -31,7 +26,7 @@ class SparseBDF(CoreBDF):
         offset, A13_idx = self.idx_temp_init_adj_sys_coeff_mat(offset, FreeDyn.SysMat.CqvDq, transpose=True)
         offset, A14_idx = self.idx_temp_init_adj_sys_coeff_mat(offset, FreeDyn.SysMat.Cq, transpose=True) 
         offset, A21_idx = self.idx_temp_init_adj_sys_coeff_mat(offset, FreeDyn.SysMat.I)
-        offset, A22_idx = self.idx_temp_init_adj_sys_coeff_mat(offset, sumA22)        
+        offset, A22_idx = self.idx_temp_init_adj_sys_coeff_mat(offset, FreeDyn.SysMat.M_fv)        
         offset, A23_idx = self.idx_temp_init_adj_sys_coeff_mat(offset, FreeDyn.SysMat.Cq, transpose=True)
         offset, A32_idx = self.idx_temp_init_adj_sys_coeff_mat(offset, FreeDyn.SysMat.Cq)  
         offset, A41_idx = self.idx_temp_init_adj_sys_coeff_mat(offset, FreeDyn.SysMat.Cq)
@@ -52,9 +47,7 @@ class SparseBDF(CoreBDF):
         self.coeff_mat_map_A13 = self.coeff_mat_map[self.build_map_coeff_mat(FreeDyn.SysMat.CqvDq, A13_idx, transpose=True)]
         self.coeff_mat_map_A14 = self.coeff_mat_map[self.build_map_coeff_mat(FreeDyn.SysMat.Cq, A14_idx, transpose=True)]
         self.coeff_mat_map_A21 = self.coeff_mat_map[self.build_map_coeff_mat(FreeDyn.SysMat.I, A21_idx)]
-        self.coeff_mat_map_M_A22 = self.coeff_mat_map[self.build_map_coeff_mat(FreeDyn.SysMat.M, A22_idx)]
-        self.coeff_mat_map_fv_A22 = self.coeff_mat_map[self.build_map_coeff_mat(FreeDyn.SysMat.fv, A22_idx, transpose=True)]
-        self.coeff_mat_map_A22 = np.unique(np.concatenate([self.coeff_mat_map_M_A22,self.coeff_mat_map_fv_A22]))
+        self.coeff_mat_map_A22 = self.coeff_mat_map[self.build_map_coeff_mat(FreeDyn.SysMat.M_fv, A22_idx)]
         self.coeff_mat_map_A23 = self.coeff_mat_map[self.build_map_coeff_mat(FreeDyn.SysMat.Cq, A23_idx, transpose=True)]
         self.coeff_mat_map_A32 = self.coeff_mat_map[self.build_map_coeff_mat(FreeDyn.SysMat.Cq, A32_idx)]
         self.coeff_mat_map_A41 = self.coeff_mat_map[self.build_map_coeff_mat(FreeDyn.SysMat.Cq, A41_idx)]
@@ -96,6 +89,11 @@ class SparseBDF(CoreBDF):
 
     def update_coeff_mat_adj_sys(self, FreeDyn, eta0):
         
+        # Updates at BDF time step s_n
+        scale_M_fv = np.array([eta0, -1.0])
+        FreeDyn.SysMat.slot_M_fv.set_scaling(scale_M_fv)
+        FreeDyn.update_sys_mat_for_BDF()
+        
         """ Update the entries of the coefficient matrix - use directly the non-zeros elements from the API """
         
         # Row 1
@@ -106,9 +104,7 @@ class SparseBDF(CoreBDF):
         
         # Row 2
         # A21 is already set in self.init_adj_sys_coeff_mat
-        self.coeff_mat.data[self.coeff_mat_map_A22] = 0.0
-        self.coeff_mat.data[self.coeff_mat_map_M_A22] = eta0 * FreeDyn.SysMat.slot_M.dll_nonzeros
-        self.coeff_mat.data[self.coeff_mat_map_fv_A22] -= FreeDyn.SysMat.slot_fv.dll_nonzeros
+        self.coeff_mat.data[self.coeff_mat_map_A22] = FreeDyn.SysMat.slot_M_fv.dll_nonzeros
         self.coeff_mat.data[self.coeff_mat_map_A23] = -FreeDyn.SysMat.slot_Cq.dll_nonzeros
     
         # Row 3
@@ -116,6 +112,11 @@ class SparseBDF(CoreBDF):
         
         # Row 4
         self.coeff_mat.data[self.coeff_mat_map_A41] = FreeDyn.SysMat.slot_Cq.dll_nonzeros 
+        
+        
+        # test = FreeDyn.SysMat.BDF_coeff_mat_neu
+        # error = (test - self.coeff_mat).toarray()
+        return None
 # -----------------------------------------------------------------------------
     
 # =============================================================================
@@ -194,9 +195,10 @@ class SparseBDF(CoreBDF):
         self.BDF_J_buff_M_times_p[idx1, :] = FreeDyn.SysMat.M @ self.adjP_J_buff[idx1, :]
         
         # Updates at BDF time step s_n
-        FreeDyn.update_sys_mat_for_BDF()
         UserFcts.get_lagrangian_dq(FreeDyn, z)
         UserFcts.get_lagrangian_dv(FreeDyn, z)
+        
+        # Sys Matrices are updated within the update of the coeff matrix
         
         return idx1, idx2
 # ----------------------------------------------------------------------------- 
@@ -209,8 +211,7 @@ class SparseBDF(CoreBDF):
         # Compute M(s_n-1) * adjP(s_n-1) - must before update_MBS_SysMat, because s_n-1 is needed!
         self.BDF_Phi_buff_M_times_P[idx1, :, :] = FreeDyn.SysMat.M @ self.adjP_Phi_buff[idx1, :, :]
         
-        # Updates at BDF time step s_n
-        FreeDyn.update_sys_mat_for_BDF()
+        # Sys Matrices are updated within the update of the coeff matrix
         
         return idx1, idx2
 
