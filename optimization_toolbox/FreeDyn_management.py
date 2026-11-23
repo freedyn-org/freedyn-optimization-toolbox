@@ -83,9 +83,6 @@ class FreeDyn(FreeDynBuffers):
         
     def update_sys_mat_for_BDF(self):
         self.SysMat.update_sys_mat_for_BDF(self.API)
-
-    def update_nnz_dll_sys_mat_for_BDF(self):
-        self.SysMat.update_nnz_dll_sys_mat_for_BDF(self.API)
     
     def update_sys_mat_for_consistent_BC_J(self):
         self.SysMat.update_sys_mat_for_consistent_BC_J(self.API)
