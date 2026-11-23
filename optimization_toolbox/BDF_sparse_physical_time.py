@@ -1,6 +1,4 @@
 import numpy as np
-import scipy
-from scipy.sparse import bmat
 from scipy.sparse.linalg import factorized
 
 from .BDF_core import CoreBDF
@@ -17,67 +15,23 @@ class SparseBDF(CoreBDF):
         """ Allocate the coefficient matrix and create maps of the individual blocks """
         nBDFsys = 2 * (FreeDyn.nDof + FreeDyn.nConstr)
         
-        #FreeDyn.update_sys_mat_for_BDF()
         FreeDyn.API.compute_initial_conditions()
-    
-    
-        idx = self.idx_temp_init_adj_sys_coeff_mat(FreeDyn.SysMat.BDF_coeff_mat_neu)  
+        mat = FreeDyn.SysMat.BDF_mat.copy()
+        mat.data = np.arange(mat.nnz, dtype=int)
+        idx_csc = mat.tocsc()
+        self.coeff_mat = idx_csc.astype(np.float64)
+        self.coeff_mat_map = np.empty(mat.nnz, dtype=int)
+        self.coeff_mat_map[idx_csc.data] = np.arange(mat.nnz, dtype=int)
         
-        
-        # Bulid Coeff Mat as csc sparse matrix
-        self.coeff_mat = idx.tocsc().astype(np.float64)
-        
-        # Mapping
-        self.coeff_mat_map = np.argsort(self.coeff_mat.data)
-        self.coeff_mat_map = self.coeff_mat_map[self.build_map_coeff_mat(FreeDyn.SysMat.BDF_coeff_mat_neu, idx)]
-        
-        return nBDFsys
-# -----------------------------------------------------------------------------  
-
-    def idx_temp_init_adj_sys_coeff_mat(self, mtx):
-        
-        tpl = mtx.copy()
-        tpl.data = np.arange(0, tpl.nnz, dtype=int) + 1   
-        return tpl
-# -----------------------------------------------------------------------------        
-    
-    def build_map_coeff_mat(self, sub_mat, block_idx_mat):
-        
-        num_cols = block_idx_mat.shape[1]
-    
-        target_coo = block_idx_mat.tocoo()
-        target_keys = target_coo.row * num_cols + target_coo.col
-        sort_idx = np.argsort(target_keys)
-        sorted_target_keys = target_keys[sort_idx]
-    
-        sub_coo = sub_mat.tocoo()
-        
-        sub_keys = sub_coo.row * num_cols + sub_coo.col
-        
-        matched_pos = np.searchsorted(sorted_target_keys, sub_keys)
-        
-        return (block_idx_mat.data[sort_idx[matched_pos]] - 1).astype(np.int32)      
+        return nBDFsys     
 # -----------------------------------------------------------------------------
 
     def update_coeff_mat_adj_sys(self, FreeDyn, eta0):
         
-        # FreeDyn.SysMat.BDF_coeff_mat_scale_neu[0] = eta0
-        # FreeDyn.SysMat.BDF_coeff_mat_scale_neu[8] = eta0
-        
-        
-        FreeDyn.SysMat.slot_BDF_coeff_mat_neu.set_scaling(np.array([0,8]),np.array([eta0,eta0]))
-        
-        # Updates at BDF time step s_n
-        # scale_M_fv = np.array([eta0, -1.0])
-        # FreeDyn.SysMat.slot_M_fv.set_scaling(scale_M_fv)
-        FreeDyn.update_sys_mat_for_BDF()
-        
         """ Update the entries of the coefficient matrix - use directly the non-zeros elements from the API """
-        
-
-        self.coeff_mat.data[self.coeff_mat_map] = FreeDyn.SysMat.slot_BDF_coeff_mat_neu.dll_nonzeros
-
-# -----------------------------------------------------------------------------
+        FreeDyn.SysMat.update_BDF_mat_eta(eta0)
+        FreeDyn.update_sys_mat_for_BDF()
+        self.coeff_mat.data[self.coeff_mat_map] = FreeDyn.SysMat.slot_BDF_mat.dll_nonzeros
     
 # =============================================================================
 # BDF Routine: Int. order 1
