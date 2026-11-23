@@ -1,19 +1,14 @@
 import numpy as np
 
 from .consistent_boundary_conditions import CoreBC
-from .BDF_sparse_physical_time import SparseBDF
-from .BDF_dense_physical_time import DenseBDF
+from .BDF_core import BDF
 
 class adjGrads_Param():
     
     def __init__(self, FreeDyn, num_xF):
         
         self.BC_FDOP = CoreBC.create(FreeDyn, num_xF)
-        
-        if FreeDyn.MBS_modeMAT_sparse:
-            self.BDF = SparseBDF(FreeDyn, num_xF)
-        else:
-            self.BDF =  DenseBDF(FreeDyn, num_xF)
+        self.BDF = BDF.create(FreeDyn, num_xF)
 
         self.adjGrad_J_buff = np.zeros((2, FreeDyn.num_FD_pars))
         self.adjGrad_J_buff_view0 = self.adjGrad_J_buff[0]

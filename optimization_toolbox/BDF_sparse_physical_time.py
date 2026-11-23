@@ -1,10 +1,14 @@
 import numpy as np
 from scipy.sparse.linalg import factorized
 
-from .BDF_core import CoreBDF
+from .BDF_core import BDF
 
+class SparseBDF(BDF):
+    
+    def init_memory_layout_dependent(self, FreeDyn, num_xF):
 
-class SparseBDF(CoreBDF):
+        self.view_block1 = FreeDyn.nDof
+        self.view_block2 = self.view_block1 + FreeDyn.nDof
     
 # =============================================================================
 # BDF System - Matrix layout sparse

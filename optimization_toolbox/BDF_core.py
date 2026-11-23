@@ -1,19 +1,23 @@
 import numpy as np 
+
+class BDF():
     
-class CoreBDF():       
+    @classmethod
+    def create(cls, FreeDyn, num_xF):
+        if FreeDyn.MBS_modeMAT_sparse:
+            from .BDF_sparse_physical_time import SparseBDF
+            return SparseBDF(FreeDyn, num_xF)
+        else:
+            from .BDF_dense_physical_time import DenseBDF
+            return DenseBDF(FreeDyn, num_xF)
     
     def __init__(self, FreeDyn, num_xF):
         
         # Create buffers for fast access
         self.BDF_idx_buff = 0
-
-        self.view_block1 = FreeDyn.nDof
-        if FreeDyn.MBS_modeMAT_sparse:
-            self.view_block2 = self.view_block1 + FreeDyn.nDof 
-        else:
-            self.view_block2 = self.view_block1 + FreeDyn.nConstr
-            self.allocate_buffs_BDF_add_dense(FreeDyn.nDof, num_xF)
-            
+        
+        self.init_memory_layout_dependent(FreeDyn, num_xF)
+        
         # Allocate memory for the coeff. Matrix of the adj Sys 
         nBDFsys = self.init_coeff_mat_adj_sys(FreeDyn)
         
@@ -51,15 +55,7 @@ class CoreBDF():
             self.adjW_Phi_buff = np.empty((2, num_q, num_xF))
             self.adjP_Phi_buff = np.empty((2, num_q, num_xF)) 
             self.BDF_Phi_buff_M_times_P = np.zeros((2, num_q, num_xF))
-            self.BDF_solVec_Phi = np.zeros((dim_sys, num_xF))
-          
-# ----------------------------------------------------------------------------- 
-            
-    def allocate_buffs_BDF_add_dense(self, num_q, num_xF):
-        
-        self.BDF_J_eta_times_adjW = np.empty(num_q)
-        if num_xF > 0:
-            self.BDF_Phi_eta_times_adjW = np.empty((num_q, num_xF))        
+            self.BDF_solVec_Phi = np.zeros((dim_sys, num_xF))    
         
 # =============================================================================
 # BDF Routine: Int. order 1

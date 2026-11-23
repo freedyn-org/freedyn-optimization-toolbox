@@ -1,8 +1,17 @@
 import numpy as np
 
-from .BDF_core import CoreBDF
+from .BDF_core import BDF
 
-class DenseBDF(CoreBDF):
+class DenseBDF(BDF):
+    
+    def init_memory_layout_dependent(self, FreeDyn, num_xF):
+    
+        self.view_block1 = FreeDyn.nDof
+        self.view_block2 = self.view_block1 + FreeDyn.nConstr
+        
+        self.BDF_J_eta_times_adjW = np.empty(FreeDyn.nDof)
+        if num_xF > 0:
+            self.BDF_Phi_eta_times_adjW = np.empty((FreeDyn.nDof, num_xF)) 
     
 # =============================================================================
 # BDF System - Matrix layout dense
