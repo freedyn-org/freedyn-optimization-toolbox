@@ -16,9 +16,10 @@ class CoreBC():
     def __init__(self, FreeDyn, num_xF):
         
         """ BC for Phi - if necessary """
-        if num_xF > 0:  
-            self.BC_dq_tr = np.zeros((FreeDyn.nDofConstr, num_xF))   # (dPhi / dq)^T
-            self.BC_dv_tr = np.zeros((FreeDyn.nDofConstr, num_xF))   # (dPhi / dv)^T
+        if num_xF > 0:
+            dim = FreeDyn.nDof + FreeDyn.nConstr
+            self.BC_dq_tr = np.zeros((dim, num_xF))   # (dPhi / dq)^T
+            self.BC_dv_tr = np.zeros((dim, num_xF))   # (dPhi / dv)^T
             
 # -----------------------------------------------------------------------------
     def get_consistent_BC_J(self, BDF, FreeDyn):

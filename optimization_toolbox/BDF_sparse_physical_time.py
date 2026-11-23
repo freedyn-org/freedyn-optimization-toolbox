@@ -45,8 +45,8 @@ class SparseBDF(CoreBDF):
         self.get_BDForder1_coeffs_eta(idx1, deltaT)
         
         # pre-compute sums of matrices
-        self.BDF_solVec_J_view_first[:] = - self.BDF1_eta1 * self.adjW_J_buff[idx1, :]
-        self.BDF_solVec_J_view_second[:] = - self.BDF1_eta1 * self.BDF_J_buff_M_times_p[idx1, :]
+        self.BDF_solVec_J[:self.view_block1] = - self.BDF1_eta1 * self.adjW_J_buff[idx1, :]
+        self.BDF_solVec_J[self.view_block1:self.view_block2] = - self.BDF1_eta1 * self.BDF_J_buff_M_times_p[idx1, :]
 
         
         self.BDF_singleStep_J_post_steps(UserFcts, FreeDyn, self.BDF1_eta0, idx2)
@@ -60,8 +60,8 @@ class SparseBDF(CoreBDF):
         self.get_BDForder1_coeffs_eta(idx1, deltaT) 
         
         # pre-compute sums of matrices
-        self.BDF_solVec_Phi_view_first[:] = - self.BDF1_eta1 * self.adjW_Phi_buff[idx1, :, :]
-        self.BDF_solVec_Phi_view_second[:] = - self.BDF1_eta1 * self.BDF_Phi_buff_M_times_P[idx1, :, :]
+        self.BDF_solVec_Phi[:self.view_block1,:] = - self.BDF1_eta1 * self.adjW_Phi_buff[idx1, :, :]
+        self.BDF_solVec_Phi[self.view_block1:self.view_block2,:] = - self.BDF1_eta1 * self.BDF_Phi_buff_M_times_P[idx1, :, :]
         
         self.BDF_singleStep_Phi_post_steps(FreeDyn, self.BDF1_eta0, idx2)
         
@@ -77,8 +77,8 @@ class SparseBDF(CoreBDF):
         self.get_BDForder2_coeffs_eta(idx1, idx2, deltaT)
         
         # pre-compute sums of matrices
-        self.BDF_solVec_J_view_first[:] = -(self.BDF2_eta1 * self.adjW_J_buff[idx1, :] + self.BDF2_eta2 * self.adjW_J_buff[idx2, :])
-        self.BDF_solVec_J_view_second[:] = -(self.BDF2_eta1 * self.BDF_J_buff_M_times_p[idx1, :] + self.BDF2_eta2 * self.BDF_J_buff_M_times_p[idx2, :])
+        self.BDF_solVec_J[:self.view_block1] = -(self.BDF2_eta1 * self.adjW_J_buff[idx1, :] + self.BDF2_eta2 * self.adjW_J_buff[idx2, :])
+        self.BDF_solVec_J[self.view_block1:self.view_block2] = -(self.BDF2_eta1 * self.BDF_J_buff_M_times_p[idx1, :] + self.BDF2_eta2 * self.BDF_J_buff_M_times_p[idx2, :])
 
         self.BDF_singleStep_J_post_steps(UserFcts, FreeDyn, self.BDF2_eta0, idx2)
 # ----------------------------------------------------------------------------- 
@@ -91,8 +91,8 @@ class SparseBDF(CoreBDF):
         self.get_BDForder2_coeffs_eta(idx1, idx2, deltaT) 
         
         # pre-compute sums of matrices
-        self.BDF_solVec_Phi_view_first[:] = - (self.BDF2_eta1 * self.adjW_Phi_buff[idx1, :, :] + self.BDF2_eta2 * self.adjW_Phi_buff[idx2, :, :])
-        self.BDF_solVec_Phi_view_second[:] = - (self.BDF2_eta1 * self.BDF_Phi_buff_M_times_P[idx1, :, :] + self.BDF2_eta2 * self.BDF_Phi_buff_M_times_P[idx2, :, :])
+        self.BDF_solVec_Phi[:self.view_block1, :] = - (self.BDF2_eta1 * self.adjW_Phi_buff[idx1, :, :] + self.BDF2_eta2 * self.adjW_Phi_buff[idx2, :, :])
+        self.BDF_solVec_Phi[self.view_block1:self.view_block2,:] = - (self.BDF2_eta1 * self.BDF_Phi_buff_M_times_P[idx1, :, :] + self.BDF2_eta2 * self.BDF_Phi_buff_M_times_P[idx2, :, :])
         
         self.BDF_singleStep_Phi_post_steps(FreeDyn, self.BDF2_eta0, idx2)
 
@@ -136,8 +136,8 @@ class SparseBDF(CoreBDF):
     def BDF_singleStep_J_post_steps(self, UserFcts, FreeDyn, eta0, idx2):
         
         # Bulid the solution vector of the Adjoint Sys
-        self.BDF_solVec_J_view_first[:] += UserFcts.dLdq.T
-        self.BDF_solVec_J_view_second[:] += UserFcts.dLdv.T
+        self.BDF_solVec_J[:self.view_block1] += UserFcts.dLdq.T
+        self.BDF_solVec_J[self.view_block1:self.view_block2] += UserFcts.dLdv.T
         
         self.update_coeff_mat_adj_sys(FreeDyn, eta0)
         solve = factorized(self.coeff_mat)
@@ -147,8 +147,8 @@ class SparseBDF(CoreBDF):
         self.BDF_idx_buff = idx2
         
         # Compute adj w and p at time idx = 0
-        self.adjW_J_buff[self.BDF_idx_buff, :] = vec_W_P_Sig_MU[:FreeDyn.nDof]
-        self.adjP_J_buff[self.BDF_idx_buff, :] = vec_W_P_Sig_MU[FreeDyn.nDof:2*FreeDyn.nDof]
+        self.adjW_J_buff[self.BDF_idx_buff, :] = vec_W_P_Sig_MU[:self.view_block1]
+        self.adjP_J_buff[self.BDF_idx_buff, :] = vec_W_P_Sig_MU[self.view_block1:self.view_block2]
 # -----------------------------------------------------------------------------
 
     def BDF_singleStep_Phi_post_steps(self, FreeDyn, eta0, idx2):
@@ -161,6 +161,6 @@ class SparseBDF(CoreBDF):
         self.BDF_idx_buff = idx2
         
         # Compute adj w and p at time idx = 0
-        self.adjW_Phi_buff[self.BDF_idx_buff, :, :] = vec_W_P_Sig_MU[:FreeDyn.nDof]
-        self.adjP_Phi_buff[self.BDF_idx_buff, :, :] = vec_W_P_Sig_MU[FreeDyn.nDof:2*FreeDyn.nDof]
+        self.adjW_Phi_buff[self.BDF_idx_buff, :, :] = vec_W_P_Sig_MU[:self.view_block1,:]
+        self.adjP_Phi_buff[self.BDF_idx_buff, :, :] = vec_W_P_Sig_MU[self.view_block1:self.view_block2,:]
 # -----------------------------------------------------------------------------

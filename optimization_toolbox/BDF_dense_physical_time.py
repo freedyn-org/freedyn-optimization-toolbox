@@ -12,13 +12,12 @@ class DenseBDF(CoreBDF):
         
         """ Allocate the coefficient matrix and create views of the individual blocks """
         
-        nBDFsys = FreeDyn.nDof + 2*FreeDyn.nConstr
-        self.BDF_coeffMat = np.zeros((nBDFsys, nBDFsys))
+        nBDFsys = self.view_block2 + FreeDyn.nConstr
+        block1 = slice(None, self.view_block1)
+        block2 = slice(self.view_block1, self.view_block2)
+        block3 = slice(self.view_block2, nBDFsys)
         
-        block1 = slice(None, FreeDyn.nDof)
-        block2 = slice(FreeDyn.nDof, FreeDyn.nDofConstr)
-        block3 = slice(FreeDyn.nDofConstr, nBDFsys)
-    
+        self.BDF_coeffMat = np.zeros((nBDFsys, nBDFsys))
         self.BDF_coeffMat_view_11 = self.BDF_coeffMat[block1, block1] 
         self.BDF_coeffMat_view_12 = self.BDF_coeffMat[block1, block2]
         self.BDF_coeffMat_view_13 = self.BDF_coeffMat[block1, block3]
@@ -56,7 +55,7 @@ class DenseBDF(CoreBDF):
         
         # pre-compute sums of matrices
         self.BDF_J_eta_times_adjW = self.BDF1_eta1 * self.adjW_J_buff[idx1, :]
-        self.BDF_solVec_J_view_first[:] = - self.BDF1_eta1 * self.BDF_J_buff_M_times_p[idx1, :]
+        self.BDF_solVec_J[:self.view_block1] = - self.BDF1_eta1 * self.BDF_J_buff_M_times_p[idx1, :]
 
         
         self.BDF_singleStep_J_post_steps(UserFcts, FreeDyn, self.BDF1_eta0, self.BDF1_eta0_inv, idx2)
@@ -71,7 +70,7 @@ class DenseBDF(CoreBDF):
         
         # pre-compute sums of matrices
         self.BDF_Phi_eta_times_adjW = self.BDF1_eta1 * self.adjW_Phi_buff[idx1, :, :]
-        self.BDF_solVec_Phi_view_first[:] = - self.BDF1_eta1 * self.BDF_Phi_buff_M_times_P[idx1, :, :]
+        self.BDF_solVec_Phi[:self.view_block1, :] = - self.BDF1_eta1 * self.BDF_Phi_buff_M_times_P[idx1, :, :]
 
         
         self.BDF_singleStep_Phi_post_steps(FreeDyn, self.BDF1_eta0, self.BDF1_eta0_inv, idx2)
@@ -89,7 +88,7 @@ class DenseBDF(CoreBDF):
         
         # pre-compute sums of matrices
         self.BDF_J_eta_times_adjW = self.BDF2_eta1 * self.adjW_J_buff[idx1, :] + self.BDF2_eta2 * self.adjW_J_buff[idx2, :]
-        self.BDF_solVec_J_view_first[:] = - (self.BDF2_eta1 * self.BDF_J_buff_M_times_p[idx1, :] + self.BDF2_eta2 * self.BDF_J_buff_M_times_p[idx2, :])
+        self.BDF_solVec_J[:self.view_block1] = - (self.BDF2_eta1 * self.BDF_J_buff_M_times_p[idx1, :] + self.BDF2_eta2 * self.BDF_J_buff_M_times_p[idx2, :])
         
         
         self.BDF_singleStep_J_post_steps(UserFcts, FreeDyn, self.BDF2_eta0, self.BDF2_eta0_inv, idx2)
@@ -104,7 +103,7 @@ class DenseBDF(CoreBDF):
         
         # pre-compute sums of matrices
         self.BDF_Phi_eta_times_adjW = self.BDF2_eta1 * self.adjW_Phi_buff[idx1, :, :] + self.BDF2_eta2 * self.adjW_Phi_buff[idx2, :, :]
-        self.BDF_solVec_Phi_view_first[:] = - (self.BDF2_eta1 * self.BDF_Phi_buff_M_times_P[idx1, :, :] + self.BDF2_eta2 * self.BDF_Phi_buff_M_times_P[idx2, :, :])
+        self.BDF_solVec_Phi[:self.view_block1, :] = - (self.BDF2_eta1 * self.BDF_Phi_buff_M_times_P[idx1, :, :] + self.BDF2_eta2 * self.BDF_Phi_buff_M_times_P[idx2, :, :])
 
         
         self.BDF_singleStep_Phi_post_steps(FreeDyn, self.BDF2_eta0, self.BDF2_eta0_inv, idx2)     
@@ -148,8 +147,8 @@ class DenseBDF(CoreBDF):
     def BDF_singleStep_J_post_steps(self, UserFcts, FreeDyn, eta0, eta0_inv, idx2):
         
         # Bulid the solution vector of the Adjoint Sys
-        self.BDF_solVec_J_view_first[:] += UserFcts.dLdv.T + eta0_inv*(UserFcts.dLdq.T - self.BDF_J_eta_times_adjW)
-        self.BDF_solVec_J_view_second[:] = FreeDyn.SysMat.Cq @ (self.BDF_J_eta_times_adjW - UserFcts.dLdq.T)
+        self.BDF_solVec_J[:self.view_block1] += UserFcts.dLdv.T + eta0_inv*(UserFcts.dLdq.T - self.BDF_J_eta_times_adjW)
+        self.BDF_solVec_J[self.view_block1:self.view_block2] = FreeDyn.SysMat.Cq @ (self.BDF_J_eta_times_adjW - UserFcts.dLdq.T)
         
         self.update_coeff_mat_adj_sys(FreeDyn, eta0, eta0_inv)
         vec_P_Sig_MU = np.linalg.solve(self.BDF_coeffMat, self.BDF_solVec_J)
@@ -158,12 +157,12 @@ class DenseBDF(CoreBDF):
         self.BDF_idx_buff = idx2
         
         # Compute adj p at time idx = 0
-        self.adjP_J_buff[self.BDF_idx_buff, :] = vec_P_Sig_MU[:FreeDyn.nDof]
+        self.adjP_J_buff[self.BDF_idx_buff, :] = vec_P_Sig_MU[:self.view_block1]
         
         # Compute adj w at time idx = 0
-        self.adjW_J_buff[self.BDF_idx_buff, :] = FreeDyn.SysMat.G_tr.T @ vec_P_Sig_MU[:FreeDyn.nDof]
-        self.adjW_J_buff[self.BDF_idx_buff, :] += FreeDyn.SysMat.CqvDq.T @ vec_P_Sig_MU[FreeDyn.nDof:FreeDyn.nDofConstr] 
-        self.adjW_J_buff[self.BDF_idx_buff, :] += FreeDyn.SysMat.Cq.T @ vec_P_Sig_MU[FreeDyn.nDofConstr:] 
+        self.adjW_J_buff[self.BDF_idx_buff, :] = FreeDyn.SysMat.G_tr.T @ vec_P_Sig_MU[:self.view_block1]
+        self.adjW_J_buff[self.BDF_idx_buff, :] += FreeDyn.SysMat.CqvDq.T @ vec_P_Sig_MU[self.view_block1:self.view_block2] 
+        self.adjW_J_buff[self.BDF_idx_buff, :] += FreeDyn.SysMat.Cq.T @ vec_P_Sig_MU[self.view_block2:] 
         self.adjW_J_buff[self.BDF_idx_buff, :] -= self.BDF_J_eta_times_adjW
         self.adjW_J_buff[self.BDF_idx_buff, :] += UserFcts.dLdq.T 
         self.adjW_J_buff[self.BDF_idx_buff, :] *= eta0_inv
@@ -172,8 +171,8 @@ class DenseBDF(CoreBDF):
     def BDF_singleStep_Phi_post_steps(self, FreeDyn, eta0, eta0_inv, idx2):
         
         # Bulid the solution vector of the Adjoint Sys      
-        self.BDF_solVec_Phi_view_first[:] -= eta0_inv * self.BDF_Phi_eta_times_adjW
-        self.BDF_solVec_Phi_view_second[:] = FreeDyn.SysMat.Cq @ self.BDF_Phi_eta_times_adjW
+        self.BDF_solVec_Phi[:self.view_block1, :] -= eta0_inv * self.BDF_Phi_eta_times_adjW
+        self.BDF_solVec_Phi[self.view_block1:self.view_block2] = FreeDyn.SysMat.Cq @ self.BDF_Phi_eta_times_adjW
         
         self.update_coeff_mat_adj_sys(FreeDyn, eta0, eta0_inv)
         vec_P_Sig_MU = np.linalg.solve(self.BDF_coeffMat, self.BDF_solVec_Phi) 
@@ -182,12 +181,12 @@ class DenseBDF(CoreBDF):
         self.BDF_idx_buff = idx2
         
         # Compute adj p at time idx = 0
-        self.adjP_Phi_buff[self.BDF_idx_buff, :, :] = vec_P_Sig_MU[:FreeDyn.nDof]
+        self.adjP_Phi_buff[self.BDF_idx_buff, :, :] = vec_P_Sig_MU[:self.view_block1]
         
         # Compute adj w at time idx = 0
-        self.adjW_Phi_buff[self.BDF_idx_buff, :, :] = FreeDyn.SysMat.G_tr.T @ vec_P_Sig_MU[:FreeDyn.nDof]
-        self.adjW_Phi_buff[self.BDF_idx_buff, :, :] += FreeDyn.SysMat.CqvDq.T @ vec_P_Sig_MU[FreeDyn.nDof:FreeDyn.nDofConstr] 
-        self.adjW_Phi_buff[self.BDF_idx_buff, :, :] += FreeDyn.SysMat.Cq.T @ vec_P_Sig_MU[FreeDyn.nDofConstr:] 
+        self.adjW_Phi_buff[self.BDF_idx_buff, :, :] = FreeDyn.SysMat.G_tr.T @ vec_P_Sig_MU[:self.view_block1,:]
+        self.adjW_Phi_buff[self.BDF_idx_buff, :, :] += FreeDyn.SysMat.CqvDq.T @ vec_P_Sig_MU[self.view_block1:self.view_block2,:] 
+        self.adjW_Phi_buff[self.BDF_idx_buff, :, :] += FreeDyn.SysMat.Cq.T @ vec_P_Sig_MU[self.view_block2:,:] 
         self.adjW_Phi_buff[self.BDF_idx_buff, :, :] -= self.BDF_Phi_eta_times_adjW
         self.adjW_Phi_buff[self.BDF_idx_buff, :, :] *= eta0_inv
   

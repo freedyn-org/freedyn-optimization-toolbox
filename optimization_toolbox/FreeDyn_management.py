@@ -29,7 +29,6 @@ class FreeDyn(FreeDynBuffers):
         info = self.API.get_info()
         self.nDof = info.num_generalized_coordinates
         self.nConstr = info.num_lagrange_multipliers
-        self.nDofConstr = self.nDof + self.nConstr 
         self.num_time_steps = 0
         
         # System matrices and derivatives - Decision: dense or sparse layout
@@ -181,4 +180,4 @@ class FreeDyn(FreeDynBuffers):
     #                 break
                     
     #     self.write_fds(self.fds_path_name)
-# ----------------------------------------------------------------------------- name
+# ----------------------------------------------------------------------------- 
