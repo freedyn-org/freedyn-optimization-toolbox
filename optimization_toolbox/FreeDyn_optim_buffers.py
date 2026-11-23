@@ -181,6 +181,9 @@ class FreeDynBuffersSparse(FreeDynBuffers):
         self.slot_coeff_mat_BC_adjP = fd.ModelRelatedMatrixBuffer(coeff_mat_BC_adjP_idx, True)
         self.coeff_mat_BC_adjW = getattr(self.slot_coeff_mat_BC_adjW, 'sp_mat') 
         self.coeff_mat_BC_adjP = getattr(self.slot_coeff_mat_BC_adjP, 'sp_mat') 
+        
+        
+        self.init_BDF_sparse_coeff_mat_slot()
 # ----------------------------------------------------------------------------- 
 
     def init_BDF_sparse_coeff_mat_slot(self):
@@ -214,7 +217,7 @@ class FreeDynBuffersSparse(FreeDynBuffers):
             1,
             # Row 4:
             0], dtype=c_int)
-        scale_mat = np.array([
+        BDF_coeff_mat_scale_neu = np.array([
             # Row 1:
             1.0, -1.0, 1.0, 1.0, 1.0, -1.0, -1.0,
             # Row 2:
@@ -223,22 +226,23 @@ class FreeDynBuffersSparse(FreeDynBuffers):
             1.0,
             # Row 4:
             1.0])
-        mat_idx = fd.analysis.create_matrix(id_mat, row_pos_mat, col_pos_mat, scale_mat)
+        mat_idx = fd.analysis.create_matrix(id_mat, row_pos_mat, col_pos_mat, BDF_coeff_mat_scale_neu)
         self.slot_BDF_coeff_mat_neu = fd.ModelRelatedMatrixBuffer(mat_idx, True)
         self.BDF_coeff_mat_neu = getattr(self.slot_BDF_coeff_mat_neu, 'sp_mat')
+        self.slot_BDF_coeff_mat_neu.init_scaling(BDF_coeff_mat_scale_neu)
 
 # -----------------------------------------------------------------------------
 
     def update_sys_mat_for_BDF(self, API):
         API.update_jacobian()
         self.slot_M.update_from_dll()
-        self.slot_M_fv.update_from_dll()
-        self.slot_Cq.update_from_dll()
-        self.slot_CqvDq.update_from_dll()
-        self.slot_G_tr.update_from_dll() 
+        # self.slot_M_fv.update_from_dll()
+        # self.slot_Cq.update_from_dll()
+        # self.slot_CqvDq.update_from_dll()
+        # self.slot_G_tr.update_from_dll() 
 
         self.slot_M.apply_to_cached_matrix()
 
-        # self.slot_BDF_coeff_mat_neu.update_from_dll()
+        self.slot_BDF_coeff_mat_neu.update_from_dll()
         # self.slot_BDF_coeff_mat_neu.apply_to_cached_matrix()
 # ----------------------------------------------------------------------------- 

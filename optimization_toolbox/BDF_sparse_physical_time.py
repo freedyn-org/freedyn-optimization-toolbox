@@ -20,53 +20,28 @@ class SparseBDF(CoreBDF):
         #FreeDyn.update_sys_mat_for_BDF()
         FreeDyn.API.compute_initial_conditions()
     
-        offset = 0
-        offset, A11_idx = self.idx_temp_init_adj_sys_coeff_mat(offset, FreeDyn.SysMat.I)  
-        offset, A12_idx = self.idx_temp_init_adj_sys_coeff_mat(offset, FreeDyn.SysMat.G_tr, transpose=True) 
-        offset, A13_idx = self.idx_temp_init_adj_sys_coeff_mat(offset, FreeDyn.SysMat.CqvDq, transpose=True)
-        offset, A14_idx = self.idx_temp_init_adj_sys_coeff_mat(offset, FreeDyn.SysMat.Cq, transpose=True) 
-        offset, A21_idx = self.idx_temp_init_adj_sys_coeff_mat(offset, FreeDyn.SysMat.I)
-        offset, A22_idx = self.idx_temp_init_adj_sys_coeff_mat(offset, FreeDyn.SysMat.M_fv)        
-        offset, A23_idx = self.idx_temp_init_adj_sys_coeff_mat(offset, FreeDyn.SysMat.Cq, transpose=True)
-        offset, A32_idx = self.idx_temp_init_adj_sys_coeff_mat(offset, FreeDyn.SysMat.Cq)  
-        offset, A41_idx = self.idx_temp_init_adj_sys_coeff_mat(offset, FreeDyn.SysMat.Cq)
+    
+        idx = self.idx_temp_init_adj_sys_coeff_mat(FreeDyn.SysMat.BDF_coeff_mat_neu)  
         
-        layout = [[A11_idx, A12_idx, A13_idx, A14_idx],
-                  [A21_idx, A22_idx, A23_idx, None],
-                  [None, A32_idx, None, None],
-                  [A41_idx, None, None, None]]
         
         # Bulid Coeff Mat as csc sparse matrix
-        self.coeff_mat = bmat(layout, format='csc').astype(np.float64)
+        self.coeff_mat = idx.tocsc().astype(np.float64)
         
         # Mapping
         self.coeff_mat_map = np.argsort(self.coeff_mat.data)
-    
-        self.coeff_mat_map_A11 = self.coeff_mat_map[self.build_map_coeff_mat(FreeDyn.SysMat.I, A11_idx)]
-        self.coeff_mat_map_A12 = self.coeff_mat_map[self.build_map_coeff_mat(FreeDyn.SysMat.G_tr, A12_idx, transpose=True)]
-        self.coeff_mat_map_A13 = self.coeff_mat_map[self.build_map_coeff_mat(FreeDyn.SysMat.CqvDq, A13_idx, transpose=True)]
-        self.coeff_mat_map_A14 = self.coeff_mat_map[self.build_map_coeff_mat(FreeDyn.SysMat.Cq, A14_idx, transpose=True)]
-        self.coeff_mat_map_A21 = self.coeff_mat_map[self.build_map_coeff_mat(FreeDyn.SysMat.I, A21_idx)]
-        self.coeff_mat_map_A22 = self.coeff_mat_map[self.build_map_coeff_mat(FreeDyn.SysMat.M_fv, A22_idx)]
-        self.coeff_mat_map_A23 = self.coeff_mat_map[self.build_map_coeff_mat(FreeDyn.SysMat.Cq, A23_idx, transpose=True)]
-        self.coeff_mat_map_A32 = self.coeff_mat_map[self.build_map_coeff_mat(FreeDyn.SysMat.Cq, A32_idx)]
-        self.coeff_mat_map_A41 = self.coeff_mat_map[self.build_map_coeff_mat(FreeDyn.SysMat.Cq, A41_idx)]
-        
-        # A21 is set here, as these are const. values
-        self.coeff_mat.data[self.coeff_mat_map_A21] = -1.0
+        self.coeff_mat_map = self.coeff_mat_map[self.build_map_coeff_mat(FreeDyn.SysMat.BDF_coeff_mat_neu, idx)]
         
         return nBDFsys
 # -----------------------------------------------------------------------------  
 
-    def idx_temp_init_adj_sys_coeff_mat(self, offset, mtx, transpose=False):
+    def idx_temp_init_adj_sys_coeff_mat(self, mtx):
         
-        tpl = mtx.T.copy() if transpose else mtx.copy()
-        tpl.data = np.arange(offset, offset + tpl.nnz, dtype=int) + 1
-        offset += tpl.nnz       
-        return offset, tpl
+        tpl = mtx.copy()
+        tpl.data = np.arange(0, tpl.nnz, dtype=int) + 1   
+        return tpl
 # -----------------------------------------------------------------------------        
     
-    def build_map_coeff_mat(self, sub_mat, block_idx_mat, transpose=False):
+    def build_map_coeff_mat(self, sub_mat, block_idx_mat):
         
         num_cols = block_idx_mat.shape[1]
     
@@ -77,10 +52,7 @@ class SparseBDF(CoreBDF):
     
         sub_coo = sub_mat.tocoo()
         
-        if transpose:
-            sub_keys = sub_coo.col * num_cols + sub_coo.row
-        else:
-            sub_keys = sub_coo.row * num_cols + sub_coo.col
+        sub_keys = sub_coo.row * num_cols + sub_coo.col
         
         matched_pos = np.searchsorted(sorted_target_keys, sub_keys)
         
@@ -89,34 +61,22 @@ class SparseBDF(CoreBDF):
 
     def update_coeff_mat_adj_sys(self, FreeDyn, eta0):
         
+        # FreeDyn.SysMat.BDF_coeff_mat_scale_neu[0] = eta0
+        # FreeDyn.SysMat.BDF_coeff_mat_scale_neu[8] = eta0
+        
+        
+        FreeDyn.SysMat.slot_BDF_coeff_mat_neu.set_scaling(np.array([0,8]),np.array([eta0,eta0]))
+        
         # Updates at BDF time step s_n
-        scale_M_fv = np.array([eta0, -1.0])
-        FreeDyn.SysMat.slot_M_fv.set_scaling(scale_M_fv)
+        # scale_M_fv = np.array([eta0, -1.0])
+        # FreeDyn.SysMat.slot_M_fv.set_scaling(scale_M_fv)
         FreeDyn.update_sys_mat_for_BDF()
         
         """ Update the entries of the coefficient matrix - use directly the non-zeros elements from the API """
         
-        # Row 1
-        self.coeff_mat.data[self.coeff_mat_map_A11] = eta0 
-        self.coeff_mat.data[self.coeff_mat_map_A12] = -FreeDyn.SysMat.slot_G_tr.dll_nonzeros
-        self.coeff_mat.data[self.coeff_mat_map_A13] = -FreeDyn.SysMat.slot_CqvDq.dll_nonzeros
-        self.coeff_mat.data[self.coeff_mat_map_A14] = -FreeDyn.SysMat.slot_Cq.dll_nonzeros
-        
-        # Row 2
-        # A21 is already set in self.init_adj_sys_coeff_mat
-        self.coeff_mat.data[self.coeff_mat_map_A22] = FreeDyn.SysMat.slot_M_fv.dll_nonzeros
-        self.coeff_mat.data[self.coeff_mat_map_A23] = -FreeDyn.SysMat.slot_Cq.dll_nonzeros
-    
-        # Row 3
-        self.coeff_mat.data[self.coeff_mat_map_A32] = FreeDyn.SysMat.slot_Cq.dll_nonzeros 
-        
-        # Row 4
-        self.coeff_mat.data[self.coeff_mat_map_A41] = FreeDyn.SysMat.slot_Cq.dll_nonzeros 
-        
-        
-        # test = FreeDyn.SysMat.BDF_coeff_mat_neu
-        # error = (test - self.coeff_mat).toarray()
-        return None
+
+        self.coeff_mat.data[self.coeff_mat_map] = FreeDyn.SysMat.slot_BDF_coeff_mat_neu.dll_nonzeros
+
 # -----------------------------------------------------------------------------
     
 # =============================================================================
