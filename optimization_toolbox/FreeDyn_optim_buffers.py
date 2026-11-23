@@ -17,15 +17,29 @@ class FreeDynBuffers():
         
         self.init_dForce_dFDparam(name_dForce_dparam)
         self.init_sys_mat_slots()
-        
-        # if memory_layout:
-        #     self.init_BDF_sparse_coeff_mat_slot()
-
+        self.init_sys_mat_slots_for_adj_BC(memory_layout)
 # -----------------------------------------------------------------------------
             
     def init_dForce_dFDparam(self, name_dForce_dparam):
         self.buffer_dForce_dFDparam = fd.ForceParameterDerivativeMatrixBuffer(name_dForce_dparam)
         self.dForce_dFDparam = self.buffer_dForce_dFDparam.data
+# -----------------------------------------------------------------------------        
+        
+    def init_sys_mat_slots_for_adj_BC(self, memory_layout):
+        attr_name = 'sp_mat' if memory_layout else 'dense_mat'
+        
+        scale = np.array([1.0, 1.0, 1.0])
+        row_pos = np.array([0, 0, 1], dtype=c_int)
+        col_pos = np.array([0, 1, 0], dtype=c_int)
+        id_adj_w = np.array([112, 201, 301], dtype=c_int)
+        id_adj_p = np.array([101, 201, 301], dtype=c_int)
+        coeff_mat_BC_adjW_idx = fd.analysis.create_matrix(id_adj_w, row_pos, col_pos, scale)
+        coeff_mat_BC_adjP_idx = fd.analysis.create_matrix(id_adj_p, row_pos, col_pos, scale)
+        self.slot_coeff_mat_BC_adjW = fd.ModelRelatedMatrixBuffer(coeff_mat_BC_adjW_idx, memory_layout)
+        self.slot_coeff_mat_BC_adjP = fd.ModelRelatedMatrixBuffer(coeff_mat_BC_adjP_idx, memory_layout)
+        self.coeff_mat_BC_adjW = getattr(self.slot_coeff_mat_BC_adjW, attr_name) 
+        self.coeff_mat_BC_adjP = getattr(self.slot_coeff_mat_BC_adjP, attr_name) 
+        
 # ----------------------------------------------------------------------------- 
 
     def update_dForce_dFDparam(self):
@@ -91,19 +105,6 @@ class FreeDynBuffersDense(FreeDynBuffers):
         G_idx = fd.analysis.create_matrix(id_matG, pos_matG, pos_matG, scale_matG)
         self.slot_G_tr = fd.ModelRelatedMatrixBuffer(G_idx, False)
         self.G_tr = getattr(self.slot_G_tr, 'dense_mat')
-        
-        # Coeff matrices for adjoint variables - BC
-        scale_coeff_mat_BC_adj = np.array([1.0, 1.0, 1.0])
-        row_coeff_mat_BC_adj = np.array([0, 0, 1], dtype=c_int)
-        col_coeff_mat_BC_adj = np.array([0, 1, 0], dtype=c_int)
-        id_coeff_mat_BC_adjW = np.array([112, 201, 301], dtype=c_int)
-        id_coeff_mat_BC_adjP = np.array([101, 201, 301], dtype=c_int)
-        coeff_mat_BC_adjW_idx = fd.analysis.create_matrix(id_coeff_mat_BC_adjW, row_coeff_mat_BC_adj, col_coeff_mat_BC_adj, scale_coeff_mat_BC_adj)
-        coeff_mat_BC_adjP_idx = fd.analysis.create_matrix(id_coeff_mat_BC_adjP, row_coeff_mat_BC_adj, col_coeff_mat_BC_adj, scale_coeff_mat_BC_adj)
-        self.slot_coeff_mat_BC_adjW = fd.ModelRelatedMatrixBuffer(coeff_mat_BC_adjW_idx, False)
-        self.slot_coeff_mat_BC_adjP = fd.ModelRelatedMatrixBuffer(coeff_mat_BC_adjP_idx, False)
-        self.coeff_mat_BC_adjW = getattr(self.slot_coeff_mat_BC_adjW, 'dense_mat') 
-        self.coeff_mat_BC_adjP = getattr(self.slot_coeff_mat_BC_adjP, 'dense_mat') 
 # ----------------------------------------------------------------------------- 
 
     def update_sys_mat_for_BDF(self, API):
@@ -129,68 +130,23 @@ class FreeDynBuffersSparse(FreeDynBuffers):
         pos_mat = np.array([0], dtype=c_int)
         scale_mat = np.array([1.0])
         
-        # Identity matrix I
-        id_I = np.array([112], dtype=c_int)
-        I_idx = fd.analysis.create_matrix(id_I, pos_mat, pos_mat, scale_mat)
-        self.slot_I = fd.ModelRelatedMatrixBuffer(I_idx, True)
-        self.I = getattr(self.slot_I, 'sp_mat') 
-        
         # Mass matrix M
         id_M = np.array([101], dtype=c_int)
         M_idx = fd.analysis.create_matrix(id_M, pos_mat, pos_mat, scale_mat)
         self.slot_M = fd.ModelRelatedMatrixBuffer(M_idx, True)
         self.M = getattr(self.slot_M, 'sp_mat') 
         
-        # Constraint Jacobian Cq
-        id_Cq = np.array([301], dtype=c_int)
-        Cq_idx = fd.analysis.create_matrix(id_Cq, pos_mat, pos_mat, scale_mat)
-        self.slot_Cq = fd.ModelRelatedMatrixBuffer(Cq_idx, True)
-        self.Cq = getattr(self.slot_Cq, 'sp_mat') 
-        
         # CQDT
         id_CqvDq = np.array([302], dtype=c_int)
         CqvDq_idx = fd.analysis.create_matrix(id_CqvDq, pos_mat, pos_mat, scale_mat)
         self.slot_CqvDq = fd.ModelRelatedMatrixBuffer(CqvDq_idx, True)
         self.CqvDq = getattr(self.slot_CqvDq, 'sp_mat') 
-        
-        # M - fv
-        id_M_fv = np.array([101,129], dtype=c_int)
-        pos_M_fv = np.array([0, 0], dtype=c_int)
-        scale_M_fv = np.array([1.0, -1.0])
-        M_fv_idx = fd.analysis.create_matrix(id_M_fv, pos_M_fv, pos_M_fv, scale_M_fv)
-        self.slot_M_fv = fd.ModelRelatedMatrixBuffer(M_fv_idx, True)
-        self.M_fv = getattr(self.slot_M_fv, 'sp_mat') 
-        
-        # mat G^T = fq - CqTxlaDq_e - CqTxlaDq_i - MxqddDq
-        id_matG = np.array([108, 110, 105, 102], dtype=c_int)
-        pos_matG = np.array([0, 0, 0, 0], dtype=c_int)
-        scale_matG = np.array([1.0, -1.0, -1.0, -1.0])
-        G_idx = fd.analysis.create_matrix(id_matG, pos_matG, pos_matG, scale_matG)
-        self.slot_G_tr = fd.ModelRelatedMatrixBuffer(G_idx, True)
-        self.G_tr = getattr(self.slot_G_tr, 'sp_mat')
-        
-        # Coeff matrices for adjoint variables - BC
-        scale_coeff_mat_BC_adj = np.array([1.0, 1.0, 1.0])
-        row_coeff_mat_BC_adj = np.array([0, 0, 1], dtype=c_int)
-        col_coeff_mat_BC_adj = np.array([0, 1, 0], dtype=c_int)
-        id_coeff_mat_BC_adjW = np.array([112, 201, 301], dtype=c_int)
-        id_coeff_mat_BC_adjP = np.array([101, 201, 301], dtype=c_int)
-        coeff_mat_BC_adjW_idx = fd.analysis.create_matrix(id_coeff_mat_BC_adjW, row_coeff_mat_BC_adj, col_coeff_mat_BC_adj, scale_coeff_mat_BC_adj)
-        coeff_mat_BC_adjP_idx = fd.analysis.create_matrix(id_coeff_mat_BC_adjP, row_coeff_mat_BC_adj, col_coeff_mat_BC_adj, scale_coeff_mat_BC_adj)
-        self.slot_coeff_mat_BC_adjW = fd.ModelRelatedMatrixBuffer(coeff_mat_BC_adjW_idx, True)
-        self.slot_coeff_mat_BC_adjP = fd.ModelRelatedMatrixBuffer(coeff_mat_BC_adjP_idx, True)
-        self.coeff_mat_BC_adjW = getattr(self.slot_coeff_mat_BC_adjW, 'sp_mat') 
-        self.coeff_mat_BC_adjP = getattr(self.slot_coeff_mat_BC_adjP, 'sp_mat') 
-        
-        
-        self.init_BDF_sparse_coeff_mat_slot()
-# ----------------------------------------------------------------------------- 
 
-    def init_BDF_sparse_coeff_mat_slot(self):
-              
+        # Coeff. matrix of adjoint system
+        self.BDF_mat_eta_pos = np.array([0,8])
+        self.BDF_mat_eta = np.array([1.0, 1.0]) # dummy values - are replaced
         
-        
-        id_mat = np.array([
+        id_BDF_mat = np.array([
             # Row 1: eta0*I | -G | -(Cq v)_q^Tr | Cq^Tr
             112, 128, 130, 125, 122, 202, 201,
             # Row 2: -I | eta0*M - fv^Tr | -Cq^Tr | 0
@@ -199,50 +155,34 @@ class FreeDynBuffersSparse(FreeDynBuffers):
             301,
             # Row 4: Cq | 0 | 0 | 0
             301], dtype=c_int)
-        row_pos_mat = np.array([
-            # Row 1:
-            0, 0, 0, 0, 0, 0, 0,
-            # Row 2:
-            1, 1, 1, 1,
-            # Row 3:
-            2,
-            # Row 4:
-            3], dtype=c_int)
-        col_pos_mat = np.array([
-            # Row 1:
-            0, 1, 1, 1, 1, 2, 3,
-            # Row 2:
-            0, 1, 1, 2,
-            # Row 3:
-            1,
-            # Row 4:
-            0], dtype=c_int)
-        BDF_coeff_mat_scale_neu = np.array([
-            # Row 1:
-            1.0, -1.0, 1.0, 1.0, 1.0, -1.0, -1.0,
-            # Row 2:
-            -1.0, 1.0, -1.0, -1.0,
-            # Row 3:
-            1.0,
-            # Row 4:
-            1.0])
-        mat_idx = fd.analysis.create_matrix(id_mat, row_pos_mat, col_pos_mat, BDF_coeff_mat_scale_neu)
-        self.slot_BDF_coeff_mat_neu = fd.ModelRelatedMatrixBuffer(mat_idx, True)
-        self.BDF_coeff_mat_neu = getattr(self.slot_BDF_coeff_mat_neu, 'sp_mat')
-        self.slot_BDF_coeff_mat_neu.init_scaling(BDF_coeff_mat_scale_neu)
-
+        row_BDF_mat = np.array([0, 0, 0, 0, 0, 0, 0,
+                                1, 1, 1, 1,
+                                2,
+                                3], dtype=c_int)
+        col_BDF_mat = np.array([0, 1, 1, 1, 1, 2, 3,
+                                0, 1, 1, 2,
+                                1,
+                                0], dtype=c_int)
+        BDF_mat_scale = np.array([self.BDF_mat_eta[0], -1.0, 1.0, 1.0, 1.0, -1.0, -1.0,
+                                  -1.0, self.BDF_mat_eta[1], -1.0, -1.0,
+                                  1.0,
+                                  1.0])
+        BDF_mat_idx = fd.analysis.create_matrix(id_BDF_mat, row_BDF_mat, col_BDF_mat, BDF_mat_scale)
+        self.slot_BDF_mat = fd.ModelRelatedMatrixBuffer(BDF_mat_idx, True)
+        self.BDF_mat = getattr(self.slot_BDF_mat, 'sp_mat')
+        
+        self.slot_BDF_mat.create_intern_scaling_values(BDF_mat_scale)
 # -----------------------------------------------------------------------------
+
+    def update_BDF_mat_eta(self, eta0):
+        self.BDF_mat_eta.fill(eta0)
+        self.slot_BDF_mat.set_scaling_from_intern_values(self.BDF_mat_eta_pos, self.BDF_mat_eta)
+# ----------------------------------------------------------------------------- 
 
     def update_sys_mat_for_BDF(self, API):
         API.update_jacobian()
+        self.slot_BDF_mat.update_from_dll()
         self.slot_M.update_from_dll()
-        # self.slot_M_fv.update_from_dll()
-        # self.slot_Cq.update_from_dll()
-        # self.slot_CqvDq.update_from_dll()
-        # self.slot_G_tr.update_from_dll() 
-
-        self.slot_M.apply_to_cached_matrix()
-
-        self.slot_BDF_coeff_mat_neu.update_from_dll()
-        # self.slot_BDF_coeff_mat_neu.apply_to_cached_matrix()
+        
+        self.slot_M.apply_to_cached_matrix()        
 # ----------------------------------------------------------------------------- 
