@@ -33,10 +33,10 @@ class BDF():
 # =============================================================================
 
     def get_adjVar_p_J(self):
-        return self.adjP_J_buff[self.BDF_idx_buff, :]
+        return self.buff_adjP_J[self.BDF_idx_buff, :]
 
     def get_adjVar_P_Phi(self):
-        return self.adjP_Phi_buff[self.BDF_idx_buff,:,:]
+        return self.buff_adjP_Phi[self.BDF_idx_buff,:,:]
             
 # =============================================================================
 # Allocate Buffers
@@ -46,16 +46,16 @@ class BDF():
         
         self.BDF_diff_tau = np.zeros(2)
         
-        self.adjW_J_buff = np.empty((2, num_q))
-        self.adjP_J_buff = np.empty((2, num_q))
-        self.BDF_J_buff_M_times_p = np.zeros((2, num_q))
-        self.BDF_solVec_J = np.zeros(dim_sys)
+        self.buff_adjW_J = np.empty((2, num_q))
+        self.buff_adjP_J = np.empty((2, num_q))
+        self.buff_M_x_AdjP_J = np.zeros((2, num_q))
+        self.buff_solVec_J = np.zeros(dim_sys)
         
         if num_xF > 0:
-            self.adjW_Phi_buff = np.empty((2, num_q, num_xF))
-            self.adjP_Phi_buff = np.empty((2, num_q, num_xF)) 
-            self.BDF_Phi_buff_M_times_P = np.zeros((2, num_q, num_xF))
-            self.BDF_solVec_Phi = np.zeros((dim_sys, num_xF))    
+            self.buff_adjW_Phi = np.empty((2, num_q, num_xF))
+            self.buff_adjP_Phi = np.empty((2, num_q, num_xF)) 
+            self.buff_M_x_AdjP_Phi = np.zeros((2, num_q, num_xF))
+            self.buff_solVec_Phi = np.zeros((dim_sys, num_xF))    
         
 # =============================================================================
 # BDF Routine: Int. order 1
