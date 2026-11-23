@@ -1,21 +1,21 @@
 import numpy as np
 
 from .consistent_boundary_conditions import CoreBC
-from .BDF_core import CoreBDF
+from .BDF_core import BDF
 
 class adjGrads_Param():
     
-    def __init__(self, dataOpt, FreeDyn, Ctrl):
+    def __init__(self, FreeDyn, num_xF):
         
-        self.BC_FDOP = CoreBC.create(dataOpt, FreeDyn)
-        self.BDF = CoreBDF.create(dataOpt, FreeDyn)
+        self.BC_FDOP = CoreBC.create(FreeDyn, num_xF)
+        self.BDF = BDF.create(FreeDyn, num_xF)
 
         self.adjGrad_J_buff = np.zeros((2, FreeDyn.num_FD_pars))
         self.adjGrad_J_buff_view0 = self.adjGrad_J_buff[0]
         self.adjGrad_J_buff_view1 = self.adjGrad_J_buff[1]
         
-        if dataOpt.num_xF > 0:
-            self.adjGrad_Phi_buff = np.zeros((2, dataOpt.num_xF, FreeDyn.num_FD_pars))
+        if num_xF > 0:
+            self.adjGrad_Phi_buff = np.zeros((2, num_xF, FreeDyn.num_FD_pars))
             self.adjGrad_Phi_buff_view0 = self.adjGrad_Phi_buff[0]
             self.adjGrad_Phi_buff_view1 = self.adjGrad_Phi_buff[1]
 # -----------------------------------------------------------------------------        
@@ -31,8 +31,8 @@ class adjGrads_Param():
         tRight = FreeDyn.API.t
         self.BC_FDOP.get_consistent_BC_J(self.BDF, FreeDyn) 
         UserFcts.get_lagrangian_dpars(FreeDyn, z)
-        FreeDyn.buffer_MBS_dForce_dFDparam.update_from_dll()
-        self.adjGrad_J_buff[idx_buff] = UserFcts.dLdpars + self.BDF.get_adjVar_p_J().T @ FreeDyn.dForce_dFDparam
+        FreeDyn.update_dForce_dFDparam()
+        self.adjGrad_J_buff[idx_buff] = UserFcts.dLdpars + self.BDF.get_adjVar_p_J().T @ FreeDyn.SysMat.dForce_dFDparam
 
         
         """ BDF order 1 """
@@ -42,8 +42,8 @@ class adjGrads_Param():
         deltaT = tRight - tLeft
         self.BDF.BDForder1_singleStep_J(UserFcts, FreeDyn, z, deltaT)        
         UserFcts.get_lagrangian_dpars(FreeDyn, z)
-        FreeDyn.buffer_MBS_dForce_dFDparam.update_from_dll()
-        self.adjGrad_J_buff[idx_buff] = UserFcts.dLdpars + self.BDF.get_adjVar_p_J().T @ FreeDyn.dForce_dFDparam
+        FreeDyn.update_dForce_dFDparam()
+        self.adjGrad_J_buff[idx_buff] = UserFcts.dLdpars + self.BDF.get_adjVar_p_J().T @ FreeDyn.SysMat.dForce_dFDparam
 
         dJdpars = deltaT * (self.adjGrad_J_buff_view0 + self.adjGrad_J_buff_view1)
                 
@@ -56,8 +56,8 @@ class adjGrads_Param():
             deltaT = tRight - tLeft
             self.BDF.BDForder2_singleStep_J(UserFcts, FreeDyn, z, deltaT)
             UserFcts.get_lagrangian_dpars(FreeDyn, z)
-            FreeDyn.buffer_MBS_dForce_dFDparam.update_from_dll()
-            self.adjGrad_J_buff[idx_buff] = UserFcts.dLdpars + self.BDF.get_adjVar_p_J().T @ FreeDyn.dForce_dFDparam
+            FreeDyn.update_dForce_dFDparam()
+            self.adjGrad_J_buff[idx_buff] = UserFcts.dLdpars + self.BDF.get_adjVar_p_J().T @ FreeDyn.SysMat.dForce_dFDparam
 
             dJdpars += deltaT * (self.adjGrad_J_buff_view0 + self.adjGrad_J_buff_view1)
             
@@ -76,8 +76,8 @@ class adjGrads_Param():
         FreeDyn.fetch_and_update_states_at_index(FreeDyn.num_time_steps-1)
         tRight = FreeDyn.API.t
         self.BC_FDOP.get_consistent_BC_Phi(self.BDF, UserFcts, FreeDyn) 
-        FreeDyn.buffer_MBS_dForce_dFDparam.update_from_dll()
-        self.adjGrad_Phi_buff[idx_buff] = self.BDF.get_adjVar_P_Phi().T @ FreeDyn.dForce_dFDparam
+        FreeDyn.update_dForce_dFDparam()
+        self.adjGrad_Phi_buff[idx_buff] = self.BDF.get_adjVar_P_Phi().T @ FreeDyn.SysMat.dForce_dFDparam
         
         """ BDF order 1 """ 
         idx_buff = 1 - idx_buff
@@ -85,8 +85,8 @@ class adjGrads_Param():
         tLeft = FreeDyn.API.t
         deltaT = tRight - tLeft
         self.BDF.BDForder1_singleStep_Phi(FreeDyn, deltaT)
-        FreeDyn.buffer_MBS_dForce_dFDparam.update_from_dll()
-        self.adjGrad_Phi_buff[idx_buff] = self.BDF.get_adjVar_P_Phi().T @ FreeDyn.dForce_dFDparam
+        FreeDyn.update_dForce_dFDparam()
+        self.adjGrad_Phi_buff[idx_buff] = self.BDF.get_adjVar_P_Phi().T @ FreeDyn.SysMat.dForce_dFDparam
 
         dPhidpars = deltaT * (self.adjGrad_Phi_buff_view0 + self.adjGrad_Phi_buff_view1)
         
@@ -98,8 +98,8 @@ class adjGrads_Param():
             tLeft = FreeDyn.API.t
             deltaT = tRight - tLeft
             self.BDF.BDForder2_singleStep_Phi(FreeDyn, deltaT)
-            FreeDyn.buffer_MBS_dForce_dFDparam.update_from_dll()
-            self.adjGrad_Phi_buff[idx_buff] = self.BDF.get_adjVar_P_Phi().T @ FreeDyn.dForce_dFDparam
+            FreeDyn.update_dForce_dFDparam()
+            self.adjGrad_Phi_buff[idx_buff] = self.BDF.get_adjVar_P_Phi().T @ FreeDyn.SysMat.dForce_dFDparam
 
             dPhidpars += deltaT * (self.adjGrad_Phi_buff_view0 + self.adjGrad_Phi_buff_view1)
             

@@ -1,39 +1,32 @@
-import numpy as np
+import numpy as np 
 
-class CoreBDF():
+class BDF():
     
     @classmethod
-    def create(cls, dataOpt, FreeDyn):
+    def create(cls, FreeDyn, num_xF):
         if FreeDyn.MBS_modeMAT_sparse:
             from .BDF_sparse_physical_time import SparseBDF
-            return SparseBDF(dataOpt, FreeDyn)
+            return SparseBDF(FreeDyn, num_xF)
         else:
             from .BDF_dense_physical_time import DenseBDF
-            return DenseBDF(dataOpt, FreeDyn)
+            return DenseBDF(FreeDyn, num_xF)
     
-    def __init__(self, dataOpt, FreeDyn):
+    def __init__(self, FreeDyn, num_xF):
         
         # Create buffers for fast access
         self.BDF_idx_buff = 0
-        num_buffs = 2   # do not change - buffer layout changes require fixes in many places
-
+        
+        self.init_memory_layout_dependent(FreeDyn, num_xF)
+        
         # Allocate memory for the coeff. Matrix of the adj Sys 
         nBDFsys = self.init_coeff_mat_adj_sys(FreeDyn)
         
-        if FreeDyn.MBS_modeMAT_sparse:
-            partition_1 = FreeDyn.nDof
-            partition_2 = 2*FreeDyn.nDof 
-        else:
-            partition_1 = FreeDyn.nDof
-            partition_2 = FreeDyn.nDofConstr
-            self.allocate_buffs_BDF_add_dense(FreeDyn.nDof, dataOpt.num_xF)        
-        
-        self.allocate_buffs_BDF(num_buffs, FreeDyn.nDof, dataOpt.num_xF, nBDFsys, partition_1, partition_2)
+        self.allocate_buffs_BDF(FreeDyn.nDof, num_xF, nBDFsys)
         
         self.init_order_one_BDF()
         self.init_order_two_BDF()
         
-        print('class BDF initialized')
+        # print('class BDF initialized')
         
 # =============================================================================
 # Return values of adjVar p at BDF time idx s_n from the buffer
@@ -49,33 +42,20 @@ class CoreBDF():
 # Allocate Buffers
 # =============================================================================
     
-    def allocate_buffs_BDF(self, num_buffs, num_q, num_xF, dim_sys, partition_1, partition_2):
+    def allocate_buffs_BDF(self, num_q, num_xF, dim_sys):
         
-        self.BDF_diff_tau = np.zeros(num_buffs)
+        self.BDF_diff_tau = np.zeros(2)
         
-        self.adjW_J_buff = np.empty((num_buffs, num_q))
-        self.adjP_J_buff = np.empty((num_buffs, num_q))
-        self.BDF_J_buff_M_times_p = np.zeros((num_buffs, num_q))
-        
+        self.adjW_J_buff = np.empty((2, num_q))
+        self.adjP_J_buff = np.empty((2, num_q))
+        self.BDF_J_buff_M_times_p = np.zeros((2, num_q))
         self.BDF_solVec_J = np.zeros(dim_sys)
-        self.BDF_solVec_J_view_first = self.BDF_solVec_J[:partition_1]
-        self.BDF_solVec_J_view_second = self.BDF_solVec_J[partition_1:partition_2]
         
         if num_xF > 0:
-            self.adjW_Phi_buff = np.empty((num_buffs, num_q, num_xF))
-            self.adjP_Phi_buff = np.empty((num_buffs, num_q, num_xF)) 
-            self.BDF_Phi_buff_M_times_P = np.zeros((num_buffs, num_q, num_xF))
-            
-            self.BDF_solVec_Phi = np.zeros((dim_sys, num_xF))
-            self.BDF_solVec_Phi_view_first = self.BDF_solVec_Phi[:partition_1, :]
-            self.BDF_solVec_Phi_view_second = self.BDF_solVec_Phi[partition_1:partition_2,:]           
-# ----------------------------------------------------------------------------- 
-            
-    def allocate_buffs_BDF_add_dense(self, num_q, num_xF):
-        
-        self.BDF_J_eta_times_adjW = np.empty(num_q)
-        if num_xF > 0:
-            self.BDF_Phi_eta_times_adjW = np.empty((num_q, num_xF))        
+            self.adjW_Phi_buff = np.empty((2, num_q, num_xF))
+            self.adjP_Phi_buff = np.empty((2, num_q, num_xF)) 
+            self.BDF_Phi_buff_M_times_P = np.zeros((2, num_q, num_xF))
+            self.BDF_solVec_Phi = np.zeros((dim_sys, num_xF))    
         
 # =============================================================================
 # BDF Routine: Int. order 1

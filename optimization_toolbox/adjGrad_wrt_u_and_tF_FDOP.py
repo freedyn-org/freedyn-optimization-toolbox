@@ -1,24 +1,24 @@
 import numpy as np
 
 from .consistent_boundary_conditions import CoreBC
-from .BDF_core import CoreBDF
+from .BDF_core import BDF
 
 class adjGrads_TOCP():
     
-    def __init__(self, dataOpt, FreeDyn, Ctrl):
+    def __init__(self, FreeDyn, Ctrl, num_xF):
         
-        self.BC_FDOP = CoreBC.create(dataOpt, FreeDyn)
-        self.BDF = CoreBDF.create(dataOpt, FreeDyn)
+        self.BC_FDOP = CoreBC.create(FreeDyn, num_xF)
+        self.BDF = BDF.create(FreeDyn, num_xF)
         
         self.adjGrad_J_uDach_buff = np.zeros((2, Ctrl.num_ctrls, Ctrl.num_grid_nodes))
         self.adjGrad_J_uDach_buff_view0 = self.adjGrad_J_uDach_buff[0].reshape(-1)
         self.adjGrad_J_uDach_buff_view1 = self.adjGrad_J_uDach_buff[1].reshape(-1)
         
-        if dataOpt.num_xF > 0: 
+        if num_xF > 0: 
             ctrl_all = Ctrl.num_ctrls * Ctrl.num_grid_nodes
-            self.adjGrad_Phi_uDach_buff = np.zeros((2, dataOpt.num_xF, Ctrl.num_ctrls, Ctrl.num_grid_nodes))
-            self.adjGrad_Phi_uDach_buff_view0 = self.adjGrad_Phi_uDach_buff[0].reshape(dataOpt.num_xF, ctrl_all)
-            self.adjGrad_Phi_uDach_buff_view1 = self.adjGrad_Phi_uDach_buff[1].reshape(dataOpt.num_xF, ctrl_all)
+            self.adjGrad_Phi_uDach_buff = np.zeros((2, num_xF, Ctrl.num_ctrls, Ctrl.num_grid_nodes))
+            self.adjGrad_Phi_uDach_buff_view0 = self.adjGrad_Phi_uDach_buff[0].reshape(num_xF, ctrl_all)
+            self.adjGrad_Phi_uDach_buff_view1 = self.adjGrad_Phi_uDach_buff[1].reshape(num_xF, ctrl_all)
 # -----------------------------------------------------------------------------
     
     def adjGrad_J(self, dataOpt, UserFcts, FreeDyn, Ctrl, z):
@@ -34,11 +34,11 @@ class adjGrads_TOCP():
         tRight = FreeDyn.API.t
         self.BC_FDOP.get_consistent_BC_J(self.BDF, FreeDyn)
         UserFcts.get_lagrangian_du(dataOpt, FreeDyn, Ctrl, z)
-        FreeDyn.buffer_MBS_dForce_dFDparam.update_from_dll()
-        dLdu_adjP_fdu = UserFcts.dLdu + self.BDF.get_adjVar_p_J().T @ FreeDyn.dForce_dFDparam
-        vec_C, dCdtau_times_uDach = Ctrl.get_vec_c_AND_dCdtau_times_uDach(tRight/dataOpt.final_time)
-        np.outer(dLdu_adjP_fdu, vec_C, out = self.adjGrad_J_uDach_buff[idx_buff])
-        integrand_tF_Right = tRight * (dLdu_adjP_fdu @ dCdtau_times_uDach)
+        FreeDyn.update_dForce_dFDparam()
+        dLdu_adjP_fdu = UserFcts.dLdu + self.BDF.get_adjVar_p_J().T @ FreeDyn.SysMat.dForce_dFDparam
+        Ctrl.update_vecC_AND_dCdtau_times_uDach(tRight/dataOpt.final_time)
+        np.outer(dLdu_adjP_fdu, Ctrl.buff_vecC, out = self.adjGrad_J_uDach_buff[idx_buff])
+        integrand_tF_Right = tRight * (dLdu_adjP_fdu @ Ctrl.buff_dCdtau_uDach)
         L_tF = UserFcts.get_lagrangian(dataOpt, FreeDyn, Ctrl, z) # is added at the end, otherwise multiplied by 0.5
         
         """ BDF order 1 """
@@ -48,11 +48,11 @@ class adjGrads_TOCP():
         deltaT = tRight - tLeft
         self.BDF.BDForder1_singleStep_J(UserFcts, FreeDyn, z, deltaT)        
         UserFcts.get_lagrangian_du(dataOpt, FreeDyn, Ctrl, z)
-        FreeDyn.buffer_MBS_dForce_dFDparam.update_from_dll()
-        dLdu_adjP_fdu = UserFcts.dLdu + self.BDF.get_adjVar_p_J().T @ FreeDyn.dForce_dFDparam
-        vec_C, dCdtau_times_uDach = Ctrl.get_vec_c_AND_dCdtau_times_uDach(tLeft/dataOpt.final_time)
-        np.outer(dLdu_adjP_fdu, vec_C, out = self.adjGrad_J_uDach_buff[idx_buff])
-        integrand_tF_Left = tLeft * (dLdu_adjP_fdu @ dCdtau_times_uDach)
+        FreeDyn.update_dForce_dFDparam()
+        dLdu_adjP_fdu = UserFcts.dLdu + self.BDF.get_adjVar_p_J().T @ FreeDyn.SysMat.dForce_dFDparam
+        Ctrl.update_vecC_AND_dCdtau_times_uDach(tLeft/dataOpt.final_time)
+        np.outer(dLdu_adjP_fdu, Ctrl.buff_vecC, out = self.adjGrad_J_uDach_buff[idx_buff])
+        integrand_tF_Left = tLeft * (dLdu_adjP_fdu @ Ctrl.buff_dCdtau_uDach)
         gradJ[0] -= deltaT * (integrand_tF_Left + integrand_tF_Right)
         gradJ[1:] += deltaT * (self.adjGrad_J_uDach_buff_view0 + self.adjGrad_J_uDach_buff_view1)
                 
@@ -66,11 +66,11 @@ class adjGrads_TOCP():
             deltaT = tRight - tLeft
             self.BDF.BDForder2_singleStep_J(UserFcts, FreeDyn, z, deltaT)
             UserFcts.get_lagrangian_du(dataOpt, FreeDyn, Ctrl, z)
-            FreeDyn.buffer_MBS_dForce_dFDparam.update_from_dll()
-            dLdu_adjP_fdu = UserFcts.dLdu + self.BDF.get_adjVar_p_J().T @ FreeDyn.dForce_dFDparam
-            vec_C, dCdtau_times_uDach = Ctrl.get_vec_c_AND_dCdtau_times_uDach(tLeft/dataOpt.final_time)
-            np.outer(dLdu_adjP_fdu, vec_C, out = self.adjGrad_J_uDach_buff[idx_buff])
-            integrand_tF_Left = tLeft * (dLdu_adjP_fdu @ dCdtau_times_uDach)
+            FreeDyn.update_dForce_dFDparam()
+            dLdu_adjP_fdu = UserFcts.dLdu + self.BDF.get_adjVar_p_J().T @ FreeDyn.SysMat.dForce_dFDparam
+            Ctrl.update_vecC_AND_dCdtau_times_uDach(tLeft/dataOpt.final_time)
+            np.outer(dLdu_adjP_fdu, Ctrl.buff_vecC, out = self.adjGrad_J_uDach_buff[idx_buff])
+            integrand_tF_Left = tLeft * (dLdu_adjP_fdu @ Ctrl.buff_dCdtau_uDach)
             gradJ[0] -= deltaT * (integrand_tF_Left + integrand_tF_Right)
             gradJ[1:] += deltaT * (self.adjGrad_J_uDach_buff_view0 + self.adjGrad_J_uDach_buff_view1)
         
@@ -93,11 +93,11 @@ class adjGrads_TOCP():
         tRight = FreeDyn.API.t
         self.BC_FDOP.get_consistent_BC_Phi(self.BDF, UserFcts, FreeDyn) # this updates dPhidq and dPhidv
         dPhidt_tF = UserFcts.dPhidq @ FreeDyn.API.Qd[:, 0] + UserFcts.dPhidv @ FreeDyn.API.Qdd[:, 0]  # is added at the end, otherwise multiplied by 0.5y()
-        FreeDyn.buffer_MBS_dForce_dFDparam.update_from_dll()
-        adjP_fdu = self.BDF.get_adjVar_P_Phi().T @ FreeDyn.dForce_dFDparam
-        vec_C, dCdtau_times_uDach = Ctrl.get_vec_c_AND_dCdtau_times_uDach(tRight/dataOpt.final_time)
-        np.multiply(adjP_fdu[:,:,np.newaxis], vec_C, out = self.adjGrad_Phi_uDach_buff[idx_buff])        
-        integrand_tF_Right = tRight * (adjP_fdu @ dCdtau_times_uDach)
+        FreeDyn.update_dForce_dFDparam()
+        adjP_fdu = self.BDF.get_adjVar_P_Phi().T @ FreeDyn.SysMat.dForce_dFDparam
+        Ctrl.update_vecC_AND_dCdtau_times_uDach(tRight/dataOpt.final_time)
+        np.multiply.outer(adjP_fdu, Ctrl.buff_vecC, out = self.adjGrad_Phi_uDach_buff[idx_buff])        
+        integrand_tF_Right = tRight * (adjP_fdu @ Ctrl.buff_dCdtau_uDach)
         
         """ BDF order 1 """ 
         idx_buff = 1 - idx_buff
@@ -105,11 +105,11 @@ class adjGrads_TOCP():
         tLeft = FreeDyn.API.t
         deltaT = tRight - tLeft
         self.BDF.BDForder1_singleStep_Phi(FreeDyn, deltaT)
-        FreeDyn.buffer_MBS_dForce_dFDparam.update_from_dll()
-        adjP_fdu = self.BDF.get_adjVar_P_Phi().T @ FreeDyn.dForce_dFDparam
-        vec_C, dCdtau_times_uDach = Ctrl.get_vec_c_AND_dCdtau_times_uDach(tLeft/dataOpt.final_time)
-        np.multiply(adjP_fdu[:,:,np.newaxis], vec_C, out = self.adjGrad_Phi_uDach_buff[idx_buff])
-        integrand_tF_Left = tLeft * (adjP_fdu @ dCdtau_times_uDach)
+        FreeDyn.update_dForce_dFDparam()
+        adjP_fdu = self.BDF.get_adjVar_P_Phi().T @ FreeDyn.SysMat.dForce_dFDparam
+        Ctrl.update_vecC_AND_dCdtau_times_uDach(tLeft/dataOpt.final_time)
+        np.multiply.outer(adjP_fdu, Ctrl.buff_vecC, out = self.adjGrad_Phi_uDach_buff[idx_buff])
+        integrand_tF_Left = tLeft * (adjP_fdu @ Ctrl.buff_dCdtau_uDach)
         gradPhi[:,0] -= deltaT * (integrand_tF_Left + integrand_tF_Right)
         gradPhi[:,1:] += deltaT * (self.adjGrad_Phi_uDach_buff_view0 + self.adjGrad_Phi_uDach_buff_view1)   
         
@@ -122,11 +122,11 @@ class adjGrads_TOCP():
             tLeft = FreeDyn.API.t
             deltaT = tRight - tLeft
             self.BDF.BDForder2_singleStep_Phi(FreeDyn, deltaT)
-            FreeDyn.buffer_MBS_dForce_dFDparam.update_from_dll()
-            adjP_fdu = self.BDF.get_adjVar_P_Phi().T @ FreeDyn.dForce_dFDparam
-            vec_C, dCdtau_times_uDach = Ctrl.get_vec_c_AND_dCdtau_times_uDach(tLeft/dataOpt.final_time)
-            np.multiply(adjP_fdu[:,:,np.newaxis], vec_C, out = self.adjGrad_Phi_uDach_buff[idx_buff])
-            integrand_tF_Left = tLeft * (adjP_fdu @ dCdtau_times_uDach)
+            FreeDyn.update_dForce_dFDparam()
+            adjP_fdu = self.BDF.get_adjVar_P_Phi().T @ FreeDyn.SysMat.dForce_dFDparam
+            Ctrl.update_vecC_AND_dCdtau_times_uDach(tLeft/dataOpt.final_time)
+            np.multiply.outer(adjP_fdu, Ctrl.buff_vecC, out = self.adjGrad_Phi_uDach_buff[idx_buff])
+            integrand_tF_Left = tLeft * (adjP_fdu @ Ctrl.buff_dCdtau_uDach)
             gradPhi[:,0] -= deltaT * (integrand_tF_Left + integrand_tF_Right)
             gradPhi[:,1:] += deltaT * (self.adjGrad_Phi_uDach_buff_view0 + self.adjGrad_Phi_uDach_buff_view1)
         

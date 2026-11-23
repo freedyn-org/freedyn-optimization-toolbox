@@ -59,7 +59,7 @@ final_state = None                # final constraints | if no, set: None
 # -----------------------------------------------------------------------------
 #
 """ Define FD parameters - if required"""
-FD_pars = np.array([])
+FD_pars = np.array([])                        # param to be optimized - no ctrl
 num_FD_pars =  len(FD_pars)
 #
 # -----------------------------------------------------------------------------

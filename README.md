@@ -10,11 +10,11 @@ Opt_TB = <ClassName>(fds_path, fds_name,
                      final_time, final_state,
                      path_FDdll)
 ```
-[`Parameters of FreeDyn Optimization Toolbox`](docs/architecture.md#required-parameters-for-the-freedyn-optimization-toolbox)
+→ [`Parameters of FreeDyn Optimization Toolbox`](docs/config.md#required-parameters-for-the-freedyn-optimization-toolbox)
 
 ## Features
 
-[Short Overwiew Demo Examples](examples/GitHub_Examples_Description.pdf)
+→ [Short Overwiew Demo Examples](examples/GitHub_Examples_Description.pdf)
 
 - Use **OptimCtrl** for optimal control problems with fixed final time
   <table>
@@ -50,6 +50,17 @@ Opt_TB = <ClassName>(fds_path, fds_name,
     </tr>
   </table>
 - Use **ParamIdent** for parameter-identification with fixed final time
+  <table>
+    <tr>
+      <td width="250" align="center" style="vertical-align:middle;">
+      <img src="examples/example_04_Five_bar_mechanism_identify_pars/five_bar_planar_mechanism.png" width="250">
+      </td>
+      <td width="400">
+        <a href="examples/example_04_Five_bar_mechanism_identify_pars/">Example Five Bar Mechanism</a><br>
+        <a href="examples/example_04_Five_bar_mechanism_identify_pars/">Parameter-Identification</a>
+      </td>
+    </tr>
+  </table>
 
 ## Optimization Tasks in Multibody Dynamics
 
@@ -89,13 +100,13 @@ pip install freedyn
 3. Download Freedyn-optimization-toolbox
 4. Run `main_*.py`
 
-[`How to Create Your Own Optimization Task`](docs/setup_guide.md)
+→ [`How to Create Your Own Optimization Task`](docs/setup_guide.md)
 
 ## Requirements
 - Python 3.8+ (Recommendation: Python 3.13)
 - numpy, scipy
 - matplotlib (optional: for plotting results)
-- freedyn 1.0.6.post1 +
+- freedyn 1.2.0
  
 ## Citation
 If you use the FreeDyn Optimization Toolbox in your research, please cite:
@@ -110,7 +121,7 @@ If you use the FreeDyn Optimization Toolbox in your research, please cite:
 ```
 
 ## Related Papers
-Papers demonstrating the toolbox:
+Papers demonstrating the toolbox v1.0.0:
 
 P. Zallinger, L. Buchner, W. Steiner, K. Nachbagauer. A Low-Effort Approach to Adjoint Gradient Computation for Optimal Control Problems Using a Multibody Dynamics Simulation Interface. 
 *Proceedings of the ASME 2026 International Design Engineering Technical Conferences and Computers and Information in Engineering Conference. 22nd International Conference on Multibody Systems, Nonlinear Dynamics, and Control (MSNDC)*. Houston, Texas, USA. 2026.
