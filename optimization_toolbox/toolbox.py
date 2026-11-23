@@ -32,6 +32,11 @@ class Toolbox():
 
     def grad_cost_fct_J(self, z):
         
+        # alt = self.OptimTask.adj_grad_J(self.FreeDyn, self.Ctrl, z)
+        # new = self.OptimTask.adjGrads.new_adjGrad_J(self.OptimTask, self.OptimTask.UserFcts, self.FreeDyn, self.Ctrl, z)
+        # error = abs(alt - new).max()
+        # print(error)
+        
         """ Gradient of the cost functional J """
         
         # Verification of the adjoint gradient via numerical differentiation
