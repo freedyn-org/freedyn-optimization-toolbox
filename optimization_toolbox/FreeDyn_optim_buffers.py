@@ -171,12 +171,12 @@ class FreeDynBuffersSparse(FreeDynBuffers):
         self.slot_BDF_mat = fd.ModelRelatedMatrixBuffer(BDF_mat_idx, True)
         self.BDF_mat = getattr(self.slot_BDF_mat, 'sp_mat')
         
-        self.slot_BDF_mat.create_intern_scaling_values(BDF_mat_scale)
+        self.slot_BDF_mat.create_internal_scaling_values(BDF_mat_scale)
 # -----------------------------------------------------------------------------
 
     def update_BDF_mat_eta(self, eta0):
         self.BDF_mat_eta.fill(eta0)
-        self.slot_BDF_mat.set_scaling_from_intern_values(self.BDF_mat_eta_pos, self.BDF_mat_eta)
+        self.slot_BDF_mat.set_scaling_from_internal_values(self.BDF_mat_eta_pos, self.BDF_mat_eta)
 # ----------------------------------------------------------------------------- 
 
     def update_sys_mat_for_BDF(self, API):
