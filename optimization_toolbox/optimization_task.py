@@ -21,10 +21,9 @@ class OptimTask():
     
     def cost_fct_J(self, FreeDyn, Ctrl, z):
         
-        self.UpdateOptimVars.compute_or_reuse(self, FreeDyn, Ctrl, z)
-        
         """ Cost functional J of the optimization problem
             J = \int_{t_0}^{t_f} L dt """
+        self.UpdateOptimVars.compute_or_reuse(self, FreeDyn, Ctrl, z)
         
         """ Numerical integration by the trapezoidal rule: use t_i , t_i+1 """
         J = 0
@@ -54,10 +53,8 @@ class OptimTask():
 
     def adj_grad_J(self, FreeDyn, Ctrl, z):
         
-        self.UpdateOptimVars.compute_or_reuse(self, FreeDyn, Ctrl, z)
-        
         """ Gradient of the cost functioncal J by the adjoint method """
-        
+        self.UpdateOptimVars.compute_or_reuse(self, FreeDyn, Ctrl, z)
         return self.adjGrads.adjGrad_J(self, self.UserFcts, FreeDyn, Ctrl, z)
 # -----------------------------------------------------------------------------
 
@@ -95,10 +92,10 @@ class OptimTask():
     
     def final_constr_eq_Phi(self, FreeDyn, Ctrl, z):
         
-        self.UpdateOptimVars.compute_or_reuse(self, FreeDyn, Ctrl, z)
-        
         """ Final constraints Phi of the optimization problem
         Phi (t_f) = 0 """
+        
+        self.UpdateOptimVars.compute_or_reuse(self, FreeDyn, Ctrl, z)
         
         # set t = t_f
         FreeDyn.fetch_and_update_states_at_index(FreeDyn.num_time_steps-1)
@@ -110,16 +107,14 @@ class OptimTask():
 
     def adj_grad_Phi(self, FreeDyn, Ctrl, z):
         
-        self.UpdateOptimVars.compute_or_reuse(self, FreeDyn, Ctrl, z)
-        
         """ Gradient of the final constraints Phi by the adjoint method """
-        
+        self.UpdateOptimVars.compute_or_reuse(self, FreeDyn, Ctrl, z)
         return self.adjGrads.adjGrad_Phi(self, self.UserFcts, FreeDyn, Ctrl, z)
 # -----------------------------------------------------------------------------
 
     def num_grad_Phi(self, FreeDyn, Ctrl, z):
-        """ Gradient of the final constraints Phi via numerical differentiation """
         
+        """ Gradient of the final constraints Phi via numerical differentiation """
         grad_Phi = np.zeros([self.num_xF, self.num_opt_vars])
         Phi = self.final_constr_eq_Phi(FreeDyn, Ctrl, z)
         
