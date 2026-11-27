@@ -15,16 +15,7 @@ class BDF():
         
         # Create buffers for fast access
         self.init_buff_indices()
-        
-        self.init_memory_layout_dependent(FreeDyn, num_xF)
-        
-        # Allocate memory for the coeff. Matrix of the adj Sys 
-        nBDFsys = self.init_coeff_mat_adj_sys(FreeDyn)
-        
-        self.allocate_buffs_BDF(FreeDyn.nDof, num_xF, nBDFsys)
-        
-        self.init_order_one_BDF()
-        self.init_order_two_BDF()        
+        self.allocate_buffs_BDF(FreeDyn, num_xF)       
 # -----------------------------------------------------------------------------
         
     def init_buff_indices(self):
@@ -34,6 +25,36 @@ class BDF():
     def shift_buff_indices(self):
         self.buff_idx1 = self.buff_idx2
         self.buff_idx2 = 1 - self.buff_idx1
+            
+# =============================================================================
+# Allocate Buffers
+# =============================================================================
+    
+    def allocate_buffs_BDF(self, FreeDyn, num_xF):
+        
+        # Run memory layout dependent setup (add. buffers, coeff. matrix of adjoint system)
+        self.init_memory_layout_dependent(FreeDyn, num_xF)
+        
+        # Buffers independent of memory layout
+        self.adjP_J = np.zeros(FreeDyn.nDof) 
+        self.buff_adjW_J = np.zeros((2, FreeDyn.nDof))
+        self.buff_M_x_AdjP_J = np.zeros((2, FreeDyn.nDof))
+        if num_xF > 0:
+            self.adjP_Phi = np.zeros((FreeDyn.nDof, num_xF)) 
+            self.buff_adjW_Phi = np.zeros((2, FreeDyn.nDof, num_xF))
+            self.buff_M_x_AdjP_Phi = np.zeros((2, FreeDyn.nDof, num_xF))
+        
+        # Buffers of time diffs for etas        
+        self.BDF_diff_tau = np.zeros(2)
+        
+        # Buffers of eta BDF order 1
+        self.BDF1_eta0 = 0.0
+        self.BDF1_eta1 = 0.0
+        
+        # Buffers of eta BDF order 2
+        self.BDF2_eta0 = 0.0
+        self.BDF2_eta1 = 0.0
+        self.BDF2_eta2 = 0.0
 
 # =============================================================================
 # Set initial values for the BDF routines
@@ -41,83 +62,80 @@ class BDF():
 
     def set_adj_BC_J(self, init_adjP, init_adjW):
         self.init_buff_indices()
-        self.buff_adjP_J[self.buff_idx1, :] = init_adjP
-        self.buff_adjW_J[self.buff_idx1, :] = init_adjW
+        self.adjP_J[:] = init_adjP
+        self.buff_adjW_J[:] = init_adjW
 
     def set_adj_BC_Phi(self, init_adjP, init_adjW):
         self.init_buff_indices()
-        self.buff_adjP_Phi[self.buff_idx1, :, :] = init_adjP
-        self.buff_adjW_Phi[self.buff_idx1, :, :] = init_adjW
-
-# =============================================================================
-# Return values of adjVar p at BDF time idx s_n from the buffer
-# =============================================================================
-
-    def get_adjVar_p_J(self):
-        return self.buff_adjP_J[self.buff_idx1, :]
-
-    def get_adjVar_P_Phi(self):
-        return self.buff_adjP_Phi[self.buff_idx1,:,:]
-            
-# =============================================================================
-# Allocate Buffers
-# =============================================================================
-    
-    def allocate_buffs_BDF(self, num_q, num_xF, dim_sys):
-        
-        self.BDF_diff_tau = np.zeros(2)
-        
-        self.buff_adjW_J = np.empty((2, num_q))
-        self.buff_adjP_J = np.empty((2, num_q))
-        self.buff_M_x_AdjP_J = np.zeros((2, num_q))
-        self.buff_solVec_J = np.zeros(dim_sys)
-        
-        if num_xF > 0:
-            self.buff_adjW_Phi = np.empty((2, num_q, num_xF))
-            self.buff_adjP_Phi = np.empty((2, num_q, num_xF)) 
-            self.buff_M_x_AdjP_Phi = np.zeros((2, num_q, num_xF))
-            self.buff_solVec_Phi = np.zeros((dim_sys, num_xF))    
+        self.adjP_Phi[:] = init_adjP
+        self.buff_adjW_Phi[:] = init_adjW
         
 # =============================================================================
 # BDF Routine: Int. order 1
 # =============================================================================
     
-    def init_order_one_BDF(self):
-        self.BDF1_eta0_inv = 0.0
-        self.BDF1_eta0 = 0.0
-        self.BDF1_eta1 = 0.0
-# -----------------------------------------------------------------------------
-    
-    def get_BDForder1_coeffs_eta(self, deltaT):
+    def order1_coeffs_eta(self, deltaT):
         
         self.BDF_diff_tau[self.buff_idx1] = deltaT
-
-        self.BDF1_eta0_inv = deltaT
+        
         self.BDF1_eta0 = 1 / deltaT
-        self.BDF1_eta1 = -self.BDF1_eta0 
+        self.BDF1_eta1 = -self.BDF1_eta0
+# -----------------------------------------------------------------------------        
+        
+    def BDForder1_singleStep_J(self, UserFcts, FreeDyn, z, deltaT):
+        self.shared_pre_steps_J(UserFcts, FreeDyn, z)                           # memory independent
+        self.order1_coeffs_eta(deltaT)
+        self.order1_post_steps_J(UserFcts, FreeDyn)                             # memory dependent
+
+    def BDForder1_singleStep_Phi(self, FreeDyn, deltaT):
+        self.shared_pre_steps_Phi(FreeDyn)                                      # memory independent
+        self.order1_coeffs_eta(deltaT)
+        self.order1_post_steps_Phi(FreeDyn)                                     # memory dependent
 
 # =============================================================================
 # BDF Routine: Int. order 2
 # =============================================================================
 
-    def init_order_two_BDF(self):
-        
-        self.BDF2_eta0_inv = 0.0
-        self.BDF2_eta0 = 0.0
-        self.BDF2_eta1 = 0.0
-        self.BDF2_eta2 = 0.0        
-# -----------------------------------------------------------------------------
-
-    def get_BDForder2_coeffs_eta(self, diff_01):
+    def order2_coeffs_eta(self, diff_01):
         
         self.BDF_diff_tau[self.buff_idx1] = diff_01                             # s_{n} - s_{n-1}
         diff_12 = self.BDF_diff_tau[self.buff_idx2]                             # s_{n-1} - s_{n-2}
         diff_02 = diff_01 + diff_12                                             # s_{n} - s_{n-2}
 
-        self.BDF2_eta0_inv = (diff_01 * diff_02) / (diff_01 + diff_02)          # inv(eta0)
-        
-        self.BDF2_eta0 = 1 / self.BDF2_eta0_inv                                 # eta_0
+        self.BDF2_eta0 = (diff_01 + diff_02) / (diff_01 * diff_02)              # eta_0
         self.BDF2_eta1 = -diff_02 / (diff_01 * diff_12)                         # eta_1
         self.BDF2_eta2 = diff_01 / (diff_02 * diff_12)                          # eta_2 
+# -----------------------------------------------------------------------------        
         
-# -----------------------------------------------------------------------------
+    def BDForder2_singleStep_J(self, UserFcts, FreeDyn, z, deltaT):
+        self.shared_pre_steps_J(UserFcts, FreeDyn, z)                           # memory independent
+        self.order2_coeffs_eta(deltaT)
+        self.order2_post_steps_J(UserFcts, FreeDyn)                             # memory dependent
+
+    def BDForder2_singleStep_Phi(self, FreeDyn, deltaT):
+        self.shared_pre_steps_Phi(FreeDyn)                                      # memory independent
+        self.order2_coeffs_eta(deltaT)
+        self.order2_post_steps_Phi(FreeDyn)                                     # memory dependent
+        
+# =============================================================================
+# BDF Routine: Shared pre steps - memory independent
+# =============================================================================
+
+    def shared_pre_steps_J(self, UserFcts, FreeDyn, z):
+        
+        # Compute M(s_n-1) * adjP(s_n-1) - must before update_MBS_SysMat, because s_n-1 is needed!
+        self.buff_M_x_AdjP_J[self.buff_idx1, :] = FreeDyn.SysMat.M @ self.adjP_J
+
+        # Updates user functions to time step s_n
+        UserFcts.get_lagrangian_dq(FreeDyn, z)
+        UserFcts.get_lagrangian_dv(FreeDyn, z)
+        
+        # update_sys_mat_for_BDF() is carried out within _dense/_spare
+# ----------------------------------------------------------------------------- 
+
+    def shared_pre_steps_Phi(self, FreeDyn):
+        
+        # Compute M(s_n-1) * adjP(s_n-1) - must before update_MBS_SysMat, because s_n-1 is needed!
+        self.buff_M_x_AdjP_Phi[self.buff_idx1, :, :] = FreeDyn.SysMat.M @ self.adjP_Phi
+        
+        # update_sys_mat_for_BDF() is carried out within _dense/_spare

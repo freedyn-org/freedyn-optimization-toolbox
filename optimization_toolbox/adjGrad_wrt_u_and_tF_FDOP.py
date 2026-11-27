@@ -35,7 +35,7 @@ class adjGrads_TOCP():
         self.BC_FDOP.get_consistent_BC_J(self.BDF, FreeDyn)
         UserFcts.get_lagrangian_du(dataOpt, FreeDyn, Ctrl, z)
         FreeDyn.update_dForce_dFDparam()
-        dLdu_adjP_fdu = UserFcts.dLdu + self.BDF.get_adjVar_p_J().T @ FreeDyn.SysMat.dForce_dFDparam
+        dLdu_adjP_fdu = UserFcts.dLdu + self.BDF.adjP_J.T @ FreeDyn.SysMat.dForce_dFDparam
         Ctrl.update_vecC_AND_dCdtau_times_uDach(tRight/dataOpt.final_time)
         np.outer(dLdu_adjP_fdu, Ctrl.buff_vecC, out = self.adjGrad_J_uDach_buff[idx_buff])
         integrand_tF_Right = tRight * (dLdu_adjP_fdu @ Ctrl.buff_dCdtau_uDach)
@@ -49,7 +49,7 @@ class adjGrads_TOCP():
         self.BDF.BDForder1_singleStep_J(UserFcts, FreeDyn, z, deltaT)        
         UserFcts.get_lagrangian_du(dataOpt, FreeDyn, Ctrl, z)
         FreeDyn.update_dForce_dFDparam()
-        dLdu_adjP_fdu = UserFcts.dLdu + self.BDF.get_adjVar_p_J().T @ FreeDyn.SysMat.dForce_dFDparam
+        dLdu_adjP_fdu = UserFcts.dLdu + self.BDF.adjP_J.T @ FreeDyn.SysMat.dForce_dFDparam
         Ctrl.update_vecC_AND_dCdtau_times_uDach(tLeft/dataOpt.final_time)
         np.outer(dLdu_adjP_fdu, Ctrl.buff_vecC, out = self.adjGrad_J_uDach_buff[idx_buff])
         integrand_tF_Left = tLeft * (dLdu_adjP_fdu @ Ctrl.buff_dCdtau_uDach)
@@ -67,7 +67,7 @@ class adjGrads_TOCP():
             self.BDF.BDForder2_singleStep_J(UserFcts, FreeDyn, z, deltaT)
             UserFcts.get_lagrangian_du(dataOpt, FreeDyn, Ctrl, z)
             FreeDyn.update_dForce_dFDparam()
-            dLdu_adjP_fdu = UserFcts.dLdu + self.BDF.get_adjVar_p_J().T @ FreeDyn.SysMat.dForce_dFDparam
+            dLdu_adjP_fdu = UserFcts.dLdu + self.BDF.adjP_J.T @ FreeDyn.SysMat.dForce_dFDparam
             Ctrl.update_vecC_AND_dCdtau_times_uDach(tLeft/dataOpt.final_time)
             np.outer(dLdu_adjP_fdu, Ctrl.buff_vecC, out = self.adjGrad_J_uDach_buff[idx_buff])
             integrand_tF_Left = tLeft * (dLdu_adjP_fdu @ Ctrl.buff_dCdtau_uDach)
@@ -94,7 +94,7 @@ class adjGrads_TOCP():
         self.BC_FDOP.get_consistent_BC_Phi(self.BDF, UserFcts, FreeDyn) # this updates dPhidq and dPhidv
         dPhidt_tF = UserFcts.dPhidq @ FreeDyn.API.Qd[:, 0] + UserFcts.dPhidv @ FreeDyn.API.Qdd[:, 0]  # is added at the end, otherwise multiplied by 0.5y()
         FreeDyn.update_dForce_dFDparam()
-        adjP_fdu = self.BDF.get_adjVar_P_Phi().T @ FreeDyn.SysMat.dForce_dFDparam
+        adjP_fdu = self.BDF.adjP_Phi.T @ FreeDyn.SysMat.dForce_dFDparam
         Ctrl.update_vecC_AND_dCdtau_times_uDach(tRight/dataOpt.final_time)
         np.multiply.outer(adjP_fdu, Ctrl.buff_vecC, out = self.adjGrad_Phi_uDach_buff[idx_buff])        
         integrand_tF_Right = tRight * (adjP_fdu @ Ctrl.buff_dCdtau_uDach)
@@ -106,7 +106,7 @@ class adjGrads_TOCP():
         deltaT = tRight - tLeft
         self.BDF.BDForder1_singleStep_Phi(FreeDyn, deltaT)
         FreeDyn.update_dForce_dFDparam()
-        adjP_fdu = self.BDF.get_adjVar_P_Phi().T @ FreeDyn.SysMat.dForce_dFDparam
+        adjP_fdu = self.BDF.adjP_Phi.T @ FreeDyn.SysMat.dForce_dFDparam
         Ctrl.update_vecC_AND_dCdtau_times_uDach(tLeft/dataOpt.final_time)
         np.multiply.outer(adjP_fdu, Ctrl.buff_vecC, out = self.adjGrad_Phi_uDach_buff[idx_buff])
         integrand_tF_Left = tLeft * (adjP_fdu @ Ctrl.buff_dCdtau_uDach)
@@ -123,7 +123,7 @@ class adjGrads_TOCP():
             deltaT = tRight - tLeft
             self.BDF.BDForder2_singleStep_Phi(FreeDyn, deltaT)
             FreeDyn.update_dForce_dFDparam()
-            adjP_fdu = self.BDF.get_adjVar_P_Phi().T @ FreeDyn.SysMat.dForce_dFDparam
+            adjP_fdu = self.BDF.adjP_Phi.T @ FreeDyn.SysMat.dForce_dFDparam
             Ctrl.update_vecC_AND_dCdtau_times_uDach(tLeft/dataOpt.final_time)
             np.multiply.outer(adjP_fdu, Ctrl.buff_vecC, out = self.adjGrad_Phi_uDach_buff[idx_buff])
             integrand_tF_Left = tLeft * (adjP_fdu @ Ctrl.buff_dCdtau_uDach)
