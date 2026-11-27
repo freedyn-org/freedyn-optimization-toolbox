@@ -110,9 +110,9 @@ class FreeDyn(FreeDynBuffers):
             self.API.set_spline(SPL, realT, Ctrl.grid_nodes[:,i])
 # -----------------------------------------------------------------------------              
             
-    def write_ctrl_dataSPL(self, Ctrl):
+    def write_ctrl_dataSPL(self, dataOpt, Ctrl):
         
-        realT = Ctrl.final_time * Ctrl.grid_tau
+        realT = dataOpt.final_time * Ctrl.grid_tau
         data = np.column_stack((realT, Ctrl.grid_nodes))
         np.savetxt(f'{self.fds_path}\\dataSPL.txt', data, fmt='%.10f')   
 
