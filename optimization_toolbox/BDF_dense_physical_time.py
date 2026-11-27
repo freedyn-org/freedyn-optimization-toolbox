@@ -156,9 +156,13 @@ class DenseBDF(BDF):
 # =============================================================================
     def BDF_singleStep_J_post_steps(self, UserFcts, FreeDyn, eta0, eta0_inv, idx2):
         
+        # Modify buff_eta_x_adjW_J for pre-computing the diff
+        self.buff_eta_x_adjW_J -= UserFcts.dLdq.T
+        
         # Bulid the solution vector of the Adjoint Sys
-        self.buff_solVec_J[:self.dim_block1] += UserFcts.dLdv.T + eta0_inv*(UserFcts.dLdq.T - self.buff_eta_x_adjW_J)
-        self.buff_solVec_J[self.dim_block1:self.dim_block2] = FreeDyn.SysMat.Cq @ (self.buff_eta_x_adjW_J - UserFcts.dLdq.T)
+        self.buff_solVec_J[:self.dim_block1] += UserFcts.dLdv.T
+        self.buff_solVec_J[:self.dim_block1] -= eta0_inv * self.buff_eta_x_adjW_J
+        self.buff_solVec_J[self.dim_block1:self.dim_block2] = FreeDyn.SysMat.Cq @ self.buff_eta_x_adjW_J
         
         self.update_coeff_mat_adj_sys(FreeDyn, eta0, eta0_inv)
         vec_P_Sig_MU = np.linalg.solve(self.BDF_coeffMat, self.buff_solVec_J)
@@ -174,7 +178,6 @@ class DenseBDF(BDF):
         self.buff_adjW_J[self.BDF_idx_buff, :] += FreeDyn.SysMat.CqvDq.T @ vec_P_Sig_MU[self.dim_block1:self.dim_block2] 
         self.buff_adjW_J[self.BDF_idx_buff, :] += FreeDyn.SysMat.Cq.T @ vec_P_Sig_MU[self.dim_block2:] 
         self.buff_adjW_J[self.BDF_idx_buff, :] -= self.buff_eta_x_adjW_J
-        self.buff_adjW_J[self.BDF_idx_buff, :] += UserFcts.dLdq.T 
         self.buff_adjW_J[self.BDF_idx_buff, :] *= eta0_inv
 # ----------------------------------------------------------------------------- 
 
@@ -182,7 +185,7 @@ class DenseBDF(BDF):
         
         # Bulid the solution vector of the Adjoint Sys      
         self.buff_solVec_Phi[:self.dim_block1, :] -= eta0_inv * self.buff_eta_x_adjW_Phi
-        self.buff_solVec_Phi[self.dim_block1:self.dim_block2] = FreeDyn.SysMat.Cq @ self.buff_eta_x_adjW_Phi
+        self.buff_solVec_Phi[self.dim_block1:self.dim_block2, :] = FreeDyn.SysMat.Cq @ self.buff_eta_x_adjW_Phi
         
         self.update_coeff_mat_adj_sys(FreeDyn, eta0, eta0_inv)
         vec_P_Sig_MU = np.linalg.solve(self.BDF_coeffMat, self.buff_solVec_Phi) 
