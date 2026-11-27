@@ -32,7 +32,7 @@ class FreeDyn(FreeDynBuffers):
         self.num_time_steps = 0
         
         # System matrices and derivatives - Decision: dense or sparse layout
-        lim_val = 10 * 7
+        lim_val = 5 * 7
         if self.nDof > lim_val:
             self.MBS_modeMAT_sparse = True
             print("Matrix layout: sparse")
