@@ -28,9 +28,9 @@ class CoreBC():
         
         self.compute_consistent_BC_J()
         
-        BDF.BDF_idx_buff = 0
-        BDF.buff_adjP_J[0, :].fill(0.0)
-        BDF.buff_adjW_J[0, :].fill(0.0)  
+        BDF.init_buff_indices()
+        BDF.buff_adjP_J[BDF.buff_idx1, :].fill(0.0)
+        BDF.buff_adjW_J[BDF.buff_idx1, :].fill(0.0)  
 # -----------------------------------------------------------------------------
     def get_consistent_BC_Phi(self, BDF, UserFcts, FreeDyn):
         
@@ -44,9 +44,9 @@ class CoreBC():
 
         WL_tF, PU_tF = self.compute_consistent_BC_Phi(FreeDyn)
         
-        BDF.BDF_idx_buff = 0
-        BDF.buff_adjW_Phi[0, :, :] = WL_tF[:FreeDyn.nDof, :]     # W_tF
-        BDF.buff_adjP_Phi[0, :, :] = PU_tF[:FreeDyn.nDof, :]     # P_tF
+        BDF.init_buff_indices()
+        BDF.buff_adjW_Phi[BDF.buff_idx1, :, :] = WL_tF[:FreeDyn.nDof, :]     # W_tF
+        BDF.buff_adjP_Phi[BDF.buff_idx1, :, :] = PU_tF[:FreeDyn.nDof, :]     # P_tF
 # -----------------------------------------------------------------------------
     
 
