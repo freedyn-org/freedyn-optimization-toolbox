@@ -64,7 +64,7 @@ class DenseBDF(BDF):
         self.get_BDForder1_coeffs_eta(deltaT) 
         
         # pre-compute sums of matrices
-        self.buff_eta_x_adjW_J = self.BDF1_eta1 * self.buff_adjW_J[self.buff_idx1, :]
+        np.multiply(self.BDF1_eta1, self.buff_adjW_J[self.buff_idx1, :], out = self.buff_eta_x_adjW_J)
         self.buff_solVec_J[:self.dim_block1] = - self.BDF1_eta1 * self.buff_M_x_AdjP_J[self.buff_idx1, :]
 
         
@@ -79,7 +79,7 @@ class DenseBDF(BDF):
         self.get_BDForder1_coeffs_eta(deltaT) 
         
         # pre-compute sums of matrices
-        self.buff_eta_x_adjW_Phi = self.BDF1_eta1 * self.buff_adjW_Phi[self.buff_idx1, :, :]
+        np.multiply(self.BDF1_eta1, self.buff_adjW_Phi[self.buff_idx1, :, :], out = self.buff_eta_x_adjW_Phi)
         self.buff_solVec_Phi[:self.dim_block1, :] = - self.BDF1_eta1 * self.buff_M_x_AdjP_Phi[self.buff_idx1, :, :]
 
         
@@ -97,7 +97,7 @@ class DenseBDF(BDF):
         self.get_BDForder2_coeffs_eta(deltaT) 
         
         # pre-compute sums of matrices
-        self.buff_eta_x_adjW_J = self.BDF2_eta1 * self.buff_adjW_J[self.buff_idx1, :] 
+        np.multiply(self.BDF2_eta1, self.buff_adjW_J[self.buff_idx1, :], out = self.buff_eta_x_adjW_J)
         self.buff_eta_x_adjW_J += self.BDF2_eta2 * self.buff_adjW_J[self.buff_idx2, :]
         self.buff_solVec_J[:self.dim_block1] = - self.BDF2_eta1 * self.buff_M_x_AdjP_J[self.buff_idx1, :] 
         self.buff_solVec_J[:self.dim_block1] -= self.BDF2_eta2 * self.buff_M_x_AdjP_J[self.buff_idx2, :]
@@ -114,7 +114,7 @@ class DenseBDF(BDF):
         self.get_BDForder2_coeffs_eta(deltaT)
         
         # pre-compute sums of matrices
-        self.buff_eta_x_adjW_Phi = self.BDF2_eta1 * self.buff_adjW_Phi[self.buff_idx1, :, :] 
+        np.multiply(self.BDF2_eta1, self.buff_adjW_Phi[self.buff_idx1, :, :], out = self.buff_eta_x_adjW_Phi)
         self.buff_eta_x_adjW_Phi += self.BDF2_eta2 * self.buff_adjW_Phi[self.buff_idx2, :, :]
         self.buff_solVec_Phi[:self.dim_block1, :] = - self.BDF2_eta1 * self.buff_M_x_AdjP_Phi[self.buff_idx1, :, :] 
         self.buff_solVec_Phi[:self.dim_block1, :] -= self.BDF2_eta2 * self.buff_M_x_AdjP_Phi[self.buff_idx2, :, :]
