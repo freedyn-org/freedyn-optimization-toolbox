@@ -106,7 +106,7 @@ pip install freedyn
 - Python 3.8+ (Recommendation: Python 3.13)
 - numpy, scipy
 - matplotlib (optional: for plotting results)
-- freedyn 1.2.0
+- freedyn 1.2.1
  
 ## Citation
 If you use the FreeDyn Optimization Toolbox in your research, please cite:
