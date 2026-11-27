@@ -34,7 +34,21 @@ class BDF():
     def shift_buff_indices(self):
         self.buff_idx1 = self.buff_idx2
         self.buff_idx2 = 1 - self.buff_idx1
-        
+
+# =============================================================================
+# Set initial values for the BDF routines
+# =============================================================================
+
+    def set_adj_BC_J(self, init_adjP, init_adjW):
+        self.init_buff_indices()
+        self.buff_adjP_J[self.buff_idx1, :] = init_adjP
+        self.buff_adjW_J[self.buff_idx1, :] = init_adjW
+
+    def set_adj_BC_Phi(self, init_adjP, init_adjW):
+        self.init_buff_indices()
+        self.buff_adjP_Phi[self.buff_idx1, :, :] = init_adjP
+        self.buff_adjW_Phi[self.buff_idx1, :, :] = init_adjW
+
 # =============================================================================
 # Return values of adjVar p at BDF time idx s_n from the buffer
 # =============================================================================
