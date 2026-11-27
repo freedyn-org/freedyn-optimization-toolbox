@@ -14,7 +14,7 @@ class BDF():
     def __init__(self, FreeDyn, num_xF):
         
         # Create buffers for fast access
-        self.BDF_idx_buff = 0
+        self.init_buff_indices()
         
         self.init_memory_layout_dependent(FreeDyn, num_xF)
         
@@ -24,19 +24,26 @@ class BDF():
         self.allocate_buffs_BDF(FreeDyn.nDof, num_xF, nBDFsys)
         
         self.init_order_one_BDF()
-        self.init_order_two_BDF()
+        self.init_order_two_BDF()        
+# -----------------------------------------------------------------------------
         
-        # print('class BDF initialized')
+    def init_buff_indices(self):
+        self.buff_idx1 = 0
+        self.buff_idx2 = 1 - self.buff_idx1
+        
+    def shift_buff_indices(self):
+        self.buff_idx1 = self.buff_idx2
+        self.buff_idx2 = 1 - self.buff_idx1
         
 # =============================================================================
 # Return values of adjVar p at BDF time idx s_n from the buffer
 # =============================================================================
 
     def get_adjVar_p_J(self):
-        return self.buff_adjP_J[self.BDF_idx_buff, :]
+        return self.buff_adjP_J[self.buff_idx1, :]
 
     def get_adjVar_P_Phi(self):
-        return self.buff_adjP_Phi[self.BDF_idx_buff,:,:]
+        return self.buff_adjP_Phi[self.buff_idx1,:,:]
             
 # =============================================================================
 # Allocate Buffers
@@ -67,9 +74,9 @@ class BDF():
         self.BDF1_eta1 = 0.0
 # -----------------------------------------------------------------------------
     
-    def get_BDForder1_coeffs_eta(self, idx1, deltaT):
+    def get_BDForder1_coeffs_eta(self, deltaT):
         
-        self.BDF_diff_tau[idx1] = deltaT
+        self.BDF_diff_tau[self.buff_idx1] = deltaT
 
         self.BDF1_eta0_inv = deltaT
         self.BDF1_eta0 = 1 / deltaT
@@ -87,10 +94,10 @@ class BDF():
         self.BDF2_eta2 = 0.0        
 # -----------------------------------------------------------------------------
 
-    def get_BDForder2_coeffs_eta(self, idx1, idx2, diff_01):
+    def get_BDForder2_coeffs_eta(self, diff_01):
         
-        self.BDF_diff_tau[idx1] = diff_01                                       # s_{n} - s_{n-1}
-        diff_12 = self.BDF_diff_tau[idx2]                                       # s_{n-1} - s_{n-2}
+        self.BDF_diff_tau[self.buff_idx1] = diff_01                             # s_{n} - s_{n-1}
+        diff_12 = self.BDF_diff_tau[self.buff_idx2]                             # s_{n-1} - s_{n-2}
         diff_02 = diff_01 + diff_12                                             # s_{n} - s_{n-2}
 
         self.BDF2_eta0_inv = (diff_01 * diff_02) / (diff_01 + diff_02)          # inv(eta0)
