@@ -43,31 +43,31 @@ class SparseBDF(BDF):
 
     def BDForder1_singleStep_J(self, UserFcts, FreeDyn, z, deltaT):
         
-        idx1, idx2 = self.BDF_singleStep_J_pre_steps(UserFcts, FreeDyn, z)
+        self.BDF_singleStep_J_pre_steps(UserFcts, FreeDyn, z)
         
         # Compute BDF coefficients
-        self.get_BDForder1_coeffs_eta(idx1, deltaT)
+        self.get_BDForder1_coeffs_eta(deltaT)
         
         # pre-compute sums of matrices
-        self.buff_solVec_J[:self.dim_block1] = - self.BDF1_eta1 * self.buff_adjW_J[idx1, :]
-        self.buff_solVec_J[self.dim_block1:self.dim_block2] = - self.BDF1_eta1 * self.buff_M_x_AdjP_J[idx1, :]
+        self.buff_solVec_J[:self.dim_block1] = - self.BDF1_eta1 * self.buff_adjW_J[self.buff_idx1, :]
+        self.buff_solVec_J[self.dim_block1:self.dim_block2] = - self.BDF1_eta1 * self.buff_M_x_AdjP_J[self.buff_idx1, :]
 
         
-        self.BDF_singleStep_J_post_steps(UserFcts, FreeDyn, self.BDF1_eta0, idx2)
+        self.BDF_singleStep_J_post_steps(UserFcts, FreeDyn, self.BDF1_eta0)
 # ----------------------------------------------------------------------------- 
 
     def BDForder1_singleStep_Phi(self, FreeDyn, deltaT):
         
-        idx1, idx2 = self.BDF_singleStep_Phi_pre_steps(FreeDyn)
+        self.BDF_singleStep_Phi_pre_steps(FreeDyn)
         
         # Compute BDF coefficients
-        self.get_BDForder1_coeffs_eta(idx1, deltaT) 
+        self.get_BDForder1_coeffs_eta(deltaT) 
         
         # pre-compute sums of matrices
-        self.buff_solVec_Phi[:self.dim_block1,:] = - self.BDF1_eta1 * self.buff_adjW_Phi[idx1, :, :]
-        self.buff_solVec_Phi[self.dim_block1:self.dim_block2,:] = - self.BDF1_eta1 * self.buff_M_x_AdjP_Phi[idx1, :, :]
+        self.buff_solVec_Phi[:self.dim_block1,:] = - self.BDF1_eta1 * self.buff_adjW_Phi[self.buff_idx1, :, :]
+        self.buff_solVec_Phi[self.dim_block1:self.dim_block2,:] = - self.BDF1_eta1 * self.buff_M_x_AdjP_Phi[self.buff_idx1, :, :]
         
-        self.BDF_singleStep_Phi_post_steps(FreeDyn, self.BDF1_eta0, idx2)
+        self.BDF_singleStep_Phi_post_steps(FreeDyn, self.BDF1_eta0)
         
 # =============================================================================
 # BDF Routine: Int. order 2
@@ -75,30 +75,34 @@ class SparseBDF(BDF):
 
     def BDForder2_singleStep_J(self, UserFcts, FreeDyn, z, deltaT):
         
-        idx1, idx2 = self.BDF_singleStep_J_pre_steps(UserFcts, FreeDyn, z)
+        self.BDF_singleStep_J_pre_steps(UserFcts, FreeDyn, z)
         
         # Compute BDF coefficients
-        self.get_BDForder2_coeffs_eta(idx1, idx2, deltaT)
+        self.get_BDForder2_coeffs_eta(deltaT)
         
         # pre-compute sums of matrices
-        self.buff_solVec_J[:self.dim_block1] = -(self.BDF2_eta1 * self.buff_adjW_J[idx1, :] + self.BDF2_eta2 * self.buff_adjW_J[idx2, :])
-        self.buff_solVec_J[self.dim_block1:self.dim_block2] = -(self.BDF2_eta1 * self.buff_M_x_AdjP_J[idx1, :] + self.BDF2_eta2 * self.buff_M_x_AdjP_J[idx2, :])
+        self.buff_solVec_J[:self.dim_block1] = - self.BDF2_eta1 * self.buff_adjW_J[self.buff_idx1, :] 
+        self.buff_solVec_J[:self.dim_block1] -= self.BDF2_eta2 * self.buff_adjW_J[self.buff_idx2, :]
+        self.buff_solVec_J[self.dim_block1:self.dim_block2] = - self.BDF2_eta1 * self.buff_M_x_AdjP_J[self.buff_idx1, :] 
+        self.buff_solVec_J[self.dim_block1:self.dim_block2] -= self.BDF2_eta2 * self.buff_M_x_AdjP_J[self.buff_idx2, :]
 
-        self.BDF_singleStep_J_post_steps(UserFcts, FreeDyn, self.BDF2_eta0, idx2)
+        self.BDF_singleStep_J_post_steps(UserFcts, FreeDyn, self.BDF2_eta0)
 # ----------------------------------------------------------------------------- 
 
     def BDForder2_singleStep_Phi(self, FreeDyn, deltaT):
         
-        idx1, idx2 = self.BDF_singleStep_Phi_pre_steps(FreeDyn)
+        self.BDF_singleStep_Phi_pre_steps(FreeDyn)
         
         # Compute BDF coefficients
-        self.get_BDForder2_coeffs_eta(idx1, idx2, deltaT) 
+        self.get_BDForder2_coeffs_eta(deltaT) 
         
         # pre-compute sums of matrices
-        self.buff_solVec_Phi[:self.dim_block1, :] = - (self.BDF2_eta1 * self.buff_adjW_Phi[idx1, :, :] + self.BDF2_eta2 * self.buff_adjW_Phi[idx2, :, :])
-        self.buff_solVec_Phi[self.dim_block1:self.dim_block2,:] = - (self.BDF2_eta1 * self.buff_M_x_AdjP_Phi[idx1, :, :] + self.BDF2_eta2 * self.buff_M_x_AdjP_Phi[idx2, :, :])
+        self.buff_solVec_Phi[:self.dim_block1, :] = - self.BDF2_eta1 * self.buff_adjW_Phi[self.buff_idx1, :, :]
+        self.buff_solVec_Phi[:self.dim_block1, :] -= self.BDF2_eta2 * self.buff_adjW_Phi[self.buff_idx2, :, :]
+        self.buff_solVec_Phi[self.dim_block1:self.dim_block2,:] = - self.BDF2_eta1 * self.buff_M_x_AdjP_Phi[self.buff_idx1, :, :] 
+        self.buff_solVec_Phi[self.dim_block1:self.dim_block2,:] -= self.BDF2_eta2 * self.buff_M_x_AdjP_Phi[self.buff_idx2, :, :]
         
-        self.BDF_singleStep_Phi_post_steps(FreeDyn, self.BDF2_eta0, idx2)
+        self.BDF_singleStep_Phi_post_steps(FreeDyn, self.BDF2_eta0)
 
 # =============================================================================
 # BDF Routine: Shared pre steps 
@@ -106,38 +110,29 @@ class SparseBDF(BDF):
 
     def BDF_singleStep_J_pre_steps(self, UserFcts, FreeDyn, z):
         
-        idx1 = self.BDF_idx_buff
-        idx2 = 1 - idx1
-        
         # Compute M(s_n-1) * adjP(s_n-1) - must before update_MBS_SysMat, because s_n-1 is needed!
-        self.buff_M_x_AdjP_J[idx1, :] = FreeDyn.SysMat.M @ self.buff_adjP_J[idx1, :]
+        self.buff_M_x_AdjP_J[self.buff_idx1, :] = FreeDyn.SysMat.M @ self.buff_adjP_J[self.buff_idx1, :]
         
         # Updates at BDF time step s_n
         UserFcts.get_lagrangian_dq(FreeDyn, z)
         UserFcts.get_lagrangian_dv(FreeDyn, z)
         
         # Sys Matrices are updated within the update of the coeff matrix
-        
-        return idx1, idx2
+
 # ----------------------------------------------------------------------------- 
 
     def BDF_singleStep_Phi_pre_steps(self, FreeDyn):
-    
-        idx1 = self.BDF_idx_buff
-        idx2 = 1 - idx1
         
         # Compute M(s_n-1) * adjP(s_n-1) - must before update_MBS_SysMat, because s_n-1 is needed!
-        self.buff_M_x_AdjP_Phi[idx1, :, :] = FreeDyn.SysMat.M @ self.buff_adjP_Phi[idx1, :, :]
+        self.buff_M_x_AdjP_Phi[self.buff_idx1, :, :] = FreeDyn.SysMat.M @ self.buff_adjP_Phi[self.buff_idx1, :, :]
         
         # Sys Matrices are updated within the update of the coeff matrix
-        
-        return idx1, idx2
 
 # =============================================================================
 # BDF Routine: Shared post steps 
 # =============================================================================
 
-    def BDF_singleStep_J_post_steps(self, UserFcts, FreeDyn, eta0, idx2):
+    def BDF_singleStep_J_post_steps(self, UserFcts, FreeDyn, eta0):
         
         # Bulid the solution vector of the Adjoint Sys
         self.buff_solVec_J[:self.dim_block1] += UserFcts.dLdq.T
@@ -148,23 +143,23 @@ class SparseBDF(BDF):
         vec_W_P_Sig_MU =  solve(self.buff_solVec_J)
 
         # idx shift - use memory of idx = 2 for idx = 0
-        self.BDF_idx_buff = idx2
+        self.shift_buff_indices()
         
         # Compute adj w and p at time idx = 0
-        self.buff_adjW_J[self.BDF_idx_buff, :] = vec_W_P_Sig_MU[:self.dim_block1]
-        self.buff_adjP_J[self.BDF_idx_buff, :] = vec_W_P_Sig_MU[self.dim_block1:self.dim_block2]
+        self.buff_adjW_J[self.buff_idx1, :] = vec_W_P_Sig_MU[:self.dim_block1]
+        self.buff_adjP_J[self.buff_idx1, :] = vec_W_P_Sig_MU[self.dim_block1:self.dim_block2]
 # -----------------------------------------------------------------------------
 
-    def BDF_singleStep_Phi_post_steps(self, FreeDyn, eta0, idx2):
+    def BDF_singleStep_Phi_post_steps(self, FreeDyn, eta0):
         
         self.update_coeff_mat_adj_sys(FreeDyn, eta0)
         solve = factorized(self.coeff_mat)
         vec_W_P_Sig_MU = solve(self.buff_solVec_Phi)
     
         # idx shift - use memory of idx = 2 for idx = 0
-        self.BDF_idx_buff = idx2
+        self.shift_buff_indices()
         
         # Compute adj w and p at time idx = 0
-        self.buff_adjW_Phi[self.BDF_idx_buff, :, :] = vec_W_P_Sig_MU[:self.dim_block1,:]
-        self.buff_adjP_Phi[self.BDF_idx_buff, :, :] = vec_W_P_Sig_MU[self.dim_block1:self.dim_block2,:]
+        self.buff_adjW_Phi[self.buff_idx1, :, :] = vec_W_P_Sig_MU[:self.dim_block1,:]
+        self.buff_adjP_Phi[self.buff_idx1, :, :] = vec_W_P_Sig_MU[self.dim_block1:self.dim_block2,:]
 # -----------------------------------------------------------------------------
