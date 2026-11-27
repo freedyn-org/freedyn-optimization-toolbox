@@ -9,6 +9,7 @@ class DenseBDF(BDF):
         self.dim_block1 = FreeDyn.nDof
         self.dim_block2 = self.dim_block1 + FreeDyn.nConstr
         
+        # Note: In post_steps buff_eta_x_adjW_J holds the diff: buff_eta_x_adjW_J - dLdq
         self.buff_eta_x_adjW_J = np.empty(FreeDyn.nDof)
         if num_xF > 0:
             self.buff_eta_x_adjW_Phi = np.empty((FreeDyn.nDof, num_xF)) 
@@ -42,10 +43,10 @@ class DenseBDF(BDF):
         
         """ Update the entries of the coefficient matrix - use the dense matricies """
         
-        self.BDF_coeffMat_view_11[:] = eta0 * FreeDyn.SysMat.M - eta0_inv * FreeDyn.SysMat.G_tr.T - FreeDyn.SysMat.fv.T
+        self.BDF_coeffMat_view_11[:] = eta0 * FreeDyn.SysMat.M - eta0_inv * FreeDyn.SysMat.G - FreeDyn.SysMat.fv_tr
         self.BDF_coeffMat_view_12[:] = -eta0_inv * FreeDyn.SysMat.CqvDq.T - FreeDyn.SysMat.Cq.T
         self.BDF_coeffMat_view_13[:] = -eta0_inv * FreeDyn.SysMat.Cq.T
-        self.BDF_coeffMat_view_21[:] = FreeDyn.SysMat.Cq @ FreeDyn.SysMat.G_tr.T
+        self.BDF_coeffMat_view_21[:] = FreeDyn.SysMat.Cq @ FreeDyn.SysMat.G
         self.BDF_coeffMat_view_22[:] = FreeDyn.SysMat.Cq @ FreeDyn.SysMat.CqvDq.T
         self.BDF_coeffMat_view_23[:] = FreeDyn.SysMat.Cq @ FreeDyn.SysMat.Cq.T
         self.BDF_coeffMat_view_31[:] = FreeDyn.SysMat.Cq
@@ -169,7 +170,7 @@ class DenseBDF(BDF):
         self.buff_adjP_J[self.BDF_idx_buff, :] = vec_P_Sig_MU[:self.dim_block1]
         
         # Compute adj w at time idx = 0
-        self.buff_adjW_J[self.BDF_idx_buff, :] = FreeDyn.SysMat.G_tr.T @ vec_P_Sig_MU[:self.dim_block1]
+        self.buff_adjW_J[self.BDF_idx_buff, :] = FreeDyn.SysMat.G @ vec_P_Sig_MU[:self.dim_block1]
         self.buff_adjW_J[self.BDF_idx_buff, :] += FreeDyn.SysMat.CqvDq.T @ vec_P_Sig_MU[self.dim_block1:self.dim_block2] 
         self.buff_adjW_J[self.BDF_idx_buff, :] += FreeDyn.SysMat.Cq.T @ vec_P_Sig_MU[self.dim_block2:] 
         self.buff_adjW_J[self.BDF_idx_buff, :] -= self.buff_eta_x_adjW_J
@@ -193,7 +194,7 @@ class DenseBDF(BDF):
         self.buff_adjP_Phi[self.BDF_idx_buff, :, :] = vec_P_Sig_MU[:self.dim_block1]
         
         # Compute adj w at time idx = 0
-        self.buff_adjW_Phi[self.BDF_idx_buff, :, :] = FreeDyn.SysMat.G_tr.T @ vec_P_Sig_MU[:self.dim_block1,:]
+        self.buff_adjW_Phi[self.BDF_idx_buff, :, :] = FreeDyn.SysMat.G @ vec_P_Sig_MU[:self.dim_block1,:]
         self.buff_adjW_Phi[self.BDF_idx_buff, :, :] += FreeDyn.SysMat.CqvDq.T @ vec_P_Sig_MU[self.dim_block1:self.dim_block2,:] 
         self.buff_adjW_Phi[self.BDF_idx_buff, :, :] += FreeDyn.SysMat.Cq.T @ vec_P_Sig_MU[self.dim_block2:,:] 
         self.buff_adjW_Phi[self.BDF_idx_buff, :, :] -= self.buff_eta_x_adjW_Phi

@@ -93,18 +93,18 @@ class FreeDynBuffersDense(FreeDynBuffers):
         self.CqvDq = getattr(self.slot_CqvDq, 'dense_mat') 
         
         # fv
-        id_fv = np.array([109], dtype=c_int)
-        fv_idx = fd.analysis.create_matrix(id_fv, pos_mat, pos_mat, scale_mat)
-        self.slot_fv = fd.ModelRelatedMatrixBuffer(fv_idx, False)
-        self.fv = getattr(self.slot_fv, 'dense_mat') 
+        id_fv_tr = np.array([129], dtype=c_int)
+        fv_tr_idx = fd.analysis.create_matrix(id_fv_tr, pos_mat, pos_mat, scale_mat)
+        self.slot_fv_tr = fd.ModelRelatedMatrixBuffer(fv_tr_idx, False)
+        self.fv_tr = getattr(self.slot_fv_tr, 'dense_mat') 
         
-        # mat G^T = fq - CqTxlaDq_e - CqTxlaDq_i - MxqddDq
-        id_matG = np.array([108, 110, 105, 102], dtype=c_int)
+        # mat G = fq^T - CqTxlaDq_e^T - CqTxlaDq_i^T - MxqddDq^T
+        id_matG = np.array([128, 130, 125, 122], dtype=c_int)
         pos_matG = np.array([0, 0, 0, 0], dtype=c_int)
         scale_matG = np.array([1.0, -1.0, -1.0, -1.0])
         G_idx = fd.analysis.create_matrix(id_matG, pos_matG, pos_matG, scale_matG)
-        self.slot_G_tr = fd.ModelRelatedMatrixBuffer(G_idx, False)
-        self.G_tr = getattr(self.slot_G_tr, 'dense_mat')
+        self.slot_G = fd.ModelRelatedMatrixBuffer(G_idx, False)
+        self.G = getattr(self.slot_G, 'dense_mat')
 # ----------------------------------------------------------------------------- 
 
     def update_sys_mat_for_BDF(self, API):
@@ -115,10 +115,10 @@ class FreeDynBuffersDense(FreeDynBuffers):
         self.slot_Cq.apply_to_cached_matrix()
         self.slot_CqvDq.update_from_dll()
         self.slot_CqvDq.apply_to_cached_matrix()
-        self.slot_fv.update_from_dll()
-        self.slot_fv.apply_to_cached_matrix()
-        self.slot_G_tr.update_from_dll()   
-        self.slot_G_tr.apply_to_cached_matrix()
+        self.slot_fv_tr.update_from_dll()
+        self.slot_fv_tr.apply_to_cached_matrix()
+        self.slot_G.update_from_dll()   
+        self.slot_G.apply_to_cached_matrix()
 # -----------------------------------------------------------------------------     
 
 
