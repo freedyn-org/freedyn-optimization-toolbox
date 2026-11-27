@@ -16,21 +16,21 @@ class CoreBC():
     def __init__(self, FreeDyn, num_xF):
         
         """ BC for Phi - if necessary """
-        if num_xF > 0:  
-            self.BC_dq_tr = np.zeros((FreeDyn.nDofConstr, num_xF))   # (dPhi / dq)^T
-            self.BC_dv_tr = np.zeros((FreeDyn.nDofConstr, num_xF))   # (dPhi / dv)^T
+        if num_xF > 0:
+            dim = FreeDyn.nDof + FreeDyn.nConstr
+            self.BC_dq_tr = np.zeros((dim, num_xF))   # (dPhi / dq)^T
+            self.BC_dv_tr = np.zeros((dim, num_xF))   # (dPhi / dv)^T
             
 # -----------------------------------------------------------------------------
     def get_consistent_BC_J(self, BDF, FreeDyn):
         
         FreeDyn.update_sys_mat_for_consistent_BC_J()
-        
-        self.compute_consistent_BC_J()
-        
-        BDF.BDF_idx_buff = 0
-        BDF.adjP_J_buff[0, :].fill(0.0)
-        BDF.adjW_J_buff[0, :].fill(0.0)  
+        adjP = np.zeros(FreeDyn.nDof)
+        adjW = np.zeros(FreeDyn.nDof)
+
+        BDF.set_adj_BC_J(adjP, adjW) 
 # -----------------------------------------------------------------------------
+
     def get_consistent_BC_Phi(self, BDF, UserFcts, FreeDyn):
         
         UserFcts.get_Phi_dq(FreeDyn)    # (dPhi / dq)^T
@@ -43,20 +43,13 @@ class CoreBC():
 
         WL_tF, PU_tF = self.compute_consistent_BC_Phi(FreeDyn)
         
-        BDF.BDF_idx_buff = 0
-        BDF.adjW_Phi_buff[0, :, :] = WL_tF[:FreeDyn.nDof, :]     # W_tF
-        BDF.adjP_Phi_buff[0, :, :] = PU_tF[:FreeDyn.nDof, :]     # P_tF
+        BDF.set_adj_BC_Phi(PU_tF[:FreeDyn.nDof, :], WL_tF[:FreeDyn.nDof, :])
 # -----------------------------------------------------------------------------
     
 
 class DenseBC(CoreBC):
     
 # -----------------------------------------------------------------------------
-        
-    def compute_consistent_BC_J(self):
-        return None 
-# -----------------------------------------------------------------------------
-    
     def compute_consistent_BC_Phi(self, FreeDyn):        
 
         coeffMat_W = FreeDyn.SysMat.coeff_mat_BC_adjW
@@ -76,12 +69,6 @@ class DenseBC(CoreBC):
 class SparseBC(CoreBC): 
     
 # -----------------------------------------------------------------------------
-    
-    def compute_consistent_BC_J(self):
-        return None
-    
-# -----------------------------------------------------------------------------
-    
     def compute_consistent_BC_Phi(self, FreeDyn):        
         
         coeffMat_W = FreeDyn.SysMat.coeff_mat_BC_adjW

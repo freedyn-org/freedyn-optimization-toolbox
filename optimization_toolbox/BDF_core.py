@@ -1,72 +1,82 @@
 import numpy as np 
+
+class BDF():
     
-class CoreBDF():       
+    @classmethod
+    def create(cls, FreeDyn, num_xF):
+        if FreeDyn.MBS_modeMAT_sparse:
+            from .BDF_sparse_physical_time import SparseBDF
+            return SparseBDF(FreeDyn, num_xF)
+        else:
+            from .BDF_dense_physical_time import DenseBDF
+            return DenseBDF(FreeDyn, num_xF)
     
     def __init__(self, FreeDyn, num_xF):
         
         # Create buffers for fast access
-        self.BDF_idx_buff = 0
-        num_buffs = 2   # do not change - buffer layout changes require fixes in many places
-
+        self.init_buff_indices()
+        
+        self.init_memory_layout_dependent(FreeDyn, num_xF)
+        
         # Allocate memory for the coeff. Matrix of the adj Sys 
         nBDFsys = self.init_coeff_mat_adj_sys(FreeDyn)
         
-        if FreeDyn.MBS_modeMAT_sparse:
-            partition_1 = FreeDyn.nDof
-            partition_2 = 2*FreeDyn.nDof 
-        else:
-            partition_1 = FreeDyn.nDof
-            partition_2 = FreeDyn.nDofConstr
-            self.allocate_buffs_BDF_add_dense(FreeDyn.nDof, num_xF)        
-        
-        self.allocate_buffs_BDF(num_buffs, FreeDyn.nDof, num_xF, nBDFsys, partition_1, partition_2)
+        self.allocate_buffs_BDF(FreeDyn.nDof, num_xF, nBDFsys)
         
         self.init_order_one_BDF()
-        self.init_order_two_BDF()
+        self.init_order_two_BDF()        
+# -----------------------------------------------------------------------------
         
-        # print('class BDF initialized')
+    def init_buff_indices(self):
+        self.buff_idx1 = 0
+        self.buff_idx2 = 1 - self.buff_idx1
         
+    def shift_buff_indices(self):
+        self.buff_idx1 = self.buff_idx2
+        self.buff_idx2 = 1 - self.buff_idx1
+
+# =============================================================================
+# Set initial values for the BDF routines
+# =============================================================================
+
+    def set_adj_BC_J(self, init_adjP, init_adjW):
+        self.init_buff_indices()
+        self.buff_adjP_J[self.buff_idx1, :] = init_adjP
+        self.buff_adjW_J[self.buff_idx1, :] = init_adjW
+
+    def set_adj_BC_Phi(self, init_adjP, init_adjW):
+        self.init_buff_indices()
+        self.buff_adjP_Phi[self.buff_idx1, :, :] = init_adjP
+        self.buff_adjW_Phi[self.buff_idx1, :, :] = init_adjW
+
 # =============================================================================
 # Return values of adjVar p at BDF time idx s_n from the buffer
 # =============================================================================
 
     def get_adjVar_p_J(self):
-        return self.adjP_J_buff[self.BDF_idx_buff, :]
+        return self.buff_adjP_J[self.buff_idx1, :]
 
     def get_adjVar_P_Phi(self):
-        return self.adjP_Phi_buff[self.BDF_idx_buff,:,:]
+        return self.buff_adjP_Phi[self.buff_idx1,:,:]
             
 # =============================================================================
 # Allocate Buffers
 # =============================================================================
     
-    def allocate_buffs_BDF(self, num_buffs, num_q, num_xF, dim_sys, partition_1, partition_2):
+    def allocate_buffs_BDF(self, num_q, num_xF, dim_sys):
         
-        self.BDF_diff_tau = np.zeros(num_buffs)
+        self.BDF_diff_tau = np.zeros(2)
         
-        self.adjW_J_buff = np.empty((num_buffs, num_q))
-        self.adjP_J_buff = np.empty((num_buffs, num_q))
-        self.BDF_J_buff_M_times_p = np.zeros((num_buffs, num_q))
-        
-        self.BDF_solVec_J = np.zeros(dim_sys)
-        self.BDF_solVec_J_view_first = self.BDF_solVec_J[:partition_1]
-        self.BDF_solVec_J_view_second = self.BDF_solVec_J[partition_1:partition_2]
+        self.buff_adjW_J = np.empty((2, num_q))
+        self.buff_adjP_J = np.empty((2, num_q))
+        self.buff_M_x_AdjP_J = np.zeros((2, num_q))
+        self.buff_solVec_J = np.zeros(dim_sys)
         
         if num_xF > 0:
-            self.adjW_Phi_buff = np.empty((num_buffs, num_q, num_xF))
-            self.adjP_Phi_buff = np.empty((num_buffs, num_q, num_xF)) 
-            self.BDF_Phi_buff_M_times_P = np.zeros((num_buffs, num_q, num_xF))
-            
-            self.BDF_solVec_Phi = np.zeros((dim_sys, num_xF))
-            self.BDF_solVec_Phi_view_first = self.BDF_solVec_Phi[:partition_1, :]
-            self.BDF_solVec_Phi_view_second = self.BDF_solVec_Phi[partition_1:partition_2,:]           
-# ----------------------------------------------------------------------------- 
-            
-    def allocate_buffs_BDF_add_dense(self, num_q, num_xF):
-        
-        self.BDF_J_eta_times_adjW = np.empty(num_q)
-        if num_xF > 0:
-            self.BDF_Phi_eta_times_adjW = np.empty((num_q, num_xF))        
+            self.buff_adjW_Phi = np.empty((2, num_q, num_xF))
+            self.buff_adjP_Phi = np.empty((2, num_q, num_xF)) 
+            self.buff_M_x_AdjP_Phi = np.zeros((2, num_q, num_xF))
+            self.buff_solVec_Phi = np.zeros((dim_sys, num_xF))    
         
 # =============================================================================
 # BDF Routine: Int. order 1
@@ -78,9 +88,9 @@ class CoreBDF():
         self.BDF1_eta1 = 0.0
 # -----------------------------------------------------------------------------
     
-    def get_BDForder1_coeffs_eta(self, idx1, deltaT):
+    def get_BDForder1_coeffs_eta(self, deltaT):
         
-        self.BDF_diff_tau[idx1] = deltaT
+        self.BDF_diff_tau[self.buff_idx1] = deltaT
 
         self.BDF1_eta0_inv = deltaT
         self.BDF1_eta0 = 1 / deltaT
@@ -98,10 +108,10 @@ class CoreBDF():
         self.BDF2_eta2 = 0.0        
 # -----------------------------------------------------------------------------
 
-    def get_BDForder2_coeffs_eta(self, idx1, idx2, diff_01):
+    def get_BDForder2_coeffs_eta(self, diff_01):
         
-        self.BDF_diff_tau[idx1] = diff_01                                       # s_{n} - s_{n-1}
-        diff_12 = self.BDF_diff_tau[idx2]                                       # s_{n-1} - s_{n-2}
+        self.BDF_diff_tau[self.buff_idx1] = diff_01                             # s_{n} - s_{n-1}
+        diff_12 = self.BDF_diff_tau[self.buff_idx2]                             # s_{n-1} - s_{n-2}
         diff_02 = diff_01 + diff_12                                             # s_{n} - s_{n-2}
 
         self.BDF2_eta0_inv = (diff_01 * diff_02) / (diff_01 + diff_02)          # inv(eta0)

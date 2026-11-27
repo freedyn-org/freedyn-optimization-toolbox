@@ -29,11 +29,10 @@ class FreeDyn(FreeDynBuffers):
         info = self.API.get_info()
         self.nDof = info.num_generalized_coordinates
         self.nConstr = info.num_lagrange_multipliers
-        self.nDofConstr = self.nDof + self.nConstr 
         self.num_time_steps = 0
         
         # System matrices and derivatives - Decision: dense or sparse layout
-        lim_val = 10 * 7
+        lim_val = 5 * 7
         if self.nDof > lim_val:
             self.MBS_modeMAT_sparse = True
             print("Matrix layout: sparse")
@@ -83,9 +82,6 @@ class FreeDyn(FreeDynBuffers):
         
     def update_sys_mat_for_BDF(self):
         self.SysMat.update_sys_mat_for_BDF(self.API)
-
-    def update_nnz_dll_sys_mat_for_BDF(self):
-        self.SysMat.update_nnz_dll_sys_mat_for_BDF(self.API)
     
     def update_sys_mat_for_consistent_BC_J(self):
         self.SysMat.update_sys_mat_for_consistent_BC_J(self.API)
@@ -114,9 +110,9 @@ class FreeDyn(FreeDynBuffers):
             self.API.set_spline(SPL, realT, Ctrl.grid_nodes[:,i])
 # -----------------------------------------------------------------------------              
             
-    def write_ctrl_dataSPL(self, Ctrl):
+    def write_ctrl_dataSPL(self, dataOpt, Ctrl):
         
-        realT = Ctrl.final_time * Ctrl.grid_tau
+        realT = dataOpt.final_time * Ctrl.grid_tau
         data = np.column_stack((realT, Ctrl.grid_nodes))
         np.savetxt(f'{self.fds_path}\\dataSPL.txt', data, fmt='%.10f')   
 
@@ -184,4 +180,4 @@ class FreeDyn(FreeDynBuffers):
     #                 break
                     
     #     self.write_fds(self.fds_path_name)
-# ----------------------------------------------------------------------------- name
+# ----------------------------------------------------------------------------- 
